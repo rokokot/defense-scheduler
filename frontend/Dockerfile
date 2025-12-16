@@ -13,6 +13,9 @@ RUN npm ci
 ARG VITE_API_URL
 ENV VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
 
+# Provide a Vite .env file so the build picks up the configured API URL
+RUN printf "VITE_API_URL=%s\n" "$VITE_API_URL" > .env.production
+
 # Copy source code
 COPY . .
 

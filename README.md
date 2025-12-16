@@ -2,6 +2,8 @@
 
 ## quick start
 
+http://134.98.159.147:3000/
+
 ### Docker (Recommended)
 ```bash
 docker-compose up --build

@@ -31,7 +31,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: http://${API_HOST:-localhost}:8000
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
     container_name: defense-scheduler-frontend
     ports:
       - "3000:80"
@@ -39,7 +39,7 @@ services:
       backend:
         condition: service_healthy
     environment:
-      - VITE_API_URL=http://${API_HOST:-localhost}:8000
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/"]

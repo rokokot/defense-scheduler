@@ -1,0 +1,246 @@
+{
+  "assignments": [
+    {
+      "assignment_id": "assign-0",
+      "entity_id": "def-1",
+      "entity_name": "Wout Piessens",
+      "resource_id": "room-10",
+      "resource_name": "Java",
+      "timeslot_id": "ts-9",
+      "day_index": 4,
+      "date": "2025-06-16",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "wout-piessens",
+        "tom-schrijvers",
+        "joost-vennekens",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-1",
+      "entity_id": "1",
+      "entity_name": "student2",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-33",
+      "day_index": 16,
+      "date": "2025-06-17",
+      "day_name": "Tuesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "student2",
+        "tom-schrijvers",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 33
+    },
+    {
+      "assignment_id": "assign-2",
+      "entity_id": "2",
+      "entity_name": "student3",
+      "resource_id": "room-10",
+      "resource_name": "Java",
+      "timeslot_id": "ts-10",
+      "day_index": 5,
+      "date": "2025-06-16",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "robin-kokot",
+        "tom-schrijvers",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    }
+  ],
+  "unscheduled": [],
+  "summary": {
+    "total": 3,
+    "scheduled": 3,
+    "unscheduled": 0
+  },
+  "utilization": {
+    "rooms": [
+      {
+        "resource": "200C 00.01",
+        "type": "room",
+        "available_hours": 24,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "200C 00.02",
+        "type": "room",
+        "available_hours": 24,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "200C 00.03",
+        "type": "room",
+        "available_hours": 24,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "200C 00.04",
+        "type": "room",
+        "available_hours": 24,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "200B 01.14",
+        "type": "room",
+        "available_hours": 24,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "200B 01.16",
+        "type": "room",
+        "available_hours": 24,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "200B 01.18",
+        "type": "room",
+        "available_hours": 24,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Ruby",
+        "type": "room",
+        "available_hours": 24,
+        "busy_hours": 1,
+        "utilization": 0.041666666666666664
+      },
+      {
+        "resource": "Python",
+        "type": "room",
+        "available_hours": 24,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Java",
+        "type": "room",
+        "available_hours": 24,
+        "busy_hours": 2,
+        "utilization": 0.08333333333333333
+      }
+    ],
+    "people": [
+      {
+        "resource": "Tom Schrijvers",
+        "type": "person",
+        "available_hours": 24,
+        "busy_hours": 3,
+        "utilization": 0.125
+      },
+      {
+        "resource": "Joost Vennekens",
+        "type": "person",
+        "available_hours": 24,
+        "busy_hours": 1,
+        "utilization": 0.041666666666666664
+      }
+    ]
+  },
+  "slack": [
+    {
+      "defense_id": 0,
+      "student": "Wout Piessens",
+      "start_slot": 9,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "Java",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Tom Schrijvers",
+          "type": "person",
+          "slack_hours": 278
+        },
+        {
+          "resource": "Joost Vennekens",
+          "type": "person",
+          "slack_hours": 278
+        }
+      ]
+    },
+    {
+      "defense_id": 1,
+      "student": "student2",
+      "start_slot": 33,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Tom Schrijvers",
+          "type": "person",
+          "slack_hours": 254
+        }
+      ]
+    },
+    {
+      "defense_id": 2,
+      "student": "robin kokot",
+      "start_slot": 10,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "Java",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Tom Schrijvers",
+          "type": "person",
+          "slack_hours": 277
+        }
+      ]
+    }
+  ],
+  "capacity_gaps": []
+}

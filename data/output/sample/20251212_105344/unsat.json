@@ -1,0 +1,188 @@
+{
+  "blocking": [
+    {
+      "defense_id": 0,
+      "student": "Wout Piessens",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        }
+      ]
+    },
+    {
+      "defense_id": 1,
+      "student": "student2",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        }
+      ]
+    },
+    {
+      "defense_id": 2,
+      "student": "robin kokot",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        }
+      ]
+    }
+  ],
+  "relax_candidates": []
+}

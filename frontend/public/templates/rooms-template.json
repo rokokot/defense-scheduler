@@ -1,0 +1,6 @@
+{
+  "rooms": [
+    { "name": "Room 101", "capacity": 1 },
+    { "name": "Room 102", "capacity": 1 }
+  ]
+}

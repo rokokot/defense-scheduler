@@ -1,0 +1,4984 @@
+{
+  "blocking": [
+    {
+      "defense_id": 11,
+      "student": "Herbert Joshua",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Danny Hughes",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            13,
+            33,
+            35,
+            37,
+            59,
+            61,
+            85,
+            106
+          ]
+        },
+        {
+          "resource": "Sam Michiels",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106
+          ]
+        },
+        {
+          "resource": "Jonathan Oostvogels",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 12,
+      "student": "Jacobs Lars",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Danny Hughes",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            13,
+            33,
+            35,
+            37,
+            59,
+            61,
+            85,
+            106
+          ]
+        },
+        {
+          "resource": "Sam Michiels",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106
+          ]
+        },
+        {
+          "resource": "Shuaibu Musa Adam",
+          "type": "person",
+          "blocked_slots": [
+            13,
+            33,
+            34,
+            35,
+            36,
+            58,
+            59,
+            60,
+            84,
+            85,
+            106,
+            107
+          ]
+        },
+        {
+          "resource": "Van Vu Bui",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            36,
+            37,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 13,
+      "student": "Mertens Flor",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Danny Hughes",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            13,
+            33,
+            35,
+            37,
+            59,
+            61,
+            85,
+            106
+          ]
+        },
+        {
+          "resource": "Sam Michiels",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106
+          ]
+        },
+        {
+          "resource": "Jonathan Oostvogels",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 15,
+      "student": "Rolly Simon",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Danny Hughes",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            13,
+            33,
+            35,
+            37,
+            59,
+            61,
+            85,
+            106
+          ]
+        },
+        {
+          "resource": "Sam Michiels",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106
+          ]
+        },
+        {
+          "resource": "Jonathan Oostvogels",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 16,
+      "student": "Soete Seppe",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Danny Hughes",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            13,
+            33,
+            35,
+            37,
+            59,
+            61,
+            85,
+            106
+          ]
+        },
+        {
+          "resource": "Sam Michiels",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106
+          ]
+        },
+        {
+          "resource": "Shuaibu Musa Adam",
+          "type": "person",
+          "blocked_slots": [
+            13,
+            33,
+            34,
+            35,
+            36,
+            58,
+            59,
+            60,
+            84,
+            85,
+            106,
+            107
+          ]
+        },
+        {
+          "resource": "Van Vu Bui",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            36,
+            37,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 18,
+      "student": "Nys Jens",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Dominique Devriese",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            12,
+            13,
+            33,
+            34,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Steven Keuchel",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Denis Carnier",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 21,
+      "student": "Clijnen Jonathan",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Frank Piessens",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            60,
+            82,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Hans Winderix",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            13,
+            33,
+            34,
+            36,
+            37,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Daan Vanoverloop",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "M\u00e1rton Bogn\u00e1r",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 23,
+      "student": "Penders Vincent",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Frank Piessens",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            60,
+            82,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "M\u00e1rton Bogn\u00e1r",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Hans Winderix",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            13,
+            33,
+            34,
+            36,
+            37,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 26,
+      "student": "Rits Beere",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Giuseppe Marra",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            12,
+            33,
+            36,
+            37,
+            57,
+            58,
+            59,
+            81,
+            82,
+            85,
+            105,
+            106,
+            109
+          ]
+        },
+        {
+          "resource": "Stefano Colamonaco",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107
+          ]
+        },
+        {
+          "resource": "David Debot",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            35,
+            36,
+            37,
+            57,
+            58,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            105,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 30,
+      "student": "Senica Dailen",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Hendrik Blockeel",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Marie Sch\u00f6nfeld",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            108
+          ]
+        },
+        {
+          "resource": "Luca Stradiotti",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            13,
+            33,
+            34,
+            35,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 31,
+      "student": "Sirbu Traian-Florin",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Hendrik Blockeel",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Stefano Viazzi",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            13,
+            34,
+            35,
+            36,
+            37,
+            58,
+            59,
+            60,
+            61,
+            82,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Simiao Lin",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            58,
+            61,
+            81,
+            82,
+            105,
+            106,
+            107,
+            108
+          ]
+        },
+        {
+          "resource": "Frederik Allaeys",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            33,
+            34,
+            37,
+            58,
+            59,
+            60,
+            83,
+            84,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 32,
+      "student": "Tan Filip",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Hendrik Blockeel",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Marie Sch\u00f6nfeld",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            108
+          ]
+        },
+        {
+          "resource": "Luca Stradiotti",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            13,
+            33,
+            34,
+            35,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 33,
+      "student": "Geybels Maarten",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Hendrik Blockeel",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Mariya Ishteva",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            13,
+            33,
+            35,
+            36,
+            57,
+            58,
+            60,
+            61,
+            81,
+            85,
+            105,
+            106,
+            107,
+            109
+          ]
+        },
+        {
+          "resource": "Joppe De Jonghe",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            58,
+            59,
+            60,
+            61,
+            81,
+            83,
+            85,
+            105,
+            106,
+            107,
+            108
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 34,
+      "student": "Hamelink Frederic",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Hendrik Blockeel",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            37,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            109
+          ]
+        },
+        {
+          "resource": "Daan Van Wesenbeeck",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            12,
+            34,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            107,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 39,
+      "student": "Braz\u00e3o Caldeira Vicente",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Jesse Davis",
+          "type": "person",
+          "blocked_slots": [
+            13,
+            37,
+            84,
+            108
+          ]
+        },
+        {
+          "resource": "Matteo Balliauw",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Pieter Robberechts",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            83,
+            84,
+            85,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Max Goldsmith",
+          "type": "person",
+          "blocked_slots": [
+            13,
+            34,
+            35,
+            84,
+            85
+          ]
+        },
+        {
+          "resource": "Maxim Wouters",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            58,
+            81,
+            82,
+            83,
+            84,
+            85,
+            107
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 41,
+      "student": "Cichomski Jan",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Jesse Davis",
+          "type": "person",
+          "blocked_slots": [
+            13,
+            37,
+            84,
+            108
+          ]
+        },
+        {
+          "resource": "Stein Aerts",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Anton De Brabandere",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            33,
+            57,
+            60,
+            61,
+            81,
+            105,
+            106,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 45,
+      "student": "Elzawawi Adham",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Jesse Davis",
+          "type": "person",
+          "blocked_slots": [
+            13,
+            37,
+            84,
+            108
+          ]
+        },
+        {
+          "resource": "Matteo Balliauw",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Lorenzo Cascioli",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            13,
+            33,
+            36,
+            37,
+            58,
+            59,
+            60,
+            61,
+            84,
+            85,
+            105,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Max Goldsmith",
+          "type": "person",
+          "blocked_slots": [
+            13,
+            34,
+            35,
+            84,
+            85
+          ]
+        },
+        {
+          "resource": "Maxim Wouters",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            58,
+            81,
+            82,
+            83,
+            84,
+            85,
+            107
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 53,
+      "student": "Wauters Kobe",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Jo Van Bulck",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            33,
+            34,
+            35,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            109
+          ]
+        },
+        {
+          "resource": "Daan Vanoverloop",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 54,
+      "student": "Andriessen Simon",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Karl Meerbergen",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            33,
+            36,
+            57,
+            60,
+            61,
+            81,
+            82,
+            83,
+            85,
+            105,
+            106,
+            109
+          ]
+        },
+        {
+          "resource": "Tjonnie Guang Feng Li",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            58,
+            59,
+            60,
+            61,
+            83,
+            84,
+            85,
+            105,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Frederik De Ceuster",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            13,
+            33,
+            36,
+            37,
+            58,
+            59,
+            61,
+            81,
+            83,
+            84,
+            85,
+            109
+          ]
+        },
+        {
+          "resource": "Arthur Offermans",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 63,
+      "student": "Borys Mikolaj",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Lieven Desmet",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            107,
+            109
+          ]
+        },
+        {
+          "resource": "Davy Preuveneers",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            13,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 67,
+      "student": "Hendrickx Anton",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Lieven Desmet",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            107,
+            109
+          ]
+        },
+        {
+          "resource": "Laurens Sion",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Jonah Bellemans",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            33,
+            37,
+            57,
+            61,
+            82,
+            84,
+            105,
+            106
+          ]
+        },
+        {
+          "resource": "Stef Verreydt",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            13,
+            33,
+            34,
+            35,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 68,
+      "student": "Ingelaere Floris",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Lieven Desmet",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            107,
+            109
+          ]
+        },
+        {
+          "resource": "Gertjan Franken",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            34,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Daan Vansteenhuyse",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            34,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 72,
+      "student": "Vangeneugden Anne",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Lieven Desmet",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            107,
+            109
+          ]
+        },
+        {
+          "resource": "Laurens Sion",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Jonah Bellemans",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            33,
+            37,
+            57,
+            61,
+            82,
+            84,
+            105,
+            106
+          ]
+        },
+        {
+          "resource": "Stef Verreydt",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            13,
+            33,
+            34,
+            35,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 76,
+      "student": "Verwimp Sander",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Luc De Raedt",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            35,
+            57,
+            58,
+            82,
+            85,
+            105
+          ]
+        },
+        {
+          "resource": "Annegret Seibt",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            12,
+            13,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            82,
+            83,
+            84,
+            85,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Vincent Derkinderen",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            35,
+            36,
+            37,
+            57,
+            59,
+            61,
+            81,
+            82,
+            83,
+            85,
+            105,
+            106,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 77,
+      "student": "Luyckx Guust",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Luc De Raedt",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            35,
+            57,
+            58,
+            82,
+            85,
+            105
+          ]
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            37,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            109
+          ]
+        },
+        {
+          "resource": "Quinten Dewulf",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 79,
+      "student": "De Almeida Prata Bernardo",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Mathias Verbeke",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            12,
+            13,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Laurens Devos",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            82,
+            83,
+            84,
+            85,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 83,
+      "student": "Pollet C\u00e9dric",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Mathy Vanhoef",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            57,
+            58,
+            81,
+            82,
+            84,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Angelos Beitis",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            34,
+            37,
+            57,
+            60,
+            61,
+            81,
+            82,
+            83,
+            85,
+            105,
+            106
+          ]
+        },
+        {
+          "resource": "Vik Vanderlinden",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            58,
+            59,
+            60,
+            61,
+            81,
+            83,
+            84,
+            85,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 100,
+      "student": "Feng Shannon",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Roel Wuyts",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            58,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Marian Verhelst",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            12,
+            13,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 114,
+      "student": "Vernaillen Alexander",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Tias Guns",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            33,
+            35,
+            37,
+            58,
+            59,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Thomas Sergeys",
+          "type": "person",
+          "blocked_slots": [
+            12,
+            13,
+            33,
+            34,
+            36,
+            37,
+            57,
+            59,
+            60,
+            61,
+            83,
+            84,
+            85,
+            106,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 132,
+      "student": "Deliever Thibaut",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Mathias Verbeke",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            12,
+            13,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            37,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            109
+          ]
+        },
+        {
+          "resource": "Ilyas Lemmens",
+          "type": "person",
+          "blocked_slots": [
+            12,
+            13,
+            36,
+            37,
+            57,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Louis Carpentier",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            57,
+            61,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 134,
+      "student": "Schoovaerts Cas",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            37,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            109
+          ]
+        },
+        {
+          "resource": "Jens B\u00fcrger",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 136,
+      "student": "Van Meulder Yani",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            37,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            109
+          ]
+        },
+        {
+          "resource": "Jens B\u00fcrger",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 138,
+      "student": "Croon Maxim",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Wouter Joosen",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            12,
+            13,
+            33,
+            35,
+            36,
+            37,
+            58,
+            60,
+            61,
+            82,
+            83,
+            84,
+            85,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Laurens Sion",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Wout Ceulemans",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Stef Verreydt",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            13,
+            33,
+            34,
+            35,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 139,
+      "student": "Cucu Stefan-C\u0103t\u0103lin",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Wouter Joosen",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            12,
+            13,
+            33,
+            35,
+            36,
+            37,
+            58,
+            60,
+            61,
+            82,
+            83,
+            84,
+            85,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Lieven Desmet",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            107,
+            109
+          ]
+        },
+        {
+          "resource": "Ilias Tsingenopoulos",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            13,
+            33,
+            35,
+            36,
+            57,
+            58,
+            59,
+            82,
+            85,
+            105,
+            106,
+            107
+          ]
+        },
+        {
+          "resource": "Vera Rimmer",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            36,
+            37,
+            57,
+            60,
+            61,
+            82,
+            83,
+            84,
+            85,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 141,
+      "student": "Guo Jiacheng",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Wouter Joosen",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            12,
+            13,
+            33,
+            35,
+            36,
+            37,
+            58,
+            60,
+            61,
+            82,
+            83,
+            84,
+            85,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Davy Preuveneers",
+          "type": "person",
+          "blocked_slots": [
+            11,
+            12,
+            13,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Javier Mart\u00ednez Llamas",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 144,
+      "student": "Koninckx Tom",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Python",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Java",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Wouter Joosen",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            12,
+            13,
+            33,
+            35,
+            36,
+            37,
+            58,
+            60,
+            61,
+            82,
+            83,
+            84,
+            85,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Laurens Sion",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            12,
+            13,
+            33,
+            34,
+            35,
+            36,
+            37,
+            57,
+            58,
+            59,
+            60,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            106,
+            107,
+            108,
+            109
+          ]
+        },
+        {
+          "resource": "Stef Verreydt",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            13,
+            33,
+            34,
+            35,
+            57,
+            58,
+            59,
+            61,
+            81,
+            82,
+            83,
+            84,
+            85,
+            105,
+            106,
+            107,
+            108,
+            109
+          ]
+        }
+      ]
+    }
+  ],
+  "relax_candidates": [
+    {
+      "resource": "Danny Hughes",
+      "type": "person",
+      "slot": 11,
+      "blocked_count": 5
+    },
+    {
+      "resource": "Danny Hughes",
+      "type": "person",
+      "slot": 12,
+      "blocked_count": 5
+    },
+    {
+      "resource": "Danny Hughes",
+      "type": "person",
+      "slot": 13,
+      "blocked_count": 5
+    },
+    {
+      "resource": "Danny Hughes",
+      "type": "person",
+      "slot": 33,
+      "blocked_count": 5
+    },
+    {
+      "resource": "Danny Hughes",
+      "type": "person",
+      "slot": 35,
+      "blocked_count": 5
+    },
+    {
+      "resource": "Danny Hughes",
+      "type": "person",
+      "slot": 37,
+      "blocked_count": 5
+    },
+    {
+      "resource": "Danny Hughes",
+      "type": "person",
+      "slot": 59,
+      "blocked_count": 5
+    },
+    {
+      "resource": "Danny Hughes",
+      "type": "person",
+      "slot": 61,
+      "blocked_count": 5
+    },
+    {
+      "resource": "Danny Hughes",
+      "type": "person",
+      "slot": 85,
+      "blocked_count": 5
+    },
+    {
+      "resource": "Danny Hughes",
+      "type": "person",
+      "slot": 106,
+      "blocked_count": 5
+    }
+  ]
+}

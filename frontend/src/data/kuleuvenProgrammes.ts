@@ -1,0 +1,481 @@
+/**
+ * KU Leuven Programmes - Faculteit Ingenieurswetenschappen
+ * 
+ */
+
+export interface Department {
+  id: string;
+  name: string;
+  nameNl: string;
+}
+
+export interface Programme {
+  id: string;
+  name: string;
+  nameNl: string;
+  type: 'Bachelor' | 'Master' | 'Master-na-master' | 'Schakelprogramma' | 'Voorbereidingsprogramma';
+  credits: number;
+  language: 'Nederlands' | 'Engels';
+  departmentId: string;
+}
+
+// dpartments F INg
+export const departments: Department[] = [
+  { id: 'arch', name: 'Architecture', nameNl: 'Architectuur' },
+  { id: 'chem', name: 'Chemical Engineering', nameNl: 'Chemische ingenieurstechnieken' },
+  { id: 'civil', name: 'Civil Engineering', nameNl: 'Burgerlijke bouwkunde' },
+  { id: 'cs', name: 'Computer Science', nameNl: 'Computerwetenschappen' },
+  { id: 'ee', name: 'Electrical Engineering', nameNl: 'Elektrotechniek' },
+  { id: 'energy', name: 'Energy', nameNl: 'Energie' },
+  { id: 'materials', name: 'Materials Engineering', nameNl: 'Materiaalkunde' },
+  { id: 'mech', name: 'Mechanical Engineering', nameNl: 'Werktuigkunde' },
+  { id: 'nano', name: 'Nanoscience and Nanotechnology', nameNl: 'Nanowetenschappen en nanotechnologie' },
+  { id: 'multi', name: 'Multidisciplinary', nameNl: 'Multidisciplinair' },
+];
+
+//  programmes 
+export const programmes: Programme[] = [
+  // bachelor
+  {
+    id: 'bach-ir-arch',
+    name: 'Bachelor in de ingenieurswetenschappen: architectuur (Leuven)',
+    nameNl: 'Bachelor in de ingenieurswetenschappen: architectuur (Leuven)',
+    type: 'Bachelor',
+    credits: 180,
+    language: 'Nederlands',
+    departmentId: 'arch',
+  },
+  {
+    id: 'bach-ir',
+    name: 'Bachelor in de ingenieurswetenschappen (Leuven)',
+    nameNl: 'Bachelor in de ingenieurswetenschappen (Leuven)',
+    type: 'Bachelor',
+    credits: 180,
+    language: 'Nederlands',
+    departmentId: 'multi',
+  },
+
+  // Master programmes
+  {
+    id: 'ma-ir-arch',
+    name: 'Master in de ingenieurswetenschappen: architectuur (Leuven)',
+    nameNl: 'Master in de ingenieurswetenschappen: architectuur (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'arch',
+  },
+  {
+    id: 'ma-ir-ai',
+    name: 'Master in de ingenieurswetenschappen: artificiële intelligentie (Leuven)',
+    nameNl: 'Master in de ingenieurswetenschappen: artificiële intelligentie (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'cs',
+  },
+  {
+    id: 'ma-ir-bio',
+    name: 'Master in de ingenieurswetenschappen: biomedische technologie (Leuven)',
+    nameNl: 'Master in de ingenieurswetenschappen: biomedische technologie (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'multi',
+  },
+  {
+    id: 'ma-ir-bouw',
+    name: 'Master in de ingenieurswetenschappen: bouwkunde (Leuven)',
+    nameNl: 'Master in de ingenieurswetenschappen: bouwkunde (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'civil',
+  },
+  {
+    id: 'ma-ir-chem',
+    name: 'Master in de ingenieurswetenschappen: chemische technologie (Leuven)',
+    nameNl: 'Master in de ingenieurswetenschappen: chemische technologie (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'chem',
+  },
+  {
+    id: 'ma-ir-cs',
+    name: 'Master in de ingenieurswetenschappen: computerwetenschappen (Leuven)',
+    nameNl: 'Master in de ingenieurswetenschappen: computerwetenschappen (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'cs',
+  },
+  {
+    id: 'ma-ir-ee',
+    name: 'Master in de ingenieurswetenschappen: elektrotechniek (Leuven)',
+    nameNl: 'Master in de ingenieurswetenschappen: elektrotechniek (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'ee',
+  },
+  {
+    id: 'ma-ir-energy',
+    name: 'Master in de ingenieurswetenschappen: energie (Leuven)',
+    nameNl: 'Master in de ingenieurswetenschappen: energie (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'energy',
+  },
+  {
+    id: 'ma-ir-materials',
+    name: 'Master in de ingenieurswetenschappen: materiaalkunde (Leuven)',
+    nameNl: 'Master in de ingenieurswetenschappen: materiaalkunde (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'materials',
+  },
+  {
+    id: 'ma-ir-nano',
+    name: 'Master in de nanowetenschappen, nanotechnologie en nano-engineering (Leuven)',
+    nameNl: 'Master in de nanowetenschappen, nanotechnologie en nano-engineering (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'nano',
+  },
+  {
+    id: 'ma-ir-mech',
+    name: 'Master in de ingenieurswetenschappen: wiskundige ingenieurstechnieken (Leuven)',
+    nameNl: 'Master in de ingenieurswetenschappen: wiskundige ingenieurstechnieken (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'multi',
+  },
+  {
+    id: 'ma-ir-werktuig',
+    name: 'Master in de ingenieurswetenschappen: werktuigkunde (Leuven)',
+    nameNl: 'Master in de ingenieurswetenschappen: werktuigkunde (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'mech',
+  },
+
+  // English Master programmes
+  {
+    id: 'ma-eng-ai',
+    name: 'Master of Artificial Intelligence (Leuven)',
+    nameNl: 'Master of Artificial Intelligence (Leuven)',
+    type: 'Master',
+    credits: 60,
+    language: 'Engels',
+    departmentId: 'cs',
+  },
+  {
+    id: 'ma-eng-biomed',
+    name: 'Master of Biomedical Engineering (Leuven)',
+    nameNl: 'Master of Biomedical Engineering (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Engels',
+    departmentId: 'multi',
+  },
+  {
+    id: 'ma-eng-chem',
+    name: 'Master of Chemical Engineering (Leuven)',
+    nameNl: 'Master of Chemical Engineering (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Engels',
+    departmentId: 'chem',
+  },
+  {
+    id: 'ma-eng-civil',
+    name: 'Master of Civil Engineering (Leuven)',
+    nameNl: 'Master of Civil Engineering (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Engels',
+    departmentId: 'civil',
+  },
+  {
+    id: 'ma-eng-monuments',
+    name: 'Master of Conservation of Monuments and Sites (Leuven)',
+    nameNl: 'Master of Conservation of Monuments and Sites (Leuven)',
+    type: 'Master',
+    credits: 90,
+    language: 'Engels',
+    departmentId: 'arch',
+  },
+  {
+    id: 'ma-eng-cyber',
+    name: 'Master of Cybersecurity (Leuven)',
+    nameNl: 'Master of Cybersecurity (Leuven)',
+    type: 'Master',
+    credits: 60,
+    language: 'Engels',
+    departmentId: 'cs',
+  },
+  {
+    id: 'ma-eng-digital-hum',
+    name: 'Master of Digital Humanities (Leuven)',
+    nameNl: 'Master of Digital Humanities (Leuven)',
+    type: 'Master',
+    credits: 60,
+    language: 'Engels',
+    departmentId: 'cs',
+  },
+  {
+    id: 'ma-eng-ee',
+    name: 'Master of Electrical Engineering (Leuven)',
+    nameNl: 'Master of Electrical Engineering (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Engels',
+    departmentId: 'ee',
+  },
+  {
+    id: 'ma-eng-energy',
+    name: 'Master of Engineering: Energy (Leuven)',
+    nameNl: 'Master of Engineering: Energy (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Engels',
+    departmentId: 'energy',
+  },
+  {
+    id: 'ma-eng-human-settle',
+    name: 'Master of Human Settlements (Leuven)',
+    nameNl: 'Master of Human Settlements (Leuven)',
+    type: 'Master',
+    credits: 60,
+    language: 'Engels',
+    departmentId: 'arch',
+  },
+  {
+    id: 'ma-eng-materials',
+    name: 'Master of Materials Engineering (Leuven)',
+    nameNl: 'Master of Materials Engineering (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Engels',
+    departmentId: 'materials',
+  },
+  {
+    id: 'ma-eng-math',
+    name: 'Master of Mathematical Engineering (Leuven)',
+    nameNl: 'Master of Mathematical Engineering (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Engels',
+    departmentId: 'multi',
+  },
+  {
+    id: 'ma-eng-mech',
+    name: 'Master of Mechanical Engineering (Leuven)',
+    nameNl: 'Master of Mechanical Engineering (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Engels',
+    departmentId: 'mech',
+  },
+  {
+    id: 'ma-eng-mobility',
+    name: 'Master in de ingenieurswetenschappen: mobiliteit en supply chain (Leuven)',
+    nameNl: 'Master in de ingenieurswetenschappen: mobiliteit en supply chain (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Nederlands',
+    departmentId: 'multi',
+  },
+  {
+    id: 'ma-eng-mobility-en',
+    name: 'Master of Mobility and Supply Chain Engineering (Leuven)',
+    nameNl: 'Master of Mobility and Supply Chain Engineering (Leuven)',
+    type: 'Master',
+    credits: 64,
+    language: 'Engels',
+    departmentId: 'multi',
+  },
+  {
+    id: 'ma-eng-nano',
+    name: 'Master of Nanoscience, Nanotechnology and Nanoengineering (Leuven)',
+    nameNl: 'Master of Nanoscience, Nanotechnology and Nanoengineering (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Engels',
+    departmentId: 'nano',
+  },
+  {
+    id: 'ma-eng-nuclear',
+    name: 'Master of Nuclear Engineering (Leuven et al)',
+    nameNl: 'Master of Nuclear Engineering (Leuven et al)',
+    type: 'Master',
+    credits: 60,
+    language: 'Engels',
+    departmentId: 'energy',
+  },
+  {
+    id: 'ma-eng-safety',
+    name: 'Master of Safety Engineering (Leuven)',
+    nameNl: 'Master of Safety Engineering (Leuven)',
+    type: 'Master',
+    credits: 60,
+    language: 'Engels',
+    departmentId: 'multi',
+  },
+  {
+    id: 'ma-eng-urban',
+    name: 'Master of Urbanism, Landscape and Planning (Leuven)',
+    nameNl: 'Master of Urbanism, Landscape and Planning (Leuven)',
+    type: 'Master',
+    credits: 120,
+    language: 'Engels',
+    departmentId: 'arch',
+  },
+  {
+    id: 'eit-kic-energy',
+    name: 'EIT-KIC Master in Energy (Leuven et al)',
+    nameNl: 'EIT-KIC Master in Energy (Leuven et al)',
+    type: 'Master',
+    credits: 120,
+    language: 'Engels',
+    departmentId: 'energy',
+  },
+  {
+    id: 'erasmus-nano',
+    name: 'Erasmus Mundus Master of Science in Nanoscience and Nanotechnology (Leuven en Grenoble)',
+    nameNl: 'Erasmus Mundus Master of Science in Nanoscience and Nanotechnology (Leuven en Grenoble)',
+    type: 'Master',
+    credits: 120,
+    language: 'Engels',
+    departmentId: 'nano',
+  },
+
+  // Voorbereidingsprogramma (Preparatory programmes)
+  {
+    id: 'vb-ir-ai',
+    name: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: artificiële intelligentie (Leuven)",
+    nameNl: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: artificiële intelligentie (Leuven)",
+    type: 'Voorbereidingsprogramma',
+    credits: 47,
+    language: 'Nederlands',
+    departmentId: 'cs',
+  },
+  {
+    id: 'vb-ir-bio',
+    name: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: biomedische technologie (Leuven)",
+    nameNl: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: biomedische technologie (Leuven)",
+    type: 'Voorbereidingsprogramma',
+    credits: 77,
+    language: 'Nederlands',
+    departmentId: 'multi',
+  },
+  {
+    id: 'vb-ir-bouw',
+    name: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: bouwkunde (Leuven)",
+    nameNl: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: bouwkunde (Leuven)",
+    type: 'Voorbereidingsprogramma',
+    credits: 60,
+    language: 'Nederlands',
+    departmentId: 'civil',
+  },
+  {
+    id: 'vb-ir-chem',
+    name: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: chemische technologie (Leuven)",
+    nameNl: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: chemische technologie (Leuven)",
+    type: 'Voorbereidingsprogramma',
+    credits: 60,
+    language: 'Nederlands',
+    departmentId: 'chem',
+  },
+  {
+    id: 'vb-ir-cs',
+    name: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: computerwetenschappen (Leuven)",
+    nameNl: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: computerwetenschappen (Leuven)",
+    type: 'Voorbereidingsprogramma',
+    credits: 64,
+    language: 'Nederlands',
+    departmentId: 'cs',
+  },
+  {
+    id: 'vb-ir-ee',
+    name: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: elektrotechniek (Leuven)",
+    nameNl: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: elektrotechniek (Leuven)",
+    type: 'Voorbereidingsprogramma',
+    credits: 60,
+    language: 'Nederlands',
+    departmentId: 'ee',
+  },
+  {
+    id: 'vb-ir-energy',
+    name: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: energie (Leuven)",
+    nameNl: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: energie (Leuven)",
+    type: 'Voorbereidingsprogramma',
+    credits: 60,
+    language: 'Nederlands',
+    departmentId: 'energy',
+  },
+  {
+    id: 'vb-ir-materials',
+    name: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: materiaalkunde (Leuven)",
+    nameNl: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: materiaalkunde (Leuven)",
+    type: 'Voorbereidingsprogramma',
+    credits: 60,
+    language: 'Nederlands',
+    departmentId: 'materials',
+  },
+  {
+    id: 'vb-ir-mobility',
+    name: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: mobiliteit en supply chain (Leuven)",
+    nameNl: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: mobiliteit en supply chain (Leuven)",
+    type: 'Voorbereidingsprogramma',
+    credits: 64,
+    language: 'Nederlands',
+    departmentId: 'multi',
+  },
+  {
+    id: 'vb-ir-nano',
+    name: "Voorbereidingsprogramma: Master in de nanowetenschappen, nanotechnologie en nano-engineering (Leuven)",
+    nameNl: "Voorbereidingsprogramma: Master in de nanowetenschappen, nanotechnologie en nano-engineering (Leuven)",
+    type: 'Voorbereidingsprogramma',
+    credits: 60,
+    language: 'Nederlands',
+    departmentId: 'nano',
+  },
+  {
+    id: 'vb-ir-werktuig',
+    name: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: werktuigkunde (Leuven)",
+    nameNl: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: werktuigkunde (Leuven)",
+    type: 'Voorbereidingsprogramma',
+    credits: 29,
+    language: 'Nederlands',
+    departmentId: 'mech',
+  },
+  {
+    id: 'vb-ir-math',
+    name: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: wiskundige ingenieurstechnieken (Leuven)",
+    nameNl: "Voorbereidingsprogramma: Master in de ingenieurswetenschappen: wiskundige ingenieurstechnieken (Leuven)",
+    type: 'Voorbereidingsprogramma',
+    credits: 60,
+    language: 'Nederlands',
+    departmentId: 'multi',
+  },
+];
+
+// helper functions
+export function getProgrammesByDepartment(departmentId: string): Programme[] {
+  return programmes.filter(p => p.departmentId === departmentId);
+}
+
+export function getProgrammesByType(type: Programme['type']): Programme[] {
+  return programmes.filter(p => p.type === type);
+}
+
+export function getProgrammesByLanguage(language: 'Nederlands' | 'Engels'): Programme[] {
+  return programmes.filter(p => p.language === language);
+}

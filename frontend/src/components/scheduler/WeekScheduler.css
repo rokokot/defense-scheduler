@@ -1,0 +1,294 @@
+/* Week Scheduler Component - Course-Centric */
+
+.week-scheduler {
+  --sched-bg-primary: #1a1a2e;
+  --sched-bg-secondary: #16213e;
+  --sched-bg-tertiary: #0f3460;
+  --sched-border: #2d3561;
+  --sched-text-primary: #eaeaea;
+  --sched-text-secondary: #a0a0a0;
+  --sched-text-muted: #606060;
+  --sched-event-bg: #3b82f6;
+  --sched-event-hover: #60a5fa;
+  --sched-event-selected: #2563eb;
+  --sched-event-text: #ffffff;
+  --sched-grid-line: #2a2a3e;
+  --sched-header-bg: #0f3460;
+
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  background: var(--sched-bg-primary);
+  color: var(--sched-text-primary);
+  position: relative;
+}
+
+/* Light theme */
+.week-scheduler--light {
+  --sched-bg-primary: #ffffff;
+  --sched-bg-secondary: #f8f9fa;
+  --sched-bg-tertiary: #e9ecef;
+  --sched-border: #dee2e6;
+  --sched-text-primary: #212529;
+  --sched-text-secondary: #6c757d;
+  --sched-text-muted: #adb5bd;
+  --sched-event-bg: #3b82f6;
+  --sched-event-hover: #60a5fa;
+  --sched-event-selected: #2563eb;
+  --sched-event-text: #ffffff;
+  --sched-grid-line: #e9ecef;
+  --sched-header-bg: #f1f3f5;
+}
+
+/* Header */
+.scheduler-header {
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--sched-header-bg);
+  border-bottom: 2px solid var(--sched-border);
+}
+
+.course-label-col {
+  width: 240px;
+  min-width: 240px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--sched-border);
+  background: var(--sched-bg-secondary);
+}
+
+.corner-cell {
+  padding: 18px 20px;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--sched-text-secondary);
+  border-bottom: 1px solid var(--sched-border);
+}
+
+.day-header {
+  flex-shrink: 0;
+  border-right: 1px solid var(--sched-border);
+  background: var(--sched-bg-secondary);
+}
+
+.day-name {
+  padding: 14px 20px;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
+  color: var(--sched-text-primary);
+  border-bottom: 1px solid var(--sched-border);
+  white-space: nowrap;
+}
+
+.time-labels {
+  position: relative;
+  height: 40px;
+  background: var(--sched-bg-tertiary);
+  padding-top: 4px;
+}
+
+.time-label {
+  position: absolute;
+  top: 12px;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: var(--sched-text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0 4px;
+  background: var(--sched-bg-tertiary);
+}
+
+/* Body */
+.scheduler-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.course-row {
+  display: flex;
+  border-bottom: 1px solid var(--sched-border);
+  background: var(--sched-bg-primary);
+  transition: background-color 0.15s ease;
+  min-height: 60px;
+}
+
+.course-row:hover {
+  background: var(--sched-bg-secondary);
+}
+
+.course-label {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.course-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--sched-text-primary);
+  margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+.course-meta {
+  font-size: 12px;
+  color: var(--sched-text-secondary);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.day-cell {
+  position: relative;
+  border-right: 1px solid var(--sched-border);
+  flex-shrink: 0;
+}
+
+.day-cell::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: -1px; /* Extend to cover the border */
+  bottom: 0;
+  background-position: 0 0;
+  background-size: 120px 100%;
+  background-repeat: repeat-x;
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      transparent 0px,
+      transparent 119px,
+      var(--sched-grid-line) 119px,
+      var(--sched-grid-line) 120px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.day-cell:hover {
+  background-color: rgba(59, 130, 246, 0.02);
+}
+
+/* Events */
+.event {
+  position: absolute;
+  border-radius: 6px;
+  background: var(--sched-event-bg);
+  color: var(--sched-event-text);
+  padding: 10px 12px;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 4px solid rgba(255, 255, 255, 0.5);
+  user-select: none;
+  min-height: 48px;
+  z-index: 1; /* Ensure events render above grid lines */
+}
+
+.event:hover {
+  background: var(--sched-event-hover);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transform: translateY(-2px);
+  z-index: 5;
+}
+
+.event--selected {
+  background: var(--sched-event-selected);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
+  z-index: 6;
+  transform: translateY(-1px);
+}
+
+.event--dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.event-title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.event-time {
+  font-size: 11px;
+  opacity: 0.98;
+  font-weight: 600;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Scrollbar styling */
+.week-scheduler::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+.week-scheduler::-webkit-scrollbar-track {
+  background: var(--sched-bg-secondary);
+  border-radius: 8px;
+}
+
+.week-scheduler::-webkit-scrollbar-thumb {
+  background: var(--sched-border);
+  border-radius: 8px;
+  border: 3px solid var(--sched-bg-secondary);
+}
+
+.week-scheduler::-webkit-scrollbar-thumb:hover {
+  background: var(--sched-text-muted);
+}
+
+.week-scheduler::-webkit-scrollbar-corner {
+  background: var(--sched-bg-secondary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .course-label-col {
+    width: 160px;
+    min-width: 160px;
+  }
+
+  .course-label {
+    padding: 10px 12px;
+  }
+
+  .course-name {
+    font-size: 11px;
+  }
+
+  .course-meta {
+    font-size: 9px;
+  }
+
+  .event-title {
+    font-size: 10px;
+  }
+
+  .event-time {
+    font-size: 8px;
+  }
+
+  .time-label {
+    font-size: 9px;
+  }
+}

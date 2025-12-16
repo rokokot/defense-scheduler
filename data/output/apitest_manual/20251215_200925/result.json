@@ -1,0 +1,257 @@
+{
+  "assignments": [
+    {
+      "assignment_id": "assign-0",
+      "entity_id": "def-1",
+      "entity_name": "Thesis 1",
+      "resource_id": "room-2",
+      "resource_name": "Room 102",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-01-01",
+      "day_name": "Wednesday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "thesis-1",
+        "prof-a",
+        "nan",
+        "assessor-x",
+        "assessor-y",
+        "mentor-1",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-1",
+      "entity_id": "def-2",
+      "entity_name": "Thesis 2",
+      "resource_id": "room-2",
+      "resource_name": "Room 102",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-01-01",
+      "day_name": "Wednesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "thesis-2",
+        "prof-b",
+        "nan",
+        "assessor-x",
+        "assessor-z",
+        "mentor-2",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-2",
+      "entity_id": "defence-1765542020775",
+      "entity_name": "New Defense",
+      "resource_id": "room-2",
+      "resource_name": "Room 102",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2025-01-01",
+      "day_name": "Wednesday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "new-student",
+        "supervisor-tbd",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    }
+  ],
+  "unscheduled": [],
+  "summary": {
+    "total": 3,
+    "scheduled": 3,
+    "unscheduled": 0
+  },
+  "utilization": {
+    "rooms": [
+      {
+        "resource": "Room 101",
+        "type": "room",
+        "available_hours": 14,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Room 102",
+        "type": "room",
+        "available_hours": 14,
+        "busy_hours": 3,
+        "utilization": 0.21428571428571427
+      }
+    ],
+    "people": [
+      {
+        "resource": "Prof A",
+        "type": "person",
+        "available_hours": 13,
+        "busy_hours": 1,
+        "utilization": 0.07692307692307693
+      },
+      {
+        "resource": "Prof B",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 1,
+        "utilization": 0.07142857142857142
+      },
+      {
+        "resource": "Supervisor TBD",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 1,
+        "utilization": 0.07142857142857142
+      },
+      {
+        "resource": "Assessor X",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 2,
+        "utilization": 0.14285714285714285
+      },
+      {
+        "resource": "Assessor Y",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 1,
+        "utilization": 0.07142857142857142
+      },
+      {
+        "resource": "Assessor Z",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 1,
+        "utilization": 0.07142857142857142
+      },
+      {
+        "resource": "Mentor 1",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 1,
+        "utilization": 0.07142857142857142
+      },
+      {
+        "resource": "Mentor 2",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 1,
+        "utilization": 0.07142857142857142
+      }
+    ]
+  },
+  "slack": [
+    {
+      "defense_id": 0,
+      "student": "Thesis 1",
+      "start_slot": 10,
+      "min_slack_hours": 5,
+      "by_resource": [
+        {
+          "resource": "Room 102",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Prof A",
+          "type": "person",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Assessor X",
+          "type": "person",
+          "slack_hours": 37
+        },
+        {
+          "resource": "Assessor Y",
+          "type": "person",
+          "slack_hours": 37
+        },
+        {
+          "resource": "Mentor 1",
+          "type": "person",
+          "slack_hours": 37
+        }
+      ]
+    },
+    {
+      "defense_id": 1,
+      "student": "Thesis 2",
+      "start_slot": 9,
+      "min_slack_hours": 6,
+      "by_resource": [
+        {
+          "resource": "Room 102",
+          "type": "room",
+          "slack_hours": 6
+        },
+        {
+          "resource": "Prof B",
+          "type": "person",
+          "slack_hours": 38
+        },
+        {
+          "resource": "Assessor X",
+          "type": "person",
+          "slack_hours": 38
+        },
+        {
+          "resource": "Assessor Z",
+          "type": "person",
+          "slack_hours": 38
+        },
+        {
+          "resource": "Mentor 2",
+          "type": "person",
+          "slack_hours": 38
+        }
+      ]
+    },
+    {
+      "defense_id": 2,
+      "student": "New Student",
+      "start_slot": 11,
+      "min_slack_hours": 4,
+      "by_resource": [
+        {
+          "resource": "Room 102",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Supervisor TBD",
+          "type": "person",
+          "slack_hours": 36
+        }
+      ]
+    }
+  ],
+  "capacity_gaps": []
+}

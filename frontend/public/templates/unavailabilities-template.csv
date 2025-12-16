@@ -1,0 +1,3 @@
+name,type,day,start_time,end_time,status
+Prof. Alice,person,2025-06-16,09:00,12:00,unavailable
+Room 101,room,2025-06-16,09:00,10:00,booked

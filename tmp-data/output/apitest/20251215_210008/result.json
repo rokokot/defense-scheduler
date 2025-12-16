@@ -1,0 +1,115 @@
+{
+  "assignments": [
+    {
+      "assignment_id": "assign-0",
+      "entity_id": "def-1",
+      "entity_name": "Thesis 1",
+      "resource_id": "room-1",
+      "resource_name": "Room 101",
+      "timeslot_id": "ts-10",
+      "day_index": 5,
+      "date": "2025-01-01",
+      "day_name": "Wednesday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "thesis-1",
+        "prof-a",
+        "nan",
+        "assessor-x",
+        "assessor-y",
+        "mentor1",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    }
+  ],
+  "unscheduled": [],
+  "summary": {
+    "total": 1,
+    "scheduled": 1,
+    "unscheduled": 0
+  },
+  "utilization": {
+    "rooms": [
+      {
+        "resource": "Room 101",
+        "type": "room",
+        "available_hours": 2,
+        "busy_hours": 1,
+        "utilization": 0.5
+      }
+    ],
+    "people": [
+      {
+        "resource": "Prof A",
+        "type": "person",
+        "available_hours": 1,
+        "busy_hours": 1,
+        "utilization": 1.0
+      },
+      {
+        "resource": "Assessor X",
+        "type": "person",
+        "available_hours": 2,
+        "busy_hours": 1,
+        "utilization": 0.5
+      },
+      {
+        "resource": "Assessor Y",
+        "type": "person",
+        "available_hours": 2,
+        "busy_hours": 1,
+        "utilization": 0.5
+      },
+      {
+        "resource": "Mentor1",
+        "type": "person",
+        "available_hours": 2,
+        "busy_hours": 1,
+        "utilization": 0.5
+      }
+    ]
+  },
+  "slack": [
+    {
+      "defense_id": 0,
+      "student": "Thesis 1",
+      "start_slot": 10,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "Room 101",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Prof A",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Assessor X",
+          "type": "person",
+          "slack_hours": 13
+        },
+        {
+          "resource": "Assessor Y",
+          "type": "person",
+          "slack_hours": 13
+        },
+        {
+          "resource": "Mentor1",
+          "type": "person",
+          "slack_hours": 13
+        }
+      ]
+    }
+  ],
+  "capacity_gaps": []
+}

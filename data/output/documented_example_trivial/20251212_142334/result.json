@@ -1,0 +1,417 @@
+{
+  "assignments": [
+    {
+      "assignment_id": "assign-0",
+      "entity_id": "def-1",
+      "entity_name": "Interactions between Kolmogorov Arnold networks and tensor decompositions",
+      "resource_id": "room-10",
+      "resource_name": "Java",
+      "timeslot_id": "ts-11",
+      "day_index": 3,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "rochkoulets-maxime",
+        "hendrik-blockeel",
+        "wannes-meert",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    },
+    {
+      "assignment_id": "assign-1",
+      "entity_id": "def-2",
+      "entity_name": "Tricking AI: comparison of adversarial examples",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-10",
+      "day_index": 3,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "senica-dailen",
+        "hendrik-blockeel",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-2",
+      "entity_id": "def-3",
+      "entity_name": "Semi-supervised classification of IoT failure Data",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-9",
+      "day_index": 3,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "sirbu-traian-florin",
+        "stefano-viazzi",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-3",
+      "entity_id": "def-4",
+      "entity_name": "Tricking AI: comparison of adversarial examples",
+      "resource_id": "room-10",
+      "resource_name": "Java",
+      "timeslot_id": "ts-10",
+      "day_index": 3,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "demuynck-dieter",
+        "stefano-viazzi",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-4",
+      "entity_id": "def-5",
+      "entity_name": "Decomposing KAN networks: A tensor decomposition analysis of Kolmogorov-Arnold neural networks",
+      "resource_id": "room-7",
+      "resource_name": "200B 01.18",
+      "timeslot_id": "ts-10",
+      "day_index": 3,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "geybels-maarten",
+        "mariya-ishteva",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-5",
+      "entity_id": "def-6",
+      "entity_name": "Time series motif discovery: the faster the better",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-9",
+      "day_index": 3,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "hamelink-frederic",
+        "mariya-ishteva",
+        "wannes-meert",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    }
+  ],
+  "unscheduled": [],
+  "summary": {
+    "total": 6,
+    "scheduled": 6,
+    "unscheduled": 0
+  },
+  "utilization": {
+    "rooms": [
+      {
+        "resource": "200C 00.01",
+        "type": "room",
+        "available_hours": 9,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "200C 00.02",
+        "type": "room",
+        "available_hours": 9,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "200C 00.03",
+        "type": "room",
+        "available_hours": 9,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "200C 00.04",
+        "type": "room",
+        "available_hours": 9,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "200B 01.14",
+        "type": "room",
+        "available_hours": 9,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "200B 01.16",
+        "type": "room",
+        "available_hours": 9,
+        "busy_hours": 2,
+        "utilization": 0.2222222222222222
+      },
+      {
+        "resource": "200B 01.18",
+        "type": "room",
+        "available_hours": 9,
+        "busy_hours": 1,
+        "utilization": 0.1111111111111111
+      },
+      {
+        "resource": "Ruby",
+        "type": "room",
+        "available_hours": 9,
+        "busy_hours": 1,
+        "utilization": 0.1111111111111111
+      },
+      {
+        "resource": "Python",
+        "type": "room",
+        "available_hours": 9,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Java",
+        "type": "room",
+        "available_hours": 9,
+        "busy_hours": 2,
+        "utilization": 0.2222222222222222
+      }
+    ],
+    "people": [
+      {
+        "resource": "Demuynck Dieter",
+        "type": "person",
+        "available_hours": 7,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Hamelink Frederic",
+        "type": "person",
+        "available_hours": 8,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Hendrik Blockeel",
+        "type": "person",
+        "available_hours": 9,
+        "busy_hours": 2,
+        "utilization": 0.2222222222222222
+      },
+      {
+        "resource": "Stefano Viazzi",
+        "type": "person",
+        "available_hours": 9,
+        "busy_hours": 2,
+        "utilization": 0.2222222222222222
+      },
+      {
+        "resource": "Mariya Ishteva",
+        "type": "person",
+        "available_hours": 9,
+        "busy_hours": 2,
+        "utilization": 0.2222222222222222
+      },
+      {
+        "resource": "Wannes Meert",
+        "type": "person",
+        "available_hours": 9,
+        "busy_hours": 2,
+        "utilization": 0.2222222222222222
+      }
+    ]
+  },
+  "slack": [
+    {
+      "defense_id": 0,
+      "student": "Rochkoulets Maxime",
+      "start_slot": 11,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "Java",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Hendrik Blockeel",
+          "type": "person",
+          "slack_hours": 60
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "slack_hours": 60
+        }
+      ]
+    },
+    {
+      "defense_id": 1,
+      "student": "Senica Dailen",
+      "start_slot": 10,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Hendrik Blockeel",
+          "type": "person",
+          "slack_hours": 61
+        }
+      ]
+    },
+    {
+      "defense_id": 2,
+      "student": "Sirbu Traian-Florin",
+      "start_slot": 9,
+      "min_slack_hours": 2,
+      "by_resource": [
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Stefano Viazzi",
+          "type": "person",
+          "slack_hours": 62
+        }
+      ]
+    },
+    {
+      "defense_id": 3,
+      "student": "Demuynck Dieter",
+      "start_slot": 10,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "Java",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Stefano Viazzi",
+          "type": "person",
+          "slack_hours": 61
+        }
+      ]
+    },
+    {
+      "defense_id": 4,
+      "student": "Geybels Maarten",
+      "start_slot": 10,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Mariya Ishteva",
+          "type": "person",
+          "slack_hours": 61
+        }
+      ]
+    },
+    {
+      "defense_id": 5,
+      "student": "Hamelink Frederic",
+      "start_slot": 9,
+      "min_slack_hours": 2,
+      "by_resource": [
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Mariya Ishteva",
+          "type": "person",
+          "slack_hours": 62
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "slack_hours": 62
+        }
+      ]
+    }
+  ],
+  "capacity_gaps": []
+}

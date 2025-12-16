@@ -1,0 +1,57 @@
+# OS/editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Python backend
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.venv/
+.env
+.env.*
+
+# Node/TS frontend
+node_modules/
+dist/
+.turbo/
+.vite/
+coverage/
+storybook-static/
+*.timestamp-*.mjs
+
+# Storybook docs builds (keep sources)
+docs/storybook_docs/**/dist/
+docs/storybook_docs/**/.cache/
+docs/*
+
+# App outputs & screenshots
+frontend/screenshots/
+backend/**/outputs/
+**/tmp/
+**/temp/
+
+# Data: keep READMEs + samples or explicitly whitelisted fixtures
+data/**
+!data/**/README.md
+!data/**/samples/**
+# example allowlist for tiny json fixtures (optional)
+!data/exam_spec_v1/**/*.json
+!data/exam_scheduling/**/*.json
+
+# Logs
+*.log
+.claude
+
+# Build artifacts
+vite.config.ts.timestamp*
+
+# Git worktrees
+.worktrees/
+

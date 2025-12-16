@@ -1,0 +1,100 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+backend/.venv/
+solver/.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Logs
+*.log
+logs/
+uvicorn*.log
+
+# Node / Frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/build/
+*.tsbuildinfo
+.npm
+.eslintcache
+
+# Data directories (session data, temporary files)
+data/sessions/
+data/uploads/
+data/output/*/solver_state*.json
+data/output/*/schedule*.json
+data/snapshots/*.json
+
+# Keep data structure but ignore large generated files
+!data/input/
+!data/output/
+data/**/*.db
+data/**/*.sqlite
+
+# Backend temporary files
+backend/tmp_*.json
+backend/output_data/**/*.json
+backend/output_data/**/*.csv
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Docker
+.dockerignore
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Keep README files
+!**/README.md
+!**/.gitkeep

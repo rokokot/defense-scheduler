@@ -1,0 +1,254 @@
+{
+  "assignments": [
+    {
+      "assignment_id": "assign-0",
+      "entity_id": "def-001",
+      "entity_name": "Adaptive Sensing for Mobile Robots",
+      "resource_id": "room-3",
+      "resource_name": "Room 3",
+      "timeslot_id": "ts-8",
+      "day_index": 0,
+      "date": "2025-06-10",
+      "day_name": "Tuesday",
+      "start_time": "08:00",
+      "end_time": "09:00",
+      "participant_ids": [
+        "alex-example",
+        "prof--l--gomez",
+        "dr--u--chen",
+        "dr--e--marcel",
+        "dr--f--day",
+        "mentor-yuki",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 8
+    },
+    {
+      "assignment_id": "assign-1",
+      "entity_id": "def-002",
+      "entity_name": "Secure Federated Analytics",
+      "resource_id": "room-2",
+      "resource_name": "Room 2",
+      "timeslot_id": "ts-8",
+      "day_index": 0,
+      "date": "2025-06-10",
+      "day_name": "Tuesday",
+      "start_time": "08:00",
+      "end_time": "09:00",
+      "participant_ids": [
+        "riley-rivera",
+        "prof--k--nouri",
+        "dr--p--jain",
+        "dr--m--ito",
+        "dr--g--singh",
+        "mentor-omar",
+        "mentor-nina",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 8
+    }
+  ],
+  "unscheduled": [],
+  "summary": {
+    "total": 2,
+    "scheduled": 2,
+    "unscheduled": 0
+  },
+  "utilization": {
+    "rooms": [
+      {
+        "resource": "Room 1",
+        "type": "room",
+        "available_hours": 45,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Room 2",
+        "type": "room",
+        "available_hours": 45,
+        "busy_hours": 1,
+        "utilization": 0.022222222222222223
+      },
+      {
+        "resource": "Room 3",
+        "type": "room",
+        "available_hours": 45,
+        "busy_hours": 1,
+        "utilization": 0.022222222222222223
+      }
+    ],
+    "people": [
+      {
+        "resource": "Mentor Yuki",
+        "type": "person",
+        "available_hours": 43,
+        "busy_hours": 1,
+        "utilization": 0.023255813953488372
+      },
+      {
+        "resource": "Prof. L. Gomez",
+        "type": "person",
+        "available_hours": 42,
+        "busy_hours": 1,
+        "utilization": 0.023809523809523808
+      },
+      {
+        "resource": "Prof. K. Nouri",
+        "type": "person",
+        "available_hours": 45,
+        "busy_hours": 1,
+        "utilization": 0.022222222222222223
+      },
+      {
+        "resource": "Dr. U. Chen",
+        "type": "person",
+        "available_hours": 45,
+        "busy_hours": 1,
+        "utilization": 0.022222222222222223
+      },
+      {
+        "resource": "Dr. P. Jain",
+        "type": "person",
+        "available_hours": 45,
+        "busy_hours": 1,
+        "utilization": 0.022222222222222223
+      },
+      {
+        "resource": "Dr. E. Marcel",
+        "type": "person",
+        "available_hours": 45,
+        "busy_hours": 1,
+        "utilization": 0.022222222222222223
+      },
+      {
+        "resource": "Dr. M. Ito",
+        "type": "person",
+        "available_hours": 45,
+        "busy_hours": 1,
+        "utilization": 0.022222222222222223
+      },
+      {
+        "resource": "Dr. F. Day",
+        "type": "person",
+        "available_hours": 45,
+        "busy_hours": 1,
+        "utilization": 0.022222222222222223
+      },
+      {
+        "resource": "Dr. G. Singh",
+        "type": "person",
+        "available_hours": 45,
+        "busy_hours": 1,
+        "utilization": 0.022222222222222223
+      },
+      {
+        "resource": "Mentor Omar",
+        "type": "person",
+        "available_hours": 45,
+        "busy_hours": 1,
+        "utilization": 0.022222222222222223
+      },
+      {
+        "resource": "Mentor Nina",
+        "type": "person",
+        "available_hours": 45,
+        "busy_hours": 1,
+        "utilization": 0.022222222222222223
+      }
+    ]
+  },
+  "slack": [
+    {
+      "defense_id": 0,
+      "student": "Alex Example",
+      "start_slot": 8,
+      "min_slack_hours": 8,
+      "by_resource": [
+        {
+          "resource": "Room 3",
+          "type": "room",
+          "slack_hours": 8
+        },
+        {
+          "resource": "Prof. L. Gomez",
+          "type": "person",
+          "slack_hours": 8
+        },
+        {
+          "resource": "Dr. U. Chen",
+          "type": "person",
+          "slack_hours": 111
+        },
+        {
+          "resource": "Dr. E. Marcel",
+          "type": "person",
+          "slack_hours": 111
+        },
+        {
+          "resource": "Dr. F. Day",
+          "type": "person",
+          "slack_hours": 111
+        },
+        {
+          "resource": "Mentor Yuki",
+          "type": "person",
+          "slack_hours": 8
+        }
+      ]
+    },
+    {
+      "defense_id": 1,
+      "student": "Riley Rivera",
+      "start_slot": 8,
+      "min_slack_hours": 8,
+      "by_resource": [
+        {
+          "resource": "Room 2",
+          "type": "room",
+          "slack_hours": 8
+        },
+        {
+          "resource": "Prof. K. Nouri",
+          "type": "person",
+          "slack_hours": 111
+        },
+        {
+          "resource": "Dr. P. Jain",
+          "type": "person",
+          "slack_hours": 111
+        },
+        {
+          "resource": "Dr. M. Ito",
+          "type": "person",
+          "slack_hours": 111
+        },
+        {
+          "resource": "Dr. G. Singh",
+          "type": "person",
+          "slack_hours": 111
+        },
+        {
+          "resource": "Mentor Omar",
+          "type": "person",
+          "slack_hours": 111
+        },
+        {
+          "resource": "Mentor Nina",
+          "type": "person",
+          "slack_hours": 111
+        }
+      ]
+    }
+  ],
+  "capacity_gaps": []
+}

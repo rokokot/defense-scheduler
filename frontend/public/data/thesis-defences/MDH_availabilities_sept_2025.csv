@@ -1,0 +1,1081 @@
+person_id,name,role,day,time_slot,status
+assessor-1,Fred Truyen,assessor,2025-09-01,09:00,available
+assessor-1,Fred Truyen,assessor,2025-09-01,10:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-01,11:00,available
+assessor-1,Fred Truyen,assessor,2025-09-01,12:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-01,13:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-01,14:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-01,15:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-01,16:00,available
+assessor-1,Fred Truyen,assessor,2025-09-02,09:00,available
+assessor-1,Fred Truyen,assessor,2025-09-02,10:00,available
+assessor-1,Fred Truyen,assessor,2025-09-02,11:00,available
+assessor-1,Fred Truyen,assessor,2025-09-02,12:00,available
+assessor-1,Fred Truyen,assessor,2025-09-02,13:00,available
+assessor-1,Fred Truyen,assessor,2025-09-02,14:00,available
+assessor-1,Fred Truyen,assessor,2025-09-02,15:00,available
+assessor-1,Fred Truyen,assessor,2025-09-02,16:00,available
+assessor-1,Fred Truyen,assessor,2025-09-03,09:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-03,10:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-03,11:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-03,12:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-03,13:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-03,14:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-03,15:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-03,16:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-04,09:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-04,10:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-04,11:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-04,12:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-04,13:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-04,14:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-04,15:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-04,16:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-05,09:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-05,10:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-05,11:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-05,12:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-05,13:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-05,14:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-05,15:00,unavailable
+assessor-1,Fred Truyen,assessor,2025-09-05,16:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-01,09:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-01,10:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-01,11:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-01,12:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-01,13:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-01,14:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-01,15:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-01,16:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-02,09:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-02,10:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-02,11:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-02,12:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-02,13:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-02,14:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-02,15:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-02,16:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-03,09:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-03,10:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-03,11:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-03,12:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-03,13:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-03,14:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-03,15:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-03,16:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-04,09:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-04,10:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-04,11:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-04,12:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-04,13:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-04,14:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-04,15:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-04,16:00,available
+assessor-2,Tim Van de Cruys,assessor,2025-09-05,09:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-05,10:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-05,11:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-05,12:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-05,13:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-05,14:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-05,15:00,unavailable
+assessor-2,Tim Van de Cruys,assessor,2025-09-05,16:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-01,09:00,available
+assessor-3,Mark Depauw,assessor,2025-09-01,10:00,available
+assessor-3,Mark Depauw,assessor,2025-09-01,11:00,available
+assessor-3,Mark Depauw,assessor,2025-09-01,12:00,available
+assessor-3,Mark Depauw,assessor,2025-09-01,13:00,available
+assessor-3,Mark Depauw,assessor,2025-09-01,14:00,available
+assessor-3,Mark Depauw,assessor,2025-09-01,15:00,available
+assessor-3,Mark Depauw,assessor,2025-09-01,16:00,available
+assessor-3,Mark Depauw,assessor,2025-09-02,09:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-02,10:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-02,11:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-02,12:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-02,13:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-02,14:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-02,15:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-02,16:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-03,09:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-03,10:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-03,11:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-03,12:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-03,13:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-03,14:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-03,15:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-03,16:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-04,09:00,available
+assessor-3,Mark Depauw,assessor,2025-09-04,10:00,available
+assessor-3,Mark Depauw,assessor,2025-09-04,11:00,available
+assessor-3,Mark Depauw,assessor,2025-09-04,12:00,available
+assessor-3,Mark Depauw,assessor,2025-09-04,13:00,available
+assessor-3,Mark Depauw,assessor,2025-09-04,14:00,available
+assessor-3,Mark Depauw,assessor,2025-09-04,15:00,available
+assessor-3,Mark Depauw,assessor,2025-09-04,16:00,available
+assessor-3,Mark Depauw,assessor,2025-09-05,09:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-05,10:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-05,11:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-05,12:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-05,13:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-05,14:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-05,15:00,unavailable
+assessor-3,Mark Depauw,assessor,2025-09-05,16:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-01,09:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-01,10:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-01,11:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-01,12:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-01,13:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-01,14:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-01,15:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-01,16:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-02,09:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-02,10:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-02,11:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-02,12:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-02,13:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-02,14:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-02,15:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-02,16:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-03,09:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-03,10:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-03,11:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-03,12:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-03,13:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-03,14:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-03,15:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-03,16:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-04,09:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-04,10:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-04,11:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-04,12:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-04,13:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-04,14:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-04,15:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-04,16:00,available
+assessor-4,Demmy Verbeke,assessor,2025-09-05,09:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-05,10:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-05,11:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-05,12:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-05,13:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-05,14:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-05,15:00,unavailable
+assessor-4,Demmy Verbeke,assessor,2025-09-05,16:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-01,09:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-01,10:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-01,11:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-01,12:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-01,13:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-01,14:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-01,15:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-01,16:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-02,09:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-02,10:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-02,11:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-02,12:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-02,13:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-02,14:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-02,15:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-02,16:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-03,09:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-03,10:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-03,11:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-03,12:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-03,13:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-03,14:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-03,15:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-03,16:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-04,09:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-04,10:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-04,11:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-04,12:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-04,13:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-04,14:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-04,15:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-04,16:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-05,09:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-05,10:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-05,11:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-05,12:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-05,13:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-05,14:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-05,15:00,unavailable
+assessor-5,Dirk Speelman,assessor,2025-09-05,16:00,unavailable
+assessor-6,Katrien Verbert,assessor,2025-09-01,09:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-01,10:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-01,11:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-01,12:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-01,13:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-01,14:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-01,15:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-01,16:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-02,09:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-02,10:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-02,11:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-02,12:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-02,13:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-02,14:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-02,15:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-02,16:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-03,09:00,unavailable
+assessor-6,Katrien Verbert,assessor,2025-09-03,10:00,unavailable
+assessor-6,Katrien Verbert,assessor,2025-09-03,11:00,unavailable
+assessor-6,Katrien Verbert,assessor,2025-09-03,12:00,unavailable
+assessor-6,Katrien Verbert,assessor,2025-09-03,13:00,unavailable
+assessor-6,Katrien Verbert,assessor,2025-09-03,14:00,unavailable
+assessor-6,Katrien Verbert,assessor,2025-09-03,15:00,unavailable
+assessor-6,Katrien Verbert,assessor,2025-09-03,16:00,unavailable
+assessor-6,Katrien Verbert,assessor,2025-09-04,09:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-04,10:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-04,11:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-04,12:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-04,13:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-04,14:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-04,15:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-04,16:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-05,09:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-05,10:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-05,11:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-05,12:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-05,13:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-05,14:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-05,15:00,available
+assessor-6,Katrien Verbert,assessor,2025-09-05,16:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-01,09:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-01,10:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-01,11:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-01,12:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-01,13:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-01,14:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-01,15:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-01,16:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-02,09:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-02,10:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-02,11:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-02,12:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-02,13:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-02,14:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-02,15:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-02,16:00,unavailable
+assessor-7,Marijke Beersmans,assessor,2025-09-03,09:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-03,10:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-03,11:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-03,12:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-03,13:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-03,14:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-03,15:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-03,16:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-04,09:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-04,10:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-04,11:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-04,12:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-04,13:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-04,14:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-04,15:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-04,16:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-05,09:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-05,10:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-05,11:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-05,12:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-05,13:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-05,14:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-05,15:00,available
+assessor-7,Marijke Beersmans,assessor,2025-09-05,16:00,available
+assessor-8,Andrew Vande Moere,assessor,2025-09-01,09:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-01,10:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-01,11:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-01,12:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-01,13:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-01,14:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-01,15:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-01,16:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-02,09:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-02,10:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-02,11:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-02,12:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-02,13:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-02,14:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-02,15:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-02,16:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-03,09:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-03,10:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-03,11:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-03,12:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-03,13:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-03,14:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-03,15:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-03,16:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-04,09:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-04,10:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-04,11:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-04,12:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-04,13:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-04,14:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-04,15:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-04,16:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-05,09:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-05,10:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-05,11:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-05,12:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-05,13:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-05,14:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-05,15:00,unavailable
+assessor-8,Andrew Vande Moere,assessor,2025-09-05,16:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-01,09:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-01,10:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-01,11:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-01,12:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-01,13:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-01,14:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-01,15:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-01,16:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-02,09:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-02,10:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-02,11:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-02,12:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-02,13:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-02,14:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-02,15:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-02,16:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-03,09:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-03,10:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-03,11:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-03,12:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-03,13:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-03,14:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-03,15:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-03,16:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-04,09:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-04,10:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-04,11:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-04,12:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-04,13:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-04,14:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-04,15:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-04,16:00,available
+assessor-9,Margherita Fantoli,assessor,2025-09-05,09:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-05,10:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-05,11:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-05,12:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-05,13:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-05,14:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-05,15:00,unavailable
+assessor-9,Margherita Fantoli,assessor,2025-09-05,16:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-01,09:00,available
+assessor-10,Kurt Fayaerts,assessor,2025-09-01,10:00,available
+assessor-10,Kurt Fayaerts,assessor,2025-09-01,11:00,available
+assessor-10,Kurt Fayaerts,assessor,2025-09-01,12:00,available
+assessor-10,Kurt Fayaerts,assessor,2025-09-01,13:00,available
+assessor-10,Kurt Fayaerts,assessor,2025-09-01,14:00,available
+assessor-10,Kurt Fayaerts,assessor,2025-09-01,15:00,available
+assessor-10,Kurt Fayaerts,assessor,2025-09-01,16:00,available
+assessor-10,Kurt Fayaerts,assessor,2025-09-02,09:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-02,10:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-02,11:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-02,12:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-02,13:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-02,14:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-02,15:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-02,16:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-03,09:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-03,10:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-03,11:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-03,12:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-03,13:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-03,14:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-03,15:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-03,16:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-04,09:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-04,10:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-04,11:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-04,12:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-04,13:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-04,14:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-04,15:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-04,16:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-05,09:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-05,10:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-05,11:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-05,12:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-05,13:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-05,14:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-05,15:00,unavailable
+assessor-10,Kurt Fayaerts,assessor,2025-09-05,16:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-01,09:00,available
+assessor-11,Paul Sambre,assessor,2025-09-01,10:00,available
+assessor-11,Paul Sambre,assessor,2025-09-01,11:00,available
+assessor-11,Paul Sambre,assessor,2025-09-01,12:00,available
+assessor-11,Paul Sambre,assessor,2025-09-01,13:00,available
+assessor-11,Paul Sambre,assessor,2025-09-01,14:00,available
+assessor-11,Paul Sambre,assessor,2025-09-01,15:00,available
+assessor-11,Paul Sambre,assessor,2025-09-01,16:00,available
+assessor-11,Paul Sambre,assessor,2025-09-02,09:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-02,10:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-02,11:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-02,12:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-02,13:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-02,14:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-02,15:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-02,16:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-03,09:00,available
+assessor-11,Paul Sambre,assessor,2025-09-03,10:00,available
+assessor-11,Paul Sambre,assessor,2025-09-03,11:00,available
+assessor-11,Paul Sambre,assessor,2025-09-03,12:00,available
+assessor-11,Paul Sambre,assessor,2025-09-03,13:00,available
+assessor-11,Paul Sambre,assessor,2025-09-03,14:00,available
+assessor-11,Paul Sambre,assessor,2025-09-03,15:00,available
+assessor-11,Paul Sambre,assessor,2025-09-03,16:00,available
+assessor-11,Paul Sambre,assessor,2025-09-04,09:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-04,10:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-04,11:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-04,12:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-04,13:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-04,14:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-04,15:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-04,16:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-05,09:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-05,10:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-05,11:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-05,12:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-05,13:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-05,14:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-05,15:00,unavailable
+assessor-11,Paul Sambre,assessor,2025-09-05,16:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-01,09:00,available
+assessor-12,Robin De Croon ,assessor,2025-09-01,10:00,available
+assessor-12,Robin De Croon ,assessor,2025-09-01,11:00,available
+assessor-12,Robin De Croon ,assessor,2025-09-01,12:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-01,13:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-01,14:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-01,15:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-01,16:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-02,09:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-02,10:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-02,11:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-02,12:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-02,13:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-02,14:00,available
+assessor-12,Robin De Croon ,assessor,2025-09-02,15:00,available
+assessor-12,Robin De Croon ,assessor,2025-09-02,16:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-03,09:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-03,10:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-03,11:00,available
+assessor-12,Robin De Croon ,assessor,2025-09-03,12:00,available
+assessor-12,Robin De Croon ,assessor,2025-09-03,13:00,available
+assessor-12,Robin De Croon ,assessor,2025-09-03,14:00,available
+assessor-12,Robin De Croon ,assessor,2025-09-03,15:00,available
+assessor-12,Robin De Croon ,assessor,2025-09-03,16:00,available
+assessor-12,Robin De Croon ,assessor,2025-09-04,09:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-04,10:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-04,11:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-04,12:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-04,13:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-04,14:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-04,15:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-04,16:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-05,09:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-05,10:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-05,11:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-05,12:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-05,13:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-05,14:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-05,15:00,unavailable
+assessor-12,Robin De Croon ,assessor,2025-09-05,16:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-01,09:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-01,10:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-01,11:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-01,12:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-01,13:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-01,14:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-01,15:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-01,16:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-02,09:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-02,10:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-02,11:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-02,12:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-02,13:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-02,14:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-02,15:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-02,16:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-03,09:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-03,10:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-03,11:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-03,12:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-03,13:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-03,14:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-03,15:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-03,16:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-04,09:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-04,10:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-04,11:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-04,12:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-04,13:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-04,14:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-04,15:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-04,16:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-05,09:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-05,10:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-05,11:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-05,12:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-05,13:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-05,14:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-05,15:00,unavailable
+assessor-13,Julie Birkholz,assessor,2025-09-05,16:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-01,09:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-01,10:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-01,11:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-01,12:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-01,13:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-01,14:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-01,15:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-01,16:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-02,09:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-02,10:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-02,11:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-02,12:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-02,13:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-02,14:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-02,15:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-02,16:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-03,09:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-03,10:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-03,11:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-03,12:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-03,13:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-03,14:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-03,15:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-03,16:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-04,09:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-04,10:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-04,11:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-04,12:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-04,13:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-04,14:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-04,15:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-04,16:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-05,09:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-05,10:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-05,11:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-05,12:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-05,13:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-05,14:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-05,15:00,unavailable
+assessor-14,Maxwell Szymansky,assessor,2025-09-05,16:00,unavailable
+assessor-15,Laura Soffiantini,assessor,2025-09-01,09:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-01,10:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-01,11:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-01,12:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-01,13:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-01,14:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-01,15:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-01,16:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-02,09:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-02,10:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-02,11:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-02,12:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-02,13:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-02,14:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-02,15:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-02,16:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-03,09:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-03,10:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-03,11:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-03,12:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-03,13:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-03,14:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-03,15:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-03,16:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-04,09:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-04,10:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-04,11:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-04,12:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-04,13:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-04,14:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-04,15:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-04,16:00,available
+assessor-15,Laura Soffiantini,assessor,2025-09-05,09:00,unavailable
+assessor-15,Laura Soffiantini,assessor,2025-09-05,10:00,unavailable
+assessor-15,Laura Soffiantini,assessor,2025-09-05,11:00,unavailable
+assessor-15,Laura Soffiantini,assessor,2025-09-05,12:00,unavailable
+assessor-15,Laura Soffiantini,assessor,2025-09-05,13:00,unavailable
+assessor-15,Laura Soffiantini,assessor,2025-09-05,14:00,unavailable
+assessor-15,Laura Soffiantini,assessor,2025-09-05,15:00,unavailable
+assessor-15,Laura Soffiantini,assessor,2025-09-05,16:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-01,09:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-01,10:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-01,11:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-01,12:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-01,13:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-01,14:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-01,15:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-01,16:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-02,09:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-02,10:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-02,11:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-02,12:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-02,13:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-02,14:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-02,15:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-02,16:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-03,09:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-03,10:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-03,11:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-03,12:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-03,13:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-03,14:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-03,15:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-03,16:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-04,09:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-04,10:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-04,11:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-04,12:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-04,13:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-04,14:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-04,15:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-04,16:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-05,09:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-05,10:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-05,11:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-05,12:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-05,13:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-05,14:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-05,15:00,unavailable
+assessor-16,Alek Keersmaekers,assessor,2025-09-05,16:00,unavailable
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-01,09:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-01,10:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-01,11:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-01,12:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-01,13:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-01,14:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-01,15:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-01,16:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-02,09:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-02,10:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-02,11:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-02,12:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-02,13:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-02,14:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-02,15:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-02,16:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-03,09:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-03,10:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-03,11:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-03,12:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-03,13:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-03,14:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-03,15:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-03,16:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-04,09:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-04,10:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-04,11:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-04,12:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-04,13:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-04,14:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-04,15:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-04,16:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-05,09:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-05,10:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-05,11:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-05,12:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-05,13:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-05,14:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-05,15:00,available
+assessor-17,Maria Mihaela Trusca,assessor,2025-09-05,16:00,available
+assessor-18,Adalberto Simeone,assessor,2025-09-01,09:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-01,10:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-01,11:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-01,12:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-01,13:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-01,14:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-01,15:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-01,16:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-02,09:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-02,10:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-02,11:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-02,12:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-02,13:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-02,14:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-02,15:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-02,16:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-03,09:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-03,10:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-03,11:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-03,12:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-03,13:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-03,14:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-03,15:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-03,16:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-04,09:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-04,10:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-04,11:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-04,12:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-04,13:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-04,14:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-04,15:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-04,16:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-05,09:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-05,10:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-05,11:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-05,12:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-05,13:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-05,14:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-05,15:00,unavailable
+assessor-18,Adalberto Simeone,assessor,2025-09-05,16:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-01,09:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-01,10:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-01,11:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-01,12:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-01,13:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-01,14:00,available
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-01,15:00,available
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-01,16:00,available
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-02,09:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-02,10:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-02,11:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-02,12:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-02,13:00,available
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-02,14:00,available
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-02,15:00,available
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-02,16:00,available
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-03,09:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-03,10:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-03,11:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-03,12:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-03,13:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-03,14:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-03,15:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-03,16:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-04,09:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-04,10:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-04,11:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-04,12:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-04,13:00,available
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-04,14:00,available
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-04,15:00,available
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-04,16:00,available
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-05,09:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-05,10:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-05,11:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-05,12:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-05,13:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-05,14:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-05,15:00,unavailable
+assessor-19,Silvia Cazacu-Bucica,assessor,2025-09-05,16:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-01,09:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-01,10:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-01,11:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-01,12:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-01,13:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-01,14:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-01,15:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-01,16:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-02,09:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-02,10:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-02,11:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-02,12:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-02,13:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-02,14:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-02,15:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-02,16:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-03,09:00,available
+assessor-20,Fien Messens ,assessor,2025-09-03,10:00,available
+assessor-20,Fien Messens ,assessor,2025-09-03,11:00,available
+assessor-20,Fien Messens ,assessor,2025-09-03,12:00,available
+assessor-20,Fien Messens ,assessor,2025-09-03,13:00,available
+assessor-20,Fien Messens ,assessor,2025-09-03,14:00,available
+assessor-20,Fien Messens ,assessor,2025-09-03,15:00,available
+assessor-20,Fien Messens ,assessor,2025-09-03,16:00,available
+assessor-20,Fien Messens ,assessor,2025-09-04,09:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-04,10:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-04,11:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-04,12:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-04,13:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-04,14:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-04,15:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-04,16:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-05,09:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-05,10:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-05,11:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-05,12:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-05,13:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-05,14:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-05,15:00,unavailable
+assessor-20,Fien Messens ,assessor,2025-09-05,16:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-01,09:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-01,10:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-01,11:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-01,12:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-01,13:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-01,14:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-01,15:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-01,16:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-02,09:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-02,10:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-02,11:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-02,12:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-02,13:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-02,14:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-02,15:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-02,16:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-03,09:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-03,10:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-03,11:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-03,12:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-03,13:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-03,14:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-03,15:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-03,16:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-04,09:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-04,10:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-04,11:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-04,12:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-04,13:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-04,14:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-04,15:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-04,16:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-05,09:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-05,10:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-05,11:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-05,12:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-05,13:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-05,14:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-05,15:00,unavailable
+assessor-21,Maryia Hurkova ,assessor,2025-09-05,16:00,unavailable
+assessor-22,Tobias Hendrickx ,assessor,2025-09-01,09:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-01,10:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-01,11:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-01,12:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-01,13:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-01,14:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-01,15:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-01,16:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-02,09:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-02,10:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-02,11:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-02,12:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-02,13:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-02,14:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-02,15:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-02,16:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-03,09:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-03,10:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-03,11:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-03,12:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-03,13:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-03,14:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-03,15:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-03,16:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-04,09:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-04,10:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-04,11:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-04,12:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-04,13:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-04,14:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-04,15:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-04,16:00,available
+assessor-22,Tobias Hendrickx ,assessor,2025-09-05,09:00,unavailable
+assessor-22,Tobias Hendrickx ,assessor,2025-09-05,10:00,unavailable
+assessor-22,Tobias Hendrickx ,assessor,2025-09-05,11:00,unavailable
+assessor-22,Tobias Hendrickx ,assessor,2025-09-05,12:00,unavailable
+assessor-22,Tobias Hendrickx ,assessor,2025-09-05,13:00,unavailable
+assessor-22,Tobias Hendrickx ,assessor,2025-09-05,14:00,unavailable
+assessor-22,Tobias Hendrickx ,assessor,2025-09-05,15:00,unavailable
+assessor-22,Tobias Hendrickx ,assessor,2025-09-05,16:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-01,09:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-01,10:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-01,11:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-01,12:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-01,13:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-01,14:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-01,15:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-01,16:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-02,09:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-02,10:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-02,11:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-02,12:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-02,13:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-02,14:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-02,15:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-02,16:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-03,09:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-03,10:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-03,11:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-03,12:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-03,13:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-03,14:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-03,15:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-03,16:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-04,09:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-04,10:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-04,11:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-04,12:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-04,13:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-04,14:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-04,15:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-04,16:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-05,09:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-05,10:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-05,11:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-05,12:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-05,13:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-05,14:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-05,15:00,unavailable
+assessor-23,Steffen Luypaert ,assessor,2025-09-05,16:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-01,09:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-01,10:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-01,11:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-01,12:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-01,13:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-01,14:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-01,15:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-01,16:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-02,09:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-02,10:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-02,11:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-02,12:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-02,13:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-02,14:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-02,15:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-02,16:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-03,09:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-03,10:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-03,11:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-03,12:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-03,13:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-03,14:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-03,15:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-03,16:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-04,09:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-04,10:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-04,11:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-04,12:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-04,13:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-04,14:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-04,15:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-04,16:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-05,09:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-05,10:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-05,11:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-05,12:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-05,13:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-05,14:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-05,15:00,unavailable
+assessor-24,Laura Narli,assessor,2025-09-05,16:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-01,09:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-01,10:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-01,11:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-01,12:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-01,13:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-01,14:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-01,15:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-01,16:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-02,09:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-02,10:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-02,11:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-02,12:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-02,13:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-02,14:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-02,15:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-02,16:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-03,09:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-03,10:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-03,11:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-03,12:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-03,13:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-03,14:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-03,15:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-03,16:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-04,09:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-04,10:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-04,11:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-04,12:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-04,13:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-04,14:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-04,15:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-04,16:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-05,09:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-05,10:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-05,11:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-05,12:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-05,13:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-05,14:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-05,15:00,unavailable
+assessor-25,Alexander Sirotkin,assessor,2025-09-05,16:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-01,09:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-01,10:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-01,11:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-01,12:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-01,13:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-01,14:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-01,15:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-01,16:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-02,09:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-02,10:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-02,11:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-02,12:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-02,13:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-02,14:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-02,15:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-02,16:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-03,09:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-03,10:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-03,11:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-03,12:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-03,13:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-03,14:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-03,15:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-03,16:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-04,09:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-04,10:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-04,11:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-04,12:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-04,13:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-04,14:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-04,15:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-04,16:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-05,09:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-05,10:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-05,11:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-05,12:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-05,13:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-05,14:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-05,15:00,unavailable
+assessor-26,Yannick Van Loon,assessor,2025-09-05,16:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-01,09:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-01,10:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-01,11:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-01,12:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-01,13:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-01,14:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-01,15:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-01,16:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-02,09:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-02,10:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-02,11:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-02,12:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-02,13:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-02,14:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-02,15:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-02,16:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-03,09:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-03,10:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-03,11:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-03,12:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-03,13:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-03,14:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-03,15:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-03,16:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-04,09:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-04,10:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-04,11:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-04,12:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-04,13:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-04,14:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-04,15:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-04,16:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-05,09:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-05,10:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-05,11:00,unavailable
+assessor-27,Andrew Vande Moere,assessor,2025-09-05,12:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-05,13:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-05,14:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-05,15:00,available
+assessor-27,Andrew Vande Moere,assessor,2025-09-05,16:00,available

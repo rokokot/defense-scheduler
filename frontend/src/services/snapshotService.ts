@@ -1,7 +1,7 @@
 import { PersistedDashboardState, exportState, importState } from '../hooks/usePersistedState';
 import { logger } from '../utils/logger';
+import { API_BASE_URL } from '../lib/apiConfig';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const API_BASE = `${API_BASE_URL}/api/snapshots`;
 
 export interface SnapshotMetadata {

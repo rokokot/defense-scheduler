@@ -11,22 +11,7 @@ import {
   ExplanationRequest,
   ExplanationResponse,
 } from '../types/api';
-
-const resolveApiBaseUrl = () => {
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
-
-  if (typeof window === 'undefined') {
-    return 'http://localhost:8000';
-  }
-
-  const protocol = window.location.protocol;
-  const host = window.location.hostname;
-  return `${protocol}//${host}:8000`;
-};
-
-const API_BASE_URL = resolveApiBaseUrl();
+import { API_BASE_URL } from '../lib/apiConfig';
 
 interface WhatIfChanges {
   constraintsToDisable?: string[];

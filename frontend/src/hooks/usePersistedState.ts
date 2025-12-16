@@ -4,6 +4,7 @@ import { LockInfo } from '../types/schedule';
 import { SchedulingContext } from '../components/panels/SetupPanel';
 import { FilterState } from '../components/panels/FilterPanel';
 import { logger } from '../utils/logger';
+import { API_BASE_URL } from '../lib/apiConfig';
 
 export interface PersistedDashboardState {
   datasetId: string;
@@ -47,7 +48,6 @@ export interface PersistedStateInput {
 }
 
 export const STORAGE_KEY = 'xcos-dashboard-state';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const STORAGE_VERSION = 1;
 const DEBOUNCE_MS = 800;
 const MAX_STORAGE_SIZE = 4 * 1024 * 1024; // 4MB safety limit (localStorage usually 5-10MB)

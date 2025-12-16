@@ -53,6 +53,7 @@ import { loadDataset as loadDatasetFromAPI } from '../../services/datasetService
 import { DashboardData } from '../../services/dashboardDataMapper';
 import { SolveResult } from '../../types/scheduling';
 import { schedulingAPI } from '../../api/scheduling';
+import { API_BASE_URL } from '../../lib/apiConfig';
 
 const normalizeName = (name?: string | null) => (name || '').trim().toLowerCase();
 const expandParticipantNames = (value?: string | null) => splitParticipantNames(value);
@@ -1876,7 +1877,7 @@ export function RosterDashboard({
 
     // Validate with backend in background
     try {
-      const response = await fetch('http://localhost:8000/api/schedule/validate', {
+      const response = await fetch(`${API_BASE_URL}/api/schedule/validate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ events: updatedEvents }),

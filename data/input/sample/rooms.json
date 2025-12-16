@@ -1,7 +1,19 @@
 {
   "rooms": [
-    "Room 1",
-    "Room 2",
-    "Room 3"
+    {
+      "id": "room-1",
+      "name": "Room 1",
+      "enabled": true
+    },
+    {
+      "id": "room-2",
+      "name": "Room 2",
+      "enabled": true
+    },
+    {
+      "id": "room-3",
+      "name": "Room 3",
+      "enabled": true
+    }
   ]
 }

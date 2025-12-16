@@ -59,6 +59,8 @@ frontend/build/
 *.tsbuildinfo
 .npm
 .eslintcache
+!frontend/src/lib/
+!frontend/src/lib/**
 
 # Data directories (session data, temporary files)
 data/sessions/

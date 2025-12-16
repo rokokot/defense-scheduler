@@ -1,6 +1,14 @@
 {
   "rooms": [
-    "Room 101",
-    "Room 102"
+    {
+      "id": "room-101",
+      "name": "Room 101",
+      "enabled": true
+    },
+    {
+      "id": "room-102",
+      "name": "Room 102",
+      "enabled": true
+    }
   ]
 }

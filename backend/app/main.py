@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import shutil
 import tempfile
 import zipfile
@@ -38,16 +39,62 @@ from .state_writer import apply_dashboard_state
 
 app = FastAPI(title="Defense Scheduler API", version="0.1.0")
 
+
+def _unique(seq: list[str]) -> list[str]:
+    seen = set()
+    result = []
+    for item in seq:
+        if item in seen:
+            continue
+        seen.add(item)
+        result.append(item)
+    return result
+
+
+def _normalize_host(value: str) -> str | None:
+    trimmed = value.strip()
+    if not trimmed:
+        return None
+    if trimmed.startswith("http://") or trimmed.startswith("https://"):
+        return trimmed
+    if ":" in trimmed:
+        return f"http://{trimmed}"
+    return f"http://{trimmed}:3000"
+
+
+def _parse_origins(value: str | None) -> list[str]:
+    if not value:
+        return []
+    return [entry.strip() for entry in value.split(",") if entry.strip()]
+
+
+def _resolve_allowed_origins() -> list[str]:
+    explicit = _parse_origins(os.getenv("ALLOWED_ORIGINS"))
+    if explicit:
+        return _unique(explicit)
+
+    default_origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
+    ]
+
+    extra_hosts = _parse_origins(os.getenv("FRONTEND_HOSTS"))
+    normalized = []
+    for host in extra_hosts:
+        resolved = _normalize_host(host)
+        if resolved:
+            normalized.append(resolved)
+
+    return _unique(default_origins + normalized)
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",  # Docker nginx frontend
-        "http://127.0.0.1:3000",
-        "http://localhost:5173",  # Vite dev server
-        "http://127.0.0.1:5173",
-        "http://localhost:4173",  # Vite preview
-        "http://127.0.0.1:4173",
-    ],
+    allow_origins=_resolve_allowed_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

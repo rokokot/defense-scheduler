@@ -26,6 +26,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://${API_HOST:-localhost}:8000
     container_name: defense-scheduler-frontend
     ports:
       - "3000:80"

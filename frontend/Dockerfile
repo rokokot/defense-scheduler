@@ -9,6 +9,10 @@ COPY package*.json ./
 # Install all dependencies (including devDependencies for build)
 RUN npm ci
 
+# Allow the API URL to be injected at build-time for Vite
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+
 # Copy source code
 COPY . .
 

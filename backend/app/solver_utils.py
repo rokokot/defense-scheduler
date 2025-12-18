@@ -38,6 +38,10 @@ def format_solver_response(raw: Dict[str, Any], opts: SolverOptions) -> Dict[str
         "utilization": _to_native(raw.get("utilization")),
         "slack": _to_native(raw.get("slack")),
         "capacity_gaps": _to_native(raw.get("capacity_gaps")),
+        "objectives": _to_native(raw.get("objectives")),
+        "planned_count": raw.get("planned_count"),
+        "total_defenses": raw.get("total_defenses"),
+        "unscheduled": _to_native(raw.get("unscheduled")),
     }
 
 

@@ -1,0 +1,464 @@
+{
+  "blocking": [
+    {
+      "defense_id": 0,
+      "student": "Rochkoulets Maxime",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            13,
+            14,
+            16
+          ]
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            12,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "Hendrik Blockeel",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            13,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            14,
+            15,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 1,
+      "student": "Senica Dailen",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            13,
+            14,
+            16
+          ]
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            12,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "Hendrik Blockeel",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            13,
+            14,
+            15,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 2,
+      "student": "Sirbu Traian-Florin",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            13,
+            14,
+            16
+          ]
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            12,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "Stefano Viazzi",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            12,
+            13,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 3,
+      "student": "Demuynck Dieter",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            13,
+            14,
+            16
+          ]
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            12,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "Stefano Viazzi",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            12,
+            13,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 4,
+      "student": "Geybels Maarten",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            13,
+            14,
+            16
+          ]
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            12,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "Mariya Ishteva",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            12,
+            14,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 5,
+      "student": "Hamelink Frederic",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            13,
+            14,
+            16
+          ]
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            12,
+            14,
+            15,
+            16
+          ]
+        },
+        {
+          "resource": "Mariya Ishteva",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            12,
+            14,
+            15
+          ]
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            14,
+            15,
+            16
+          ]
+        }
+      ]
+    }
+  ],
+  "relax_candidates": [
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 9,
+      "blocked_count": 6
+    },
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 10,
+      "blocked_count": 6
+    },
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 11,
+      "blocked_count": 6
+    },
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 12,
+      "blocked_count": 6
+    },
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 13,
+      "blocked_count": 6
+    },
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 14,
+      "blocked_count": 6
+    },
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 15,
+      "blocked_count": 6
+    },
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 16,
+      "blocked_count": 6
+    },
+    {
+      "resource": "200C 00.01",
+      "type": "room",
+      "slot": 9,
+      "blocked_count": 6
+    },
+    {
+      "resource": "200C 00.01",
+      "type": "room",
+      "slot": 10,
+      "blocked_count": 6
+    },
+    {
+      "resource": "200C 00.01",
+      "type": "room",
+      "slot": 11,
+      "blocked_count": 6
+    },
+    {
+      "resource": "200C 00.01",
+      "type": "room",
+      "slot": 13,
+      "blocked_count": 6
+    },
+    {
+      "resource": "200C 00.01",
+      "type": "room",
+      "slot": 14,
+      "blocked_count": 6
+    },
+    {
+      "resource": "Hendrik Blockeel",
+      "type": "person",
+      "slot": 9,
+      "blocked_count": 2
+    },
+    {
+      "resource": "Hendrik Blockeel",
+      "type": "person",
+      "slot": 10,
+      "blocked_count": 2
+    },
+    {
+      "resource": "Hendrik Blockeel",
+      "type": "person",
+      "slot": 13,
+      "blocked_count": 2
+    },
+    {
+      "resource": "Hendrik Blockeel",
+      "type": "person",
+      "slot": 14,
+      "blocked_count": 2
+    },
+    {
+      "resource": "Hendrik Blockeel",
+      "type": "person",
+      "slot": 15,
+      "blocked_count": 2
+    }
+  ]
+}

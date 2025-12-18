@@ -47,7 +47,6 @@ export interface FilterPanelProps {
 
 export function FilterPanel({
   isCollapsed,
-  onToggleCollapse: _onToggleCollapse,
   filters,
   onFilterChange,
   stats,

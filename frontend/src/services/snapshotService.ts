@@ -147,3 +147,38 @@ export async function uploadSnapshot(file: File): Promise<PersistedDashboardStat
     return null;
   }
 }
+
+export interface ExportedRosterInfo {
+  status: string;
+  dataset: string;
+  path: string;
+  schedule_label: string;
+}
+
+export async function exportRosterSnapshot(
+  state: PersistedDashboardState,
+  datasetId: string,
+  label: string
+): Promise<ExportedRosterInfo | null> {
+  try {
+    const payload = JSON.parse(exportState(state));
+    const response = await fetch(`${API_BASE_URL}/api/session/export`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        dataset_id: datasetId,
+        state: payload,
+        snapshot_name: label,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    const result = (await response.json()) as ExportedRosterInfo;
+    logger.info('Exported roster snapshot', { datasetId, label, path: result.path });
+    return result;
+  } catch (error) {
+    logger.error('Failed to export roster snapshot:', error);
+    return null;
+  }
+}

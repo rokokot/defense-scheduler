@@ -3,11 +3,15 @@
  * WIP v0.2.0 (29-10)
  */
 import { useState, useRef, useEffect, useMemo, useTransition, useCallback } from 'react';
-import { GripHorizontal } from 'lucide-react';
-import { AvailabilityGrid, RosterInfo } from './AvailabilityGrid';
+import { AlertCircle, GripHorizontal, Lock } from 'lucide-react';
+import {
+  AvailabilityGrid,
+  RosterInfo,
+  AVAILABILITY_STATUS_CLASSES,
+  AVAILABILITY_STATUS_LABELS,
+} from './AvailabilityGrid';
 import { PersonAvailability, ViewGranularity, PersonRole, AvailabilityStatus } from './types';
 import { Conflict } from '../../types/schedule';
-import { RoomAvailabilityRoom } from '../panels/RoomAvailabilityDrawer';
 
 export interface AvailabilityPanelProps {
   availabilities: PersonAvailability[];
@@ -32,8 +36,6 @@ export interface AvailabilityPanelProps {
   scheduledBookings?: Map<string, Map<string, string[]>>;
   workloadStats?: Map<string, { required: number; scheduled: number }>;
   columnHighlights?: Record<string, Record<string, 'primary' | 'match'>>;
-  roomAvailabilityRooms?: RoomAvailabilityRoom[];
-  roomDrawerSlot?: { day: string; timeSlot: string } | null;
   sharedHeight?: number;
   onHeightChange?: (height: number) => void;
   registerResizeHandle?: (handler: ((event: React.MouseEvent) => void) | null) => void;
@@ -53,7 +55,6 @@ export function AvailabilityPanel({
   onDayLockToggle,
   positioning = 'fixed',
   isExpanded: controlledIsExpanded,
-  onToggleExpanded: _onToggleExpanded,
   highlightedPersons = [],
   highlightedSlot,
   rosters,
@@ -62,20 +63,16 @@ export function AvailabilityPanel({
   scheduledBookings,
   workloadStats,
   columnHighlights,
-  roomAvailabilityRooms,
-  roomDrawerSlot,
   sharedHeight,
   onHeightChange,
   registerResizeHandle,
   hideInternalHandle = false,
 }: AvailabilityPanelProps) {
-  const [internalIsExpanded, _setInternalIsExpanded] = useState(false);
   const [granularity, setGranularity] = useState<ViewGranularity>('day');
   const [roleFilter, setRoleFilter] = useState<PersonRole | 'all'>('all');
   const [panelHeight, setPanelHeight] = useState(sharedHeight ?? 525);
   const [isDragging, setIsDragging] = useState(false);
   const [contentMounted, setContentMounted] = useState(!!controlledIsExpanded);
-  const [roomDrawerOpen, setRoomDrawerOpen] = useState(true);
   const [, startViewTransition] = useTransition();
   const dragStartY = useRef(0);
   const dragStartHeight = useRef(0);
@@ -83,8 +80,7 @@ export function AvailabilityPanel({
   const currentDragHeight = useRef(0);
 
   // Use controlled state if provided, otherwise use internal state
-  const isExpanded = controlledIsExpanded !== undefined ? controlledIsExpanded : internalIsExpanded;
-  // const _toggleExpanded = onToggleExpanded || (() => _setInternalIsExpanded(!internalIsExpanded));
+  const isExpanded = controlledIsExpanded ?? false;
 
   useEffect(() => {
     if (isExpanded) {
@@ -202,44 +198,95 @@ export function AvailabilityPanel({
       {/* Content area */}
       {contentMounted && (
         <div
-          className="h-full pt-2 transition-opacity duration-200"
+          className="h-full pt-2 transition-opacity duration-200 flex flex-col"
           style={{
             pointerEvents: isExpanded ? (isDragging ? 'none' : 'auto') : 'none',
             minHeight: `${panelHeight - 10}px`,
-            overflow: 'hidden',
             opacity: isExpanded ? 1 : 0,
             visibility: isExpanded ? 'visible' : 'hidden'
           }}
           aria-hidden={!isExpanded}
         >
-          <AvailabilityGrid
-            availabilities={filteredAvailabilities}
-            days={days}
-            dayLabels={dayLabels}
-            timeSlots={timeSlots}
-            columnWidth={columnWidth}
-            granularity={granularity}
-            editable={editable}
-            onPersonClick={onPersonClick}
-            onSlotClick={onSlotClick}
-            onSlotEdit={onSlotEdit}
-            onDayLockToggle={onDayLockToggle}
-            highlightedPersons={highlightedPersons}
-            highlightedSlot={highlightedSlot}
-            onGranularityChange={handleGranularityChange}
-            roleFilter={roleFilter}
-            onRoleFilterChange={(role) => setRoleFilter(role as PersonRole | 'all')}
-            rosters={rosters}
-            activeRosterId={activeRosterId}
-            slotConflicts={slotConflicts}
-            scheduledBookings={scheduledBookings}
-            workloadStats={workloadStats}
-            columnHighlights={columnHighlights}
-            roomDrawerRooms={roomAvailabilityRooms}
-            roomDrawerSlot={roomDrawerSlot}
-            roomDrawerOpen={roomDrawerOpen}
-            onRoomDrawerToggle={() => setRoomDrawerOpen(open => !open)}
-          />
+          <div className="flex-1 min-h-0">
+            <AvailabilityGrid
+              availabilities={filteredAvailabilities}
+              days={days}
+              dayLabels={dayLabels}
+              timeSlots={timeSlots}
+              columnWidth={columnWidth}
+              granularity={granularity}
+              editable={editable}
+              onPersonClick={onPersonClick}
+              onSlotClick={onSlotClick}
+              onSlotEdit={onSlotEdit}
+              onDayLockToggle={onDayLockToggle}
+              highlightedPersons={highlightedPersons}
+              highlightedSlot={highlightedSlot}
+              onGranularityChange={handleGranularityChange}
+              roleFilter={roleFilter}
+              onRoleFilterChange={(role) => setRoleFilter(role as PersonRole | 'all')}
+              rosters={rosters}
+              activeRosterId={activeRosterId}
+              slotConflicts={slotConflicts}
+              scheduledBookings={scheduledBookings}
+              workloadStats={workloadStats}
+              columnHighlights={columnHighlights}
+              showLegend={false}
+            />
+          </div>
+          <div className="shrink-0 sticky bottom-0 left-0 right-0 bg-white border-t p-2 sm:p-3 mt-2 sm:mt-4 z-10 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 md:gap-6 text-xs sm:text-sm">
+              <span className="font-semibold text-gray-700 hidden sm:inline">Legend:</span>
+              {(Object.keys(AVAILABILITY_STATUS_CLASSES) as AvailabilityStatus[])
+                .filter(status => status !== 'empty')
+                .map(status => (
+                  <div key={status} className="flex items-center gap-1.5 sm:gap-2">
+                    <div
+                      className={`w-4 h-4 sm:w-5 sm:h-5 border-2 border-white shadow-sm flex-shrink-0 rounded ${AVAILABILITY_STATUS_CLASSES[status]}`}
+                    />
+                    <span className="text-gray-700 capitalize whitespace-nowrap">
+                      {AVAILABILITY_STATUS_LABELS[status]}
+                    </span>
+                  </div>
+                ))}
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-gray-400 flex items-center justify-center flex-shrink-0">
+                  <Lock className="h-2 w-2 sm:h-2.5 sm:w-2.5 text-white" strokeWidth={2.5} />
+                </div>
+                <span className="text-gray-700 whitespace-nowrap">Locked</span>
+              </div>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-red-500 flex-shrink-0" />
+                <span className="text-gray-700 whitespace-nowrap">Conflict</span>
+              </div>
+              <div className="h-4 w-px bg-gray-300 hidden sm:block"></div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">View:</label>
+                <select
+                  value={granularity}
+                  onChange={(e) => handleGranularityChange(e.target.value as ViewGranularity)}
+                  className="px-3 py-1 text-sm border rounded bg-white min-w-[160px]"
+                >
+                  <option value="slot">Time Slots</option>
+                  <option value="day">Daily</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">Role:</label>
+                <select
+                  value={roleFilter}
+                  onChange={(e) => setRoleFilter(e.target.value as PersonRole | 'all')}
+                  className="px-3 py-1 text-sm border rounded bg-white min-w-[120px]"
+                >
+                  <option value="all">All</option>
+                  <option value="student">Students</option>
+                  <option value="supervisor">Supervisors</option>
+                  <option value="assessor">Assessors</option>
+                  <option value="mentor">Mentors</option>
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

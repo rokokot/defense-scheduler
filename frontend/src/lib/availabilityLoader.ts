@@ -87,8 +87,8 @@ function detectConflicts(availabilities: PersonAvailability[]): void {
 
     // For now, we'll detect conflicts by looking for 'booked' status
     // In a real system, you'd compare against actual scheduled events
-    Object.entries(person.availability).forEach(([_day, slots]) => {
-      Object.entries(slots).forEach(([_timeSlot, status]) => {
+    Object.values(person.availability).forEach(slots => {
+      Object.values(slots).forEach(status => {
         // This is a placeholder - actual conflict detection would require
         // checking against scheduled events to see if person is double-booked
         if (status === 'booked') {

@@ -4,7 +4,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { TrendingUp, MapPin, Plus, X, GripHorizontal, ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
 import { GlobalObjective, LocalObjective, ObjectiveScores, ScheduleStats } from '../../types/objectives';
-import { ParallelCoordinatesChart, ParallelChartStyle } from './ParallelCoordinatesMock';
+import { ParallelCoordinatesChart, ParallelChartStyle, DEFAULT_PARALLEL_CHART_STYLE } from './ParallelCoordinatesMock';
 
 const participantCategories = [
   'Supervisor',
@@ -23,6 +23,20 @@ interface AxisDescriptor {
   label: string;
   objectiveId: string;
   binLabel?: string;
+}
+
+interface ComparisonScheduleInput {
+  id: string;
+  label: string;
+  scheduledEvents: number;
+  totalEvents: number;
+  color?: string;
+  objectiveValues?: Record<string, number>;
+  adjacency?: {
+    score?: number | null;
+    possible?: number | null;
+  };
+  variant?: 'real' | 'demo';
 }
 
 export interface ObjectivesPanelProps {
@@ -49,6 +63,13 @@ export interface ObjectivesPanelProps {
   axisLabelFormatter?: (label: string) => string;
   registerResizeHandle?: (handler: ((event: React.MouseEvent) => void) | null) => void;
   hideInternalHandle?: boolean;
+  solverPreferences?: {
+    mustPlanAllDefenses: boolean;
+    onMustPlanAllDefensesChange?: (value: boolean) => void;
+  };
+  objectiveHighlights?: Record<string, { value: number | null; max?: number | null } | undefined>;
+  comparisonSchedules?: ComparisonScheduleInput[];
+  activeScheduleId?: string | null;
 }
 
 export function ObjectivesPanel({
@@ -61,7 +82,6 @@ export function ObjectivesPanel({
   onLocalObjectiveRemove,
   onLocalObjectiveAdd,
   isExpanded,
-  onToggleExpanded: _onToggleExpanded,
   positioning = 'relative',
   comparisonMode = false,
   rosterLabels = [],
@@ -75,6 +95,10 @@ export function ObjectivesPanel({
   axisLabelFormatter,
   registerResizeHandle,
   hideInternalHandle = false,
+  solverPreferences,
+  objectiveHighlights,
+  comparisonSchedules,
+  activeScheduleId,
 }: ObjectivesPanelProps) {
   const [activeTab, setActiveTab] = useState<'global' | 'local'>('global');
   const [panelHeight, setPanelHeight] = useState(sharedHeight ?? 525); // Default height
@@ -84,6 +108,9 @@ export function ObjectivesPanel({
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
   const dragStartY = useRef(0);
   const dragStartHeight = useRef(0);
+  const handleComparisonSelect = useCallback((scheduleId: string) => {
+    setSelectedScheduleId(scheduleId);
+  }, []);
 
   const positionClasses = positioning === 'fixed'
     ? 'fixed bottom-0 left-0 right-0'
@@ -169,7 +196,7 @@ export function ObjectivesPanel({
     return Array.from(binSet);
   }, [selectedBins]);
 
-  const scheduleTemplates = useMemo(() => {
+  const fallbackSchedules = useMemo(() => {
     const totalEvents = scheduleStats?.totalEvents ?? 32;
     const scheduledEvents = scheduleStats?.scheduledEvents ?? Math.round(totalEvents * 0.65);
     return Array.from({ length: 3 }, (_, idx) => ({
@@ -180,6 +207,8 @@ export function ObjectivesPanel({
       totalEvents,
     }));
   }, [scheduleStats]);
+  const scheduleSource: ComparisonScheduleInput[] =
+    comparisonSchedules && comparisonSchedules.length > 0 ? comparisonSchedules : fallbackSchedules;
 
   const activeObjectives = useMemo(
     () => globalObjectives.filter(objective => objective.enabled),
@@ -222,6 +251,18 @@ export function ObjectivesPanel({
       return `${sanitizedBase}\n${bin}`;
     });
   const showGraph = axisDescriptors.length > 0;
+  const radarStyleOverrides = useMemo<ParallelChartStyle>(() => {
+    const base: ParallelChartStyle = {
+      ...DEFAULT_PARALLEL_CHART_STYLE,
+      ...(graphStyle ?? {}),
+    };
+    const paddingSource =
+      graphStyle?.chartPadding ??
+      DEFAULT_PARALLEL_CHART_STYLE.chartPadding ??
+      60;
+    base.chartPadding = Math.max(20, paddingSource - 10);
+    return base;
+  }, [graphStyle]);
 
   const computeScore = (objectiveId: string, offset: number) => {
     const hash = objectiveId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -229,22 +270,59 @@ export function ObjectivesPanel({
     return Math.round(normalized * 10) / 10;
   };
 
+  const demoSchedule = useMemo(() => {
+    if (axisDescriptors.length === 0) return null;
+    const values = axisDescriptors.reduce<Record<string, number>>((acc, axis, idx) => {
+      const baseHash = axis.axisId.split('').reduce((accHash, char) => accHash + char.charCodeAt(0), 0);
+      const pseudo = Math.abs(Math.sin(baseHash * (idx + 1)) * 10);
+      acc[axis.axisId] = Math.round(pseudo * 10) / 10;
+      return acc;
+    }, {});
+    return {
+      id: 'demo-radar',
+      label: 'Objective demo',
+      scheduledEvents: scheduleStats?.scheduledEvents ?? 0,
+      totalEvents: scheduleStats?.totalEvents ?? 0,
+      color: '#8B5CF6',
+      objectiveValues: values,
+      variant: 'demo' as const,
+    };
+  }, [axisDescriptors, scheduleStats?.scheduledEvents, scheduleStats?.totalEvents]);
+
   const comparisonData = useMemo(() => {
-    return scheduleTemplates.map((template, scheduleIdx) => {
+    const mapped = scheduleSource.map((template, scheduleIdx) => {
       const values = axisDescriptors.reduce<Record<string, number>>((acc, axis, axisIdx) => {
-        const key = `${axis.objectiveId}-${axis.binLabel ?? 'overall'}`;
-        acc[axis.axisId] = computeScore(key, scheduleIdx + axisIdx * 0.17);
+        const axisKey = axis.binLabel ? `${axis.objectiveId}:${axis.binLabel}` : `${axis.objectiveId}:overall`;
+        const provided =
+          template.objectiveValues?.[axisKey] ??
+          template.objectiveValues?.[axis.objectiveId];
+        acc[axis.axisId] =
+          typeof provided === 'number'
+            ? provided
+            : computeScore(`${axisKey}-${template.id}`, scheduleIdx + axisIdx * 0.17);
         return acc;
       }, {});
-      return { ...template, values };
+      const color = template.color || SCHEDULE_COLORS[scheduleIdx % SCHEDULE_COLORS.length];
+      return { ...template, variant: template.variant ?? 'real', color, values };
     });
-  }, [scheduleTemplates, axisDescriptors]);
+    if (demoSchedule) {
+      mapped.push({
+        ...demoSchedule,
+        values: demoSchedule.objectiveValues || {},
+      });
+    }
+    return mapped;
+  }, [scheduleSource, axisDescriptors, demoSchedule]);
 
   useEffect(() => {
+    if (activeScheduleId && activeScheduleId !== selectedScheduleId) {
+      setSelectedScheduleId(activeScheduleId);
+      return;
+    }
     if (!selectedScheduleId && comparisonData.length > 0) {
       setSelectedScheduleId(comparisonData[0].id);
     }
-  }, [comparisonData, selectedScheduleId]);
+  }, [activeScheduleId, comparisonData, selectedScheduleId]);
 
   const handleDragStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -383,11 +461,32 @@ export function ObjectivesPanel({
                 style={{ minHeight: `${Math.max(graphMinHeight, 320)}px` }}
               >
                 <div className="space-y-3" style={{ maxWidth: `${objectiveColumnMaxWidth}px`, flex: '0 0 auto' }}>
-                  {globalObjectives.map(objective => (
-                    <div
-                      key={objective.id}
-                    className="p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-                    >
+                  {solverPreferences && (
+                    <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                      <label className="flex items-start gap-3 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={solverPreferences.mustPlanAllDefenses}
+                          onChange={e => solverPreferences.onMustPlanAllDefensesChange?.(e.target.checked)}
+                          className="mt-1 h-4 w-4"
+                        />
+                        <div>
+                          <div className="font-semibold text-gray-900">Require scheduling every defense</div>
+                          <div className="text-sm text-gray-600 mt-0.5">
+                            When disabled, the solver maximizes the number of scheduled defenses and may leave conflicted ones
+                            unscheduled.
+                          </div>
+                        </div>
+                      </label>
+                    </div>
+                  )}
+                  {globalObjectives.map(objective => {
+                    const highlight = objectiveHighlights?.[objective.id];
+                    return (
+                      <div
+                        key={objective.id}
+                        className="p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                      >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-start gap-3 flex-1 pr-2">
                           <input
@@ -400,9 +499,20 @@ export function ObjectivesPanel({
                             <div className="font-semibold text-base text-gray-900">{objective.label}</div>
                             <div className="text-sm text-gray-600 mt-0.5">{objective.description}</div>
                             {objective.id === 'adjacency-objective' && (
-                              <div className="text-sm text-gray-700 mt-1">
-                                Keep consecutive defenses in back-to-back timeslots
-                              </div>
+                              <>
+                                <div className="text-sm text-gray-700 mt-1">
+                                  Keep consecutive defenses in back-to-back timeslots
+                                </div>
+                                {highlight && (
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    {highlight.value != null
+                                      ? `Last run: ${highlight.value}${
+                                          highlight.max != null ? ` / ${highlight.max}` : ''
+                                        } adjacent pairs`
+                                      : 'Last run: pending'}
+                                  </div>
+                                )}
+                              </>
                             )}
                             {objective.id === 'distance-objective' && (
                               <div className="text-sm text-gray-600 mt-1">
@@ -480,19 +590,19 @@ export function ObjectivesPanel({
                           </div>
                         </div>
                       )}
-                    </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </div>
                 <ScheduleComparisonPanel
                   axes={axisDescriptors}
                   comparisonData={comparisonData}
                   activeBins={activeBins}
                   selectedScheduleId={selectedScheduleId}
-                  onSelectSchedule={setSelectedScheduleId}
-                  scheduleStats={scheduleStats}
+                  onSelectSchedule={handleComparisonSelect}
                   showGraph={showGraph}
                   graphMinHeight={graphMinHeight}
-                  graphStyle={graphStyle}
+                graphStyle={radarStyleOverrides}
                   valueFormatter={formatValue}
                   axisFormatter={formatAxisLabel}
                   comparisonPanelMinWidth={comparisonPanelMinWidth}
@@ -575,6 +685,11 @@ interface ScheduleComparisonDatum {
   values: Record<string, number>;
   scheduledEvents: number;
   totalEvents: number;
+  variant?: 'real' | 'demo';
+  adjacency?: {
+    score?: number | null;
+    possible?: number | null;
+  };
 }
 
 interface ScheduleComparisonPanelProps {
@@ -583,7 +698,6 @@ interface ScheduleComparisonPanelProps {
   activeBins: string[];
   selectedScheduleId: string | null;
   onSelectSchedule: (id: string) => void;
-  scheduleStats?: ScheduleStats;
   showGraph: boolean;
   graphMinHeight: number;
   comparisonPanelMinWidth: number;
@@ -598,7 +712,6 @@ function ScheduleComparisonPanel({
   activeBins,
   selectedScheduleId,
   onSelectSchedule,
-  scheduleStats,
   showGraph,
   graphMinHeight,
   comparisonPanelMinWidth,
@@ -635,14 +748,14 @@ function ScheduleComparisonPanel({
         </span>
       </div>
       <div className="flex flex-col xl:flex-row gap-4 flex-1 items-start" style={{ minHeight: `${graphMinHeight}px` }}>
-        <div
-          className="flex flex-col gap-2 w-full xl:w-60 overflow-y-auto pr-1"
-        >
+        <div className="w-full xl:w-72 flex flex-col gap-3 h-full">
+          <div className="overflow-y-auto pr-1 flex flex-col gap-2 max-h-[320px]">
           {comparisonData.map(item => {
             const selected = selectedScheduleId === item.id;
-            const scheduleSummary = scheduleStats
-              ? `${item.scheduledEvents} / ${item.totalEvents} events scheduled`
-              : `${item.scheduledEvents} / ${item.totalEvents} mock events`;
+            const scheduleSummary =
+              item.variant === 'demo'
+                ? 'Demonstration dataset'
+                : `${item.scheduledEvents} / ${item.totalEvents} events scheduled`;
             const expanded = expandedSchedules[item.id] ?? false;
             const axisScores = axes
               .map(axis => ({ axis, value: item.values[axis.axisId] }))
@@ -651,6 +764,20 @@ function ScheduleComparisonPanel({
               axisScores.length > 0
                 ? axisScores.reduce((sum, entry) => sum + entry.value, 0) / axisScores.length
                 : undefined;
+            const adjacencyText =
+              item.variant !== 'demo' &&
+              item.adjacency &&
+              (item.adjacency.score != null || item.adjacency.possible != null)
+                ? `Adjacency ${item.adjacency.score ?? '—'}${
+                    item.adjacency.possible != null ? ` / ${item.adjacency.possible}` : ''
+                  }`
+                : null;
+            const statusLabel =
+              item.variant === 'demo'
+                ? 'Demo'
+                : selected
+                  ? 'Active'
+                  : 'Schedule';
 
             const baseColor = item.color;
             const containerClasses = selected
@@ -679,14 +806,12 @@ function ScheduleComparisonPanel({
               >
                 <div className="flex items-center justify-between">
                   <span className="text-base font-semibold text-gray-900">{item.label}</span>
-                  <span className="text-sm text-gray-500">{selected ? 'Active' : 'Mock run'}</span>
+                  <span className="text-sm text-gray-500">{statusLabel}</span>
                 </div>
                 {!expanded || axisScores.length === 0 ? (
-                  <div className="mt-1 flex items-center justify-between text-sm text-gray-600">
+                  <div className="mt-1 flex flex-col gap-1 text-sm text-gray-600">
                     <span>{scheduleSummary}</span>
-                    {axes.length > 0 && (
-                      <span className="text-xs text-gray-500"></span>
-                    )}
+                    {adjacencyText && <span className="text-xs text-gray-500">{adjacencyText}</span>}
                   </div>
                 ) : (
                   <div className="mt-2 text-sm text-gray-700 space-y-2">
@@ -694,6 +819,9 @@ function ScheduleComparisonPanel({
                       <div className="font-semibold text-gray-800">
                         Average score: {valueFormatter(averageScore)}
                       </div>
+                    )}
+                    {adjacencyText && (
+                      <div className="text-gray-600 text-sm">{adjacencyText}</div>
                     )}
                     <div className="space-y-1 text-gray-700">
                       {axisScores.map(({ axis, value }) => (
@@ -707,18 +835,46 @@ function ScheduleComparisonPanel({
               </button>
             );
           })}
+          </div>
+          <div className="w-full rounded-2xl border border-gray-200 bg-white shadow-sm p-4 flex-shrink-0">
+          {(() => {
+            const activeDatum = comparisonData.find(d => d.id === (selectedScheduleId || comparisonData[0]?.id));
+            if (!activeDatum) {
+              return <p className="text-sm text-gray-500">Select a schedule to see objective values.</p>;
+            }
+            return (
+              <div className="space-y-2">
+                <div className="text-base font-semibold text-gray-900">{activeDatum.label}</div>
+                <div className="space-y-1 text-sm text-gray-600">
+                  {axes.map(axis => {
+                    const value = activeDatum.values[axis.axisId] ?? 0;
+                    const formatted =
+                      valueFormatter ? valueFormatter(value) : Number(value).toFixed(1);
+                    const labelText = axisFormatter ? axisFormatter(axis.label) : axis.label;
+                    return (
+                      <div key={`${activeDatum.id}-${axis.axisId}`} className="flex items-center justify-between gap-2">
+                        <span className="truncate text-gray-500">{labelText}</span>
+                        <span className="font-semibold text-gray-900">{formatted}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+          </div>
         </div>
         {showGraph ? (
           <div
-            className="flex-1 overflow-auto pb-8"
-            style={{ minHeight: `${graphMinHeight}px`, maxHeight: `${graphMinHeight}px`, paddingBottom: '80px' }}
+            className="flex-1 overflow-auto pb-4"
+            style={{ minHeight: `${graphMinHeight * 0.6}px`, maxHeight: `${graphMinHeight * 0.6}px` }}
           >
             <ParallelCoordinatesChart
               axes={axes.map(axis => ({ id: axis.axisId, label: axis.label }))}
               data={comparisonData}
               selectedId={selectedScheduleId}
               onSelect={onSelectSchedule}
-              minHeight={graphMinHeight}
+              minHeight={graphMinHeight * 0.6}
               styleOverrides={graphStyle}
               valueFormatter={valueFormatter}
               axisFormatter={axisFormatter}

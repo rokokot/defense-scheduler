@@ -35,7 +35,7 @@ from .snapshot_store import delete_snapshot, list_snapshots, load_snapshot, save
 from .solver_runner import SolverOptions, runner
 from .solver_tasks import run_manager
 from .solver_utils import format_solver_response
-from .state_writer import apply_dashboard_state
+from .state_writer import apply_dashboard_state, export_roster_snapshot
 
 app = FastAPI(title="Defense Scheduler API", version="0.1.0")
 
@@ -74,6 +74,8 @@ def _resolve_allowed_origins() -> list[str]:
         return _unique(explicit)
 
     default_origins = [
+        "http://localhost",
+        "http://127.0.0.1",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:5173",
@@ -200,7 +202,14 @@ def load_schedule(payload: Dict[str, Any] = Body(...)):
 @app.post("/api/schedule/solve")
 async def solve_schedule(req: SolveRequest):
     dataset_id = req.data.dataset_id
-    opts = SolverOptions(dataset=dataset_id, timeout=req.timeout or 180, solver=req.solver or "ortools")
+    opts = SolverOptions(
+        dataset=dataset_id,
+        timeout=req.timeout or 180,
+        solver=req.solver or "ortools",
+        adjacency_objective=req.adjacency_objective,
+        must_plan_all=req.must_plan_all_defenses,
+        allow_online_defenses=req.allow_online_defenses,
+    )
     loop = asyncio.get_event_loop()
     raw = await loop.run_in_executor(None, runner.solve, opts)
     return format_solver_response(raw, opts)
@@ -224,7 +233,14 @@ def _run_to_response(record) -> SolverRunResponse:
 @app.post("/api/solver/runs")
 def create_solver_run(req: SolveRequest) -> SolverRunResponse:
     dataset_id = req.data.dataset_id
-    opts = SolverOptions(dataset=dataset_id, timeout=req.timeout or 180, solver=req.solver or "ortools")
+    opts = SolverOptions(
+        dataset=dataset_id,
+        timeout=req.timeout or 180,
+        solver=req.solver or "ortools",
+        adjacency_objective=req.adjacency_objective,
+        must_plan_all=req.must_plan_all_defenses,
+        allow_online_defenses=req.allow_online_defenses,
+    )
     record = run_manager.submit(opts)
     return _run_to_response(record)
 
@@ -235,6 +251,14 @@ def read_solver_run(run_id: str) -> SolverRunResponse:
     if not record:
         raise HTTPException(status_code=404, detail="Run not found")
     return _run_to_response(record)
+
+
+@app.post("/api/solver/runs/{run_id}/cancel")
+def cancel_solver_run(run_id: str) -> Dict[str, Any]:
+    success = run_manager.cancel(run_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Run not found or already completed")
+    return {"run_id": run_id, "status": "cancelled"}
 
 
 @app.get("/api/solver/runs")
@@ -250,7 +274,9 @@ def list_solver_runs(dataset_id: Optional[str] = None) -> Dict[str, Any]:
 @app.post("/api/schedule/explain")
 def explain_schedule(req: ExplainRequest):
     # simple placeholder derived from capacity gaps
-    gaps = runner.solve(SolverOptions(dataset=req.data.dataset_id, must_plan_all=True)).get("capacity_gaps", [])
+    gaps = runner.solve(
+        SolverOptions(dataset=req.data.dataset_id, must_plan_all=True)
+    ).get("capacity_gaps", [])
     muses = []
     for idx, gap in enumerate(gaps):
         muses.append(
@@ -378,3 +404,20 @@ def save_session_state(req: SessionSaveRequest):
         snap = save_snapshot(snap_name, req.snapshot_name, req.state)
         snapshot_id = snap.id
     return {"status": "saved", "dataset": req.dataset_id, "snapshot_id": snapshot_id}
+
+
+@app.post("/api/session/export")
+def export_session_state(req: SessionSaveRequest):
+    dataset_id = req.dataset_id
+    roster_label = req.state.get("rosters", [{}])[0].get("label", "schedule")
+    target_label = req.snapshot_name or roster_label
+    try:
+        export_path = export_roster_snapshot(dataset_id, req.state, target_label, req.state.get("activeRosterId"))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    return {
+        "status": "exported",
+        "dataset": dataset_id,
+        "path": str(export_path),
+        "schedule_label": target_label,
+    }

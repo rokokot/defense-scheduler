@@ -3,9 +3,10 @@
  *
  * v0.2.0 (02-11) - Added drag-and-drop, lock mechanism, history management
  */
-import { useState, useEffect, useRef, useMemo, useCallback, startTransition, Fragment } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useEffect, useRef, useMemo, useCallback, startTransition } from 'react';
 import type { ReactNode } from 'react';
-import { GripHorizontal, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { GripHorizontal, Loader2, CheckCircle2, AlertTriangle, CircleSlash2 } from 'lucide-react';
 import clsx from 'clsx';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
@@ -22,7 +23,7 @@ import { ObjectivesPanel } from '../objectives/ObjectivesPanel';
 import { AdaptiveToolbar, CardViewMode } from '../toolbar/AdaptiveToolbar';
 import { PersonAvailability, AvailabilityStatus, SlotAvailability } from '../availability/types';
 import { GlobalObjective, LocalObjective } from '../../types/objectives';
-import { DefenceEvent, ScheduleState, ScheduleAction, Conflict, ConflictSeverity, SolverRunInfo, RoomOption } from '../../types/schedule';
+import { DefenceEvent, ScheduleState, ScheduleAction, Conflict, ConflictSeverity, SolverRunInfo, RoomOption, RoomAvailabilityState, LockInfo } from '../../types/schedule';
 import { Roster } from '../../types/roster';
 import { useScheduleHistory } from '../../hooks/useScheduleHistory';
 import {
@@ -54,6 +55,7 @@ import { DashboardData } from '../../services/dashboardDataMapper';
 import { SolveResult } from '../../types/scheduling';
 import { schedulingAPI } from '../../api/scheduling';
 import { API_BASE_URL } from '../../lib/apiConfig';
+import { exportRosterSnapshot } from '../../services/snapshotService';
 
 const normalizeName = (name?: string | null) => (name || '').trim().toLowerCase();
 const expandParticipantNames = (value?: string | null) => splitParticipantNames(value);
@@ -63,6 +65,13 @@ const slugifyRoomId = (value: string) =>
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+
+const DEFAULT_SOLVER_TIMEOUT_SECONDS = 180;
+type SolverExecutionSummary = {
+  total: number;
+  scheduled: number;
+  unscheduled: number;
+};
 
 const ensureRoomOptionsList = (
   options?: RoomOption[] | null,
@@ -111,6 +120,163 @@ const ensureRoomOptionsList = (
 const getEnabledRoomNames = (options: RoomOption[]) =>
   options.filter(opt => opt.enabled !== false).map(opt => opt.name);
 
+const createRoomAvailabilitySlots = (
+  days: string[],
+  timeSlots: string[]
+): Record<string, Record<string, 'available' | 'unavailable'>> => {
+  const slots: Record<string, Record<string, 'available' | 'unavailable'>> = {};
+  days.forEach(day => {
+    slots[day] = {};
+    timeSlots.forEach(slot => {
+      slots[day][slot] = 'available';
+    });
+  });
+  return slots;
+};
+
+const normalizeRoomSlots = (
+  slots: Record<string, Record<string, 'available' | 'unavailable'>> | undefined,
+  days: string[],
+  timeSlots: string[]
+) => {
+  const normalized: Record<string, Record<string, 'available' | 'unavailable'>> = {};
+  days.forEach(day => {
+    normalized[day] = {};
+    const daySlots = slots?.[day] || {};
+    timeSlots.forEach(slot => {
+      normalized[day][slot] = daySlots[slot] === 'unavailable' ? 'unavailable' : 'available';
+    });
+  });
+  return normalized;
+};
+
+const normalizeRoomAvailabilityState = (
+  source: RoomAvailabilityState[] | undefined,
+  roomOptions: RoomOption[],
+  days: string[],
+  timeSlots: string[]
+): RoomAvailabilityState[] => {
+  const byId = new Map<string, RoomAvailabilityState>();
+  source?.forEach(room => {
+    byId.set(room.id, {
+      ...room,
+      slots: normalizeRoomSlots(room.slots, days, timeSlots),
+    });
+  });
+  roomOptions.forEach(option => {
+    if (!byId.has(option.id)) {
+      byId.set(option.id, {
+        id: option.id,
+        label: option.name,
+        slots: createRoomAvailabilitySlots(days, timeSlots),
+      });
+    }
+  });
+  const orderMap = new Map<string, number>();
+  roomOptions.forEach((option, index) => orderMap.set(option.id, index));
+  return Array.from(byId.values()).sort(
+    (a, b) =>
+      (orderMap.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (orderMap.get(b.id) ?? Number.MAX_SAFE_INTEGER) ||
+      a.label.localeCompare(b.label)
+  );
+};
+
+const compareRoomSlots = (
+  a: Record<string, Record<string, 'available' | 'unavailable'>>,
+  b: Record<string, Record<string, 'available' | 'unavailable'>>,
+  days: string[],
+  timeSlots: string[]
+) =>
+  days.every(day =>
+    timeSlots.every(slot => (a[day]?.[slot] || 'available') === (b[day]?.[slot] || 'available'))
+  );
+
+const stabilizeRoomAvailabilityState = (
+  current: RoomAvailabilityState[],
+  roomOptions: RoomOption[],
+  days: string[],
+  timeSlots: string[]
+) => {
+  const normalized = normalizeRoomAvailabilityState(current, roomOptions, days, timeSlots);
+  const unchanged =
+    normalized.length === current.length &&
+    normalized.every((room, index) => {
+      const prev = current[index];
+      if (!prev) return false;
+      if (prev.id !== room.id || prev.label !== room.label) return false;
+      return compareRoomSlots(prev.slots, room.slots, days, timeSlots);
+    });
+  return unchanged ? current : normalized;
+};
+const isStudentRole = (role?: string | null) => {
+  if (!role) return false;
+  return String(role).trim().toLowerCase() === 'student';
+};
+
+const cloneScheduleStateDeep = (state: ScheduleState): ScheduleState => {
+  const clonedEvents = state.events.map(event => ({
+    ...event,
+    assessors: [...event.assessors],
+    mentors: [...event.mentors],
+    conflicts: event.conflicts ? [...event.conflicts] : undefined,
+  }));
+  const clonedLocks = new Map<string, LockInfo>(
+    Array.from(state.locks?.entries() || []).map(([key, lock]) => [key, { ...lock }])
+  );
+  const clonedConflicts = state.conflicts.map(conflict => ({
+    ...conflict,
+    affectedDefenceIds: [...conflict.affectedDefenceIds],
+    participants: conflict.participants ? [...conflict.participants] : undefined,
+    suggestions: conflict.suggestions
+      ? conflict.suggestions.map(suggestion => ({
+          ...suggestion,
+          payload: suggestion.payload ? { ...suggestion.payload } : undefined,
+        }))
+      : undefined,
+  }));
+  return {
+    events: clonedEvents,
+    locks: clonedLocks,
+    solverMetadata: state.solverMetadata ? { ...state.solverMetadata } : null,
+    conflicts: clonedConflicts,
+  };
+};
+
+const clonePersonAvailabilities = (list: PersonAvailability[]): PersonAvailability[] =>
+  list.map(person => {
+    const availability: PersonAvailability['availability'] = {};
+    Object.entries(person.availability || {}).forEach(([day, slots]) => {
+      const clonedSlots: Record<string, AvailabilityStatus | SlotAvailability> = {};
+      Object.entries(slots || {}).forEach(([slot, value]) => {
+        clonedSlots[slot] = typeof value === 'string' ? value : { ...value };
+      });
+      availability[day] = clonedSlots;
+    });
+    return {
+      ...person,
+      availability,
+      dayLocks: person.dayLocks ? { ...person.dayLocks } : undefined,
+      conflicts: person.conflicts
+        ? person.conflicts.map(conflict => ({
+            ...conflict,
+            conflictingEvents: [...conflict.conflictingEvents],
+          }))
+        : undefined,
+    };
+  });
+
+const cloneObjectives = (objectives: {
+  global: GlobalObjective[];
+  local: LocalObjective[];
+}) => ({
+  global: objectives.global.map(obj => ({ ...obj })),
+  local: objectives.local.map(obj => ({
+    ...obj,
+    defenseIds: [...obj.defenseIds],
+    parameters: obj.parameters ? { ...obj.parameters } : undefined,
+  })),
+});
+
 // Adjust this value to control the maximum width of each schedule column (in pixels)
 const SCHEDULE_COLUMN_WIDTH = 220;
 
@@ -135,6 +301,7 @@ export interface RosterDashboardProps {
   initialTimeHorizon?: TimeHorizon;
   initialRooms?: string[];
   initialRoomOptions?: RoomOption[];
+  initialRoomAvailability?: RoomAvailabilityState[];
   onEventClick?: (eventId: string) => void;
   onAvailabilityEdit?: (personId: string, day: string, timeSlot: string, newStatus: AvailabilityStatus | SlotAvailability, locked: boolean) => void;
 }
@@ -150,6 +317,7 @@ export function RosterDashboard({
   initialTimeHorizon,
   initialRooms = [],
   initialRoomOptions = [],
+  initialRoomAvailability = [],
   onEventClick,
   onAvailabilityEdit,
 }: RosterDashboardProps) {
@@ -207,7 +375,7 @@ export function RosterDashboard({
   }, [datasetId, datasetVersion]);
 
   const { currentState, canUndo, canRedo, push, undo, redo, reset: resetHistory } = useScheduleHistory(initialState);
-  const events = currentState?.events || [];
+  const events = useMemo(() => currentState?.events ?? [], [currentState]);
 
   // Roster management with global counter for proper naming
   const rosterCounterRef = useRef(persistedSnapshot ? persistedSnapshot.rosters.length : 1);
@@ -295,20 +463,36 @@ export function RosterDashboard({
     message: '',
   });
   const [solverRunning, setSolverRunning] = useState(false);
+  const [activeSolverRunId, setActiveSolverRunId] = useState<string | null>(null);
+  const [cancellingSolverRun, setCancellingSolverRun] = useState(false);
   const [solverStatusModal, setSolverStatusModal] = useState<{
     open: boolean;
-    status: 'running' | 'success' | 'error';
+    status: 'running' | 'success' | 'error' | 'cancelled';
     title: string;
     message: string;
-  }>({ open: false, status: 'running', title: '', message: '' });
-  const solverModalTimer = useRef<NodeJS.Timeout | null>(null);
+    adjacencyLabel: string | null;
+    startedAt: number | null;
+    timeoutSeconds: number | null;
+    elapsedSeconds: number;
+    runId: string | null;
+  }>({
+    open: false,
+    status: 'running',
+    title: '',
+    message: '',
+    adjacencyLabel: null,
+    startedAt: null,
+    timeoutSeconds: null,
+    elapsedSeconds: 0,
+    runId: null,
+  });
+  const solverProgressInterval = useRef<NodeJS.Timeout | null>(null);
   const closeSolverStatusModal = useCallback(() => {
     setSolverStatusModal(prev => {
       if (prev.status === 'running') return prev;
       return { ...prev, open: false };
     });
   }, []);
-
   // Bottom panel state
   type BottomPanelTab = 'availability' | 'objectives' | 'rooms' | 'conflicts';
   const [bottomPanelTab, setBottomPanelTab] = useState<BottomPanelTab>('availability');
@@ -430,6 +614,30 @@ export function RosterDashboard({
     },
   ]);
   const [localObjectives, setLocalObjectives] = useState<LocalObjective[]>([]);
+  const [objectiveHighlights, setObjectiveHighlights] = useState<
+    Record<string, { value: number | null; max?: number | null } | undefined>
+  >({});
+  const [mustPlanAllDefenses, setMustPlanAllDefenses] = useState(true);
+  const [partialScheduleNotice, setPartialScheduleNotice] = useState<{ total: number; unscheduled: number } | null>(null);
+  const [pendingSolverResult, setPendingSolverResult] = useState<{
+    result: SolveResult;
+    mode: 'solve' | 'reoptimize';
+    summary: SolverExecutionSummary;
+  } | null>(null);
+  const adjacencyObjectiveEnabled = useMemo(
+    () => globalObjectives.some(obj => obj.id === 'adjacency-objective' && obj.enabled),
+    [globalObjectives]
+  );
+  const solverStatusPrimaryText =
+    solverStatusModal.message ||
+    (solverStatusModal.status === 'running' ? '' : '');
+  const pendingAdjacencyInfo = pendingSolverResult?.result.objectives?.adjacency;
+  const pendingAdjacencyLabel =
+    pendingAdjacencyInfo && (pendingAdjacencyInfo.score ?? pendingAdjacencyInfo.possible) !== undefined
+      ? `Adjacency ${pendingAdjacencyInfo.score ?? 0}${
+          pendingAdjacencyInfo.possible !== undefined ? ` / ${pendingAdjacencyInfo.possible}` : ''
+        }`
+      : null;
 
   // Ref for schedule grid rows to enable scrolling to specific slots
   const timeSlotRefs = useRef<Map<string, HTMLTableRowElement>>(new Map());
@@ -455,13 +663,21 @@ export function RosterDashboard({
   }, []);
 
   // Grid structure derived from time horizon or props
-  const [days, setDays] = useState<string[]>(persistedSnapshot?.gridData.days || propDays);
-  const [dayLabels, setDayLabels] = useState<string[]>(
-    persistedSnapshot?.gridData.dayLabels || propDayLabels || propDays
-  );
-  const [timeSlots, setTimeSlots] = useState<string[]>(
+const [days, setDays] = useState<string[]>(persistedSnapshot?.gridData.days || propDays);
+const [dayLabels, setDayLabels] = useState<string[]>(
+  persistedSnapshot?.gridData.dayLabels || propDayLabels || propDays
+);
+const [timeSlots, setTimeSlots] = useState<string[]>(
+  persistedSnapshot?.gridData.timeSlots || propTimeSlots
+);
+const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabilityState[]>(() =>
+  normalizeRoomAvailabilityState(
+    persistedSnapshot?.roomAvailability || initialRoomAvailability,
+    initialRoomOptions,
+    persistedSnapshot?.gridData.days || propDays,
     persistedSnapshot?.gridData.timeSlots || propTimeSlots
-  );
+  )
+);
   const currentGridData = useMemo(
     () => ({
       days,
@@ -560,9 +776,14 @@ export function RosterDashboard({
       ),
     [schedulingContext.roomOptions, schedulingContext.rooms, datasetRoomOptions]
   );
+  useEffect(() => {
+    setRoomAvailabilityState(prev =>
+      stabilizeRoomAvailabilityState(prev, resolvedRoomOptions, days, timeSlots)
+    );
+  }, [resolvedRoomOptions, days, timeSlots]);
   const roomAvailabilityRooms = useMemo(
-    () => buildRoomAvailabilityRooms(events, days, timeSlots, resolvedRoomOptions),
-    [events, days, timeSlots, resolvedRoomOptions]
+    () => buildRoomAvailabilityRooms(events, days, timeSlots, resolvedRoomOptions, roomAvailabilityState),
+    [events, days, timeSlots, resolvedRoomOptions, roomAvailabilityState]
   );
   useEffect(() => {
     if (!schedulingContext.roomOptions && resolvedRoomOptions.length > 0) {
@@ -594,8 +815,9 @@ export function RosterDashboard({
 
     const getStatus = (person: PersonAvailability, day: string, slot: string): AvailabilityStatus => {
       const slotValue = person.availability?.[day]?.[slot];
-      if (!slotValue) return 'empty';
-      return typeof slotValue === 'string' ? slotValue : slotValue.status;
+      if (!slotValue) return 'available';
+      const rawStatus = typeof slotValue === 'string' ? slotValue : slotValue.status;
+      return rawStatus === 'empty' ? 'available' : rawStatus;
     };
 
     days.forEach(day => {
@@ -630,6 +852,13 @@ export function RosterDashboard({
     () => events.filter(event => Boolean(event.day && event.startTime)).length,
     [events]
   );
+  useEffect(() => {
+    if (!partialScheduleNotice) return;
+    const unscheduledCount = events.filter(event => !event.day || !event.startTime).length;
+    if (unscheduledCount === 0) {
+      setPartialScheduleNotice(null);
+    }
+  }, [events, partialScheduleNotice]);
 
   // Auto-persist state with debouncing
   const { persistNow, clearPersistedState } = usePersistedState(
@@ -640,6 +869,7 @@ export function RosterDashboard({
     filters,
     { days, dayLabels, timeSlots },
     { toolbarPosition, cardViewMode, filterPanelCollapsed },
+    roomAvailabilityState,
     currentDatasetVersion || undefined
   );
   const currentSnapshotState = useMemo(
@@ -652,6 +882,7 @@ export function RosterDashboard({
         schedulingContext,
         filters,
         gridData: currentGridData,
+        roomAvailability: roomAvailabilityState,
         uiPreferences: {
           toolbarPosition,
           cardViewMode,
@@ -666,6 +897,7 @@ export function RosterDashboard({
       schedulingContext,
       filters,
       currentGridData,
+      roomAvailabilityState,
       toolbarPosition,
       cardViewMode,
       filterPanelCollapsed,
@@ -718,7 +950,7 @@ export function RosterDashboard({
 
           if (sourceEvent.day === targetEvent.day && sourceEvent.startTime === targetEvent.startTime) {
             const closestEdge = extractClosestEdge(targetData);
-            let cellEvents = eventsSnapshot.filter(
+            const cellEvents = eventsSnapshot.filter(
               e => e.day === sourceEvent.day && e.startTime === sourceEvent.startTime
             );
 
@@ -848,6 +1080,14 @@ export function RosterDashboard({
     setDayLabels(data.dayLabels);
     setTimeSlots(data.timeSlots);
     setSchedulingContext(updatedContext);
+    setRoomAvailabilityState(
+      normalizeRoomAvailabilityState(
+        data.roomAvailability,
+        data.roomOptions,
+        data.days,
+        data.timeSlots
+      )
+    );
     const defaultFilters = buildDefaultFilterState();
     setFilters(defaultFilters);
     setSelectedEvent(null);
@@ -866,6 +1106,7 @@ export function RosterDashboard({
       schedulingContext: updatedContext,
       filters: defaultFilters,
       gridData,
+      roomAvailability: data.roomAvailability,
       uiPreferences: {
         toolbarPosition,
         cardViewMode,
@@ -904,11 +1145,25 @@ export function RosterDashboard({
     setActiveRosterId(state.activeRosterId);
     setSchedulingContext(state.schedulingContext);
     setFilters(state.filters);
+    const snapshotDays = state.gridData?.days || days;
+    const snapshotSlots = state.gridData?.timeSlots || timeSlots;
     if (state.gridData) {
       setDays(state.gridData.days);
       setDayLabels(state.gridData.dayLabels);
       setTimeSlots(state.gridData.timeSlots);
     }
+    const snapshotRoomOptions = ensureRoomOptionsList(
+      state.schedulingContext?.roomOptions,
+      state.schedulingContext?.rooms
+    );
+    setRoomAvailabilityState(
+      normalizeRoomAvailabilityState(
+        state.roomAvailability || [],
+        snapshotRoomOptions,
+        snapshotDays,
+        snapshotSlots
+      )
+    );
     setToolbarPosition(state.uiPreferences.toolbarPosition);
     setCardViewMode(state.uiPreferences.cardViewMode);
     setFilterPanelCollapsed(state.uiPreferences.filterPanelCollapsed);
@@ -961,11 +1216,14 @@ export function RosterDashboard({
         };
       });
 
+      const adjacencyInfo = result.objectives?.adjacency;
       const solverMetadata: SolverRunInfo = {
         timestamp: Date.now(),
         mode: mode === 'reoptimize' ? 're-optimize' : 'solve-from-scratch',
         runtime: result.solve_time_ms,
         objectiveValue: result.objective_value,
+        adjacencyScore: adjacencyInfo?.score ?? null,
+        adjacencyPossible: adjacencyInfo?.possible ?? null,
         lockCount: updatedEvents.filter(event => event.locked).length,
       };
 
@@ -994,6 +1252,55 @@ export function RosterDashboard({
     [persistNow, push, setUnsatNotice]
   );
 
+  const summarizeSolveResult = useCallback(
+    (result: SolveResult): SolverExecutionSummary => {
+      const summary = (result.summary || {}) as Record<string, unknown>;
+      const total =
+        typeof summary.total === 'number'
+          ? summary.total
+          : typeof result.total_defenses === 'number'
+          ? result.total_defenses
+          : currentStateRef.current?.events.length || 0;
+      const scheduled =
+        typeof summary.scheduled === 'number'
+          ? summary.scheduled
+          : typeof result.planned_count === 'number'
+          ? result.planned_count
+          : result.assignments?.length || 0;
+      const unscheduled =
+        typeof summary.unscheduled === 'number'
+          ? summary.unscheduled
+          : Math.max(total - scheduled, 0);
+      return { total, scheduled, unscheduled };
+    },
+    []
+  );
+
+  const handleSolverMetrics = useCallback(
+    (result: SolveResult, summary: SolverExecutionSummary) => {
+      setPartialScheduleNotice(summary.unscheduled > 0 ? { total: summary.total, unscheduled: summary.unscheduled } : null);
+      setObjectiveHighlights(prev => {
+        const adjacency = result.objectives?.adjacency;
+        if (adjacency && (adjacency.score ?? adjacency.possible) !== undefined) {
+          return {
+            ...prev,
+            'adjacency-objective': {
+              value: adjacency.score ?? null,
+              max: adjacency.possible ?? null,
+            },
+          };
+        }
+        if (prev['adjacency-objective']) {
+          const next = { ...prev };
+          delete next['adjacency-objective'];
+          return next;
+        }
+        return prev;
+      });
+    },
+    []
+  );
+
   const runSolver = useCallback(
     async (options?: { mode?: 'solve' | 'reoptimize'; timeout?: number; label?: string }) => {
       if (!currentDatasetId) {
@@ -1001,18 +1308,29 @@ export function RosterDashboard({
         return;
       }
       if (solverRunning) return;
+      setPendingSolverResult(null);
+      setActiveSolverRunId(null);
+      setCancellingSolverRun(false);
       const mode = options?.mode || 'solve';
-      const baseTitle = mode === 'reoptimize' ? 'Re-optimizing schedule' : 'Solving schedule';
+      const baseTitle =
+        mode === 'reoptimize' ? 'Re-optimizing schedule' : 'Searching for a feasible timetable…';
       const description =
         options?.label ||
         (mode === 'reoptimize'
-          ? 'Adjusting the current roster while respecting locks'
-          : 'Searching for a feasible timetable…');
+          ? ''
+          : '');
+      const runStartedAt = Date.now();
+      const timeoutSeconds = options?.timeout ?? DEFAULT_SOLVER_TIMEOUT_SECONDS;
       setSolverStatusModal({
         open: true,
         status: 'running',
         title: baseTitle,
         message: description,
+        adjacencyLabel: null,
+        startedAt: runStartedAt,
+        timeoutSeconds,
+        elapsedSeconds: 0,
+        runId: null,
       });
       setSolverRunning(true);
       try {
@@ -1021,44 +1339,124 @@ export function RosterDashboard({
         const result = await schedulingAPI.solve(schedule, {
           timeout: options?.timeout,
           solver: 'ortools',
+          adjacencyObjective: adjacencyObjectiveEnabled,
+          mustPlanAllDefenses,
+        }, {
+          onRunId: runId => {
+            setActiveSolverRunId(runId);
+            setSolverStatusModal(prev => ({ ...prev, runId }));
+          },
         });
-        applySolveResult(result, mode);
-        const durationSeconds = (result.solve_time_ms || 0) / 1000;
+        const summaryStats = summarizeSolveResult(result);
+        const durationSeconds =
+          typeof result.solve_time_ms === 'number'
+            ? result.solve_time_ms / 1000
+            : (Date.now() - runStartedAt) / 1000;
+        const summaryLabel = `${summaryStats.scheduled}/${summaryStats.total} defenses scheduled`;
+        const adjacencyInfo = result.objectives?.adjacency;
+        const adjacencyLabel =
+          adjacencyInfo && (adjacencyInfo.score ?? adjacencyInfo.possible) !== undefined
+            ? `Adjacency ${adjacencyInfo.score ?? 0}${
+                adjacencyInfo.possible !== undefined ? `/${adjacencyInfo.possible}` : ''
+              }`
+            : null;
+        const statusLine = [result.status, summaryLabel, `${durationSeconds.toFixed(1)}s`]
+          .filter(Boolean)
+          .join(' · ');
         setSolverStatusModal({
           open: true,
           status: 'success',
-          title: 'Solver complete',
-          message: `${result.status} · ${result.num_assignments} assignments in ${durationSeconds.toFixed(1)}s`,
+          title: 'Schedule complete',
+          message: statusLine,
+          adjacencyLabel,
+          startedAt: null,
+          timeoutSeconds: null,
+          elapsedSeconds: durationSeconds,
+          runId: null,
         });
-        if (solverModalTimer.current) {
-          clearTimeout(solverModalTimer.current);
+        if (summaryStats.unscheduled > 0) {
+          if (summaryStats.scheduled > 0) {
+            setPendingSolverResult({ result, mode, summary: summaryStats });
+          } else {
+            setUnsatNotice({
+              open: true,
+              message:
+                summaryStats.total > 0
+                  ? `The solver could not automatically schedule any of the ${summaryStats.total} defenses with the current constraints. Adjust availabilities or loosen constraints and try again.`
+                  : 'The solver could not automatically schedule any defenses with the current constraints.',
+            });
+          }
+          return;
         }
-        solverModalTimer.current = setTimeout(() => {
-          setSolverStatusModal(prev =>
-            prev.status === 'success'
-              ? {
-                  ...prev,
-                  open: false,
-                }
-              : prev
-          );
-        }, 2000);
+        applySolveResult(result, mode);
+        handleSolverMetrics(result, summaryStats);
       } catch (error) {
-        logger.error('Solver failed', error);
         const message = error instanceof Error ? error.message : 'Failed to run solver. Check backend logs.';
+        const cancelled = typeof message === 'string' && message.toLowerCase().includes('cancelled');
+        if (!cancelled) {
+          logger.error('Solver failed', error);
+        } else {
+          logger.info('Solver run cancelled by user');
+        }
         setSolverStatusModal({
           open: true,
-          status: 'error',
-          title: 'Solver failed',
-          message,
+          status: cancelled ? 'cancelled' : 'error',
+          title: cancelled ? 'Solver cancelled' : 'Solver failed',
+          message: cancelled ? 'The solver was stopped before completion.' : message,
+          adjacencyLabel: null,
+          startedAt: null,
+          timeoutSeconds: null,
+          elapsedSeconds: (Date.now() - runStartedAt) / 1000,
+          runId: null,
         });
-        showToast.error('Failed to run solver. Check backend logs.');
+        if (cancelled) {
+          showToast.info('Solver run cancelled');
+        } else {
+          showToast.error('Failed to run solver. Check backend logs.');
+        }
       } finally {
         setSolverRunning(false);
+        setActiveSolverRunId(null);
+        setCancellingSolverRun(false);
       }
     },
-    [applySolveResult, currentDatasetId, persistNow, solverRunning]
+    [
+      adjacencyObjectiveEnabled,
+      applySolveResult,
+      currentDatasetId,
+      handleSolverMetrics,
+      mustPlanAllDefenses,
+      persistNow,
+      solverRunning,
+      summarizeSolveResult,
+    ]
   );
+
+  const handleApplyPartialResult = useCallback(() => {
+    if (!pendingSolverResult) return;
+    applySolveResult(pendingSolverResult.result, pendingSolverResult.mode);
+    handleSolverMetrics(pendingSolverResult.result, pendingSolverResult.summary);
+    setPendingSolverResult(null);
+  }, [applySolveResult, handleSolverMetrics, pendingSolverResult]);
+
+  const handleDiscardPartialResult = useCallback(() => {
+    setPendingSolverResult(null);
+    showToast.info('Kept previous schedule');
+  }, []);
+
+  const handleCancelSolverRun = useCallback(async () => {
+    if (!activeSolverRunId || cancellingSolverRun) {
+      return;
+    }
+    try {
+      setCancellingSolverRun(true);
+      await schedulingAPI.cancelSolverRun(activeSolverRunId);
+    } catch (err) {
+      logger.error('Failed to cancel solver run', err);
+      setCancellingSolverRun(false);
+      showToast.error('Unable to cancel solver run. Please try again.');
+    }
+  }, [activeSolverRunId, cancellingSolverRun]);
 
   // Solver preset configurations (reserved for future quick-solve feature)
   // const quickSolvePresets: Record<'fast' | 'optimal' | 'enumerate', { timeout: number; label: string }> = {
@@ -1079,8 +1477,9 @@ export function RosterDashboard({
 
   useEffect(() => {
     return () => {
-      if (solverModalTimer.current) {
-        clearTimeout(solverModalTimer.current);
+      if (solverProgressInterval.current) {
+        clearInterval(solverProgressInterval.current);
+        solverProgressInterval.current = null;
       }
     };
   }, []);
@@ -1169,7 +1568,7 @@ export function RosterDashboard({
 
   const visibleAvailabilities = useMemo(() => {
     if (availabilities.length === 0) return availabilities;
-    const nonStudents = availabilities.filter(person => person.role !== 'student');
+    const nonStudents = availabilities.filter(person => !isStudentRole(person.role));
     if (nonStudents.length === 0) {
       return nonStudents;
     }
@@ -1180,10 +1579,12 @@ export function RosterDashboard({
   }, [availabilities, eventParticipantNames]);
 
   // Track previous roster sync values for deep change detection
-  const prevRosterSyncRef = useRef<{
+const prevRosterSyncRef = useRef<{
     currentState: ScheduleState | null;
     availabilities: PersonAvailability[];
     activeRosterId: string;
+    globalObjectives: GlobalObjective[];
+    localObjectives: LocalObjective[];
   }>();
 
   // Sync active roster state when currentState or availabilities change (debounced)
@@ -1199,6 +1600,8 @@ export function RosterDashboard({
       if (prev.activeRosterId !== activeRosterId) return true;
       if (prev.currentState?.events !== currentState.events) return true;
       if (prev.availabilities !== availabilities) return true;
+      if (prev.globalObjectives !== globalObjectives) return true;
+      if (prev.localObjectives !== localObjectives) return true;
 
       return false;
     })();
@@ -1223,6 +1626,8 @@ export function RosterDashboard({
           currentState,
           availabilities,
           activeRosterId,
+          globalObjectives,
+          localObjectives,
         };
 
         return prev.map(r =>
@@ -1232,8 +1637,12 @@ export function RosterDashboard({
                 state: currentState,
                 availabilities: availabilities,
                 objectives: {
-                  global: globalObjectives,
-                  local: localObjectives,
+                  global: globalObjectives.map(obj => ({ ...obj })),
+                  local: localObjectives.map(obj => ({
+                    ...obj,
+                    defenseIds: [...obj.defenseIds],
+                    parameters: obj.parameters ? { ...obj.parameters } : undefined,
+                  })),
                 },
               }
             : r
@@ -1254,8 +1663,10 @@ export function RosterDashboard({
         return aHour - bHour;
       });
 
-      const startHour = sortedSlots.length > 0 ? parseInt(sortedSlots[0].split(':')[0]) : 8;
-      const endHour = sortedSlots.length > 0 ? parseInt(sortedSlots[sortedSlots.length - 1].split(':')[0]) : 17;
+      const firstSlotHour = sortedSlots.length > 0 ? parseInt(sortedSlots[0].split(':')[0], 10) : 8;
+      const lastSlotHour = sortedSlots.length > 0 ? parseInt(sortedSlots[sortedSlots.length - 1].split(':')[0], 10) : 16;
+      const startHour = Number.isFinite(firstSlotHour) ? firstSlotHour : 8;
+      const endHour = Number.isFinite(lastSlotHour) ? lastSlotHour + 1 : startHour + 8;
 
       setSchedulingContext(prev => ({
         ...prev,
@@ -2102,16 +2513,58 @@ export function RosterDashboard({
     [setSchedulingContext, datasetRoomOptions]
   );
 
+  const handleRoomSlotToggle = useCallback(
+    (roomId: string, day: string, slot: string, desiredStatus?: 'available' | 'unavailable') => {
+      setRoomAvailabilityState(prev => {
+        const stabilized = stabilizeRoomAvailabilityState(prev, resolvedRoomOptions, days, timeSlots);
+        const index = stabilized.findIndex(room => room.id === roomId);
+        let updatedRooms = stabilized;
+        if (index === -1) {
+          const slots = createRoomAvailabilitySlots(days, timeSlots);
+          if (slots[day]) {
+            slots[day][slot] = desiredStatus ?? 'unavailable';
+          }
+          updatedRooms = [
+            ...stabilized,
+            {
+              id: roomId,
+              label: roomId,
+              slots,
+            },
+          ];
+        } else {
+          const target = stabilized[index];
+          const normalizedSlots = normalizeRoomSlots(target.slots, days, timeSlots);
+          const current = normalizedSlots[day]?.[slot] === 'unavailable';
+          if (normalizedSlots[day]) {
+            const nextStatus = desiredStatus ?? (current ? 'available' : 'unavailable');
+            normalizedSlots[day][slot] = nextStatus;
+          }
+          updatedRooms = stabilized.map((room, idx) =>
+            idx === index ? { ...room, slots: normalizedSlots } : room
+          );
+        }
+        return stabilizeRoomAvailabilityState(updatedRooms, resolvedRoomOptions, days, timeSlots);
+      });
+    },
+    [days, timeSlots, resolvedRoomOptions]
+  );
+
+
+  const clearSchedulingFields = (event: DefenceEvent): DefenceEvent => ({
+    ...event,
+    day: '',
+    startTime: '',
+    endTime: '',
+    room: undefined,
+  });
+
   const handleUnscheduleSelection = () => {
     if (!currentState || selectedEvents.size === 0) return;
 
-    const unscheduledEvents = currentState.events.map(e => {
-      if (selectedEvents.has(e.id)) {
-        const { day: _day, startTime: _startTime, endTime: _endTime, room: _room, ...rest } = e;
-        return rest as DefenceEvent;
-      }
-      return e;
-    });
+    const unscheduledEvents = currentState.events.map(e =>
+      selectedEvents.has(e.id) ? clearSchedulingFields(e) : e
+    );
 
     const action: ScheduleAction = {
       type: 'manual-edit',
@@ -2131,10 +2584,7 @@ export function RosterDashboard({
 
   const handleUnscheduleAll = () => {
     if (!currentState || currentState.events.length === 0) return;
-    const unscheduledEvents = currentState.events.map(e => {
-      const { day: _day, startTime: _startTime, endTime: _endTime, room: _room, ...rest } = e;
-      return rest as DefenceEvent;
-    });
+    const unscheduledEvents = currentState.events.map(clearSchedulingFields);
     const action: ScheduleAction = {
       type: 'manual-edit',
       timestamp: Date.now(),
@@ -2382,42 +2832,55 @@ export function RosterDashboard({
 
   // Roster management handlers
   const handleNewRoster = () => {
-    rosterCounterRef.current += 1;
+    if (!currentState) return;
 
-    // Create empty roster with no events
-    const emptyState: ScheduleState = {
-      events: [],
-      locks: new Map(),
-      solverMetadata: null,
-      conflicts: [],
+    const clonedState = cloneScheduleStateDeep(currentState);
+    const clonedAvailabilities = clonePersonAvailabilities(availabilities);
+    const clonedObjectives = cloneObjectives({
+      global: globalObjectives,
+      local: localObjectives,
+    });
+    const gridDataCopy = {
+      days: [...currentGridData.days],
+      dayLabels: [...currentGridData.dayLabels],
+      timeSlots: [...currentGridData.timeSlots],
     };
 
+    rosterCounterRef.current += 1;
+    const newRosterId = `roster-${Date.now()}`;
+    const newLabel = `Schedule ${rosterCounterRef.current}`;
+
     const newRoster: Roster = {
-      id: `roster-${Date.now()}`,
-      label: `Schedule ${rosterCounterRef.current}`,
-      state: emptyState,
-      availabilities: [], // Empty availability list
-      objectives: {
-        global: globalObjectives,
-        local: localObjectives,
-      },
+      id: newRosterId,
+      label: newLabel,
+      state: clonedState,
+      availabilities: clonedAvailabilities,
+      objectives: clonedObjectives,
       createdAt: Date.now(),
-      source: 'manual',
+      source: currentState.solverMetadata ? 'solver' : 'manual',
+      gridData: gridDataCopy,
     };
 
     setRosters(prev => [...prev, newRoster]);
-    setActiveRosterId(newRoster.id);
 
-    // Switch to the new empty roster
-    push({
-      type: 'manual-edit',
-      timestamp: Date.now(),
-      description: `Created ${newRoster.label}`,
-      data: {},
-    }, emptyState);
-    updateAvailabilities([]);
+    startTransition(() => {
+      setActiveRosterId(newRosterId);
+      push(
+        {
+          type: 'manual-edit',
+          timestamp: Date.now(),
+          description: `Copied to ${newLabel}`,
+          data: { rosterId: newRosterId },
+        },
+        clonedState
+      );
+      updateAvailabilities(clonedAvailabilities);
+      setDays(gridDataCopy.days);
+      setDayLabels(gridDataCopy.dayLabels);
+      setTimeSlots(gridDataCopy.timeSlots);
+    });
 
-    showToast.success(`Created empty ${newRoster.label}`);
+    showToast.success(`Copied schedule to ${newLabel}`);
   };
 
   const handleRosterSelect = (rosterId: string) => {
@@ -2434,8 +2897,10 @@ export function RosterDashboard({
         data: { rosterId },
       }, roster.state);
       updateAvailabilities(roster.availabilities);
-      if (roster.objectives) {
+      if (roster.objectives?.global && roster.objectives.global.length > 0) {
         setGlobalObjectives(roster.objectives.global);
+      }
+      if (roster.objectives?.local && roster.objectives.local.length > 0) {
         setLocalObjectives(roster.objectives.local);
       }
 
@@ -2635,8 +3100,10 @@ export function RosterDashboard({
       });
 
       const filteredAvailability = rosterParticipants.size === 0
-        ? roster.availabilities
-        : roster.availabilities.filter(person => rosterParticipants.has(normalizeName(person.name)));
+        ? roster.availabilities.filter(person => !isStudentRole(person.role))
+        : roster.availabilities
+            .filter(person => rosterParticipants.has(normalizeName(person.name)))
+            .filter(person => !isStudentRole(person.role));
 
       return {
         id: roster.id,
@@ -2648,6 +3115,78 @@ export function RosterDashboard({
 
   // Memoize roster list for toolbar to prevent unnecessary re-renders
   const toolbarRosters = useMemo(() => rosters.map(r => ({ id: r.id, label: r.label })), [rosters]);
+  const scheduleComparisonEntries = useMemo(
+    () =>
+      rosters.map(roster => {
+        const rosterEvents = roster.state.events || [];
+        const scheduledCount = rosterEvents.filter(event => event.day && event.startTime).length;
+        const adjacencyScore = roster.state.solverMetadata?.adjacencyScore ?? null;
+        const adjacencyPossible = roster.state.solverMetadata?.adjacencyPossible ?? null;
+        const objectiveValues: Record<string, number> = {};
+        if (typeof adjacencyScore === 'number') {
+          objectiveValues['adjacency-objective:overall'] = adjacencyScore;
+        }
+        return {
+          id: roster.id,
+          label: roster.label,
+          scheduledEvents: scheduledCount,
+          totalEvents: rosterEvents.length,
+          variant: 'real' as const,
+          adjacency:
+            adjacencyScore != null || adjacencyPossible != null
+              ? { score: adjacencyScore, possible: adjacencyPossible }
+              : undefined,
+          objectiveValues,
+        };
+      }),
+    [rosters]
+  );
+  const handleExportRoster = useCallback(() => {
+    const activeRoster = rosters.find(r => r.id === activeRosterId);
+    if (!activeRoster) {
+      showToast.error('No active schedule to export');
+      return;
+    }
+    const snapshot = createPersistedStateSnapshot({
+      datasetId: currentDatasetId,
+      datasetVersion: currentDatasetVersion || undefined,
+      rosters,
+      activeRosterId,
+      schedulingContext,
+      filters,
+      gridData: currentGridData,
+      roomAvailability: roomAvailabilityState,
+      uiPreferences: {
+        toolbarPosition,
+        cardViewMode,
+        filterPanelCollapsed,
+      },
+    });
+    showToast.info(`Exporting ${activeRoster.label}…`);
+    startTransition(() => {
+      void (async () => {
+        const result = await exportRosterSnapshot(snapshot, currentDatasetId, activeRoster.label);
+        if (!result) {
+          showToast.error('Failed to export schedule');
+          return;
+        }
+        showToast.success(`Exported to ${result.path}`);
+      })();
+    });
+  }, [
+    rosters,
+    activeRosterId,
+    currentDatasetId,
+    currentDatasetVersion,
+    schedulingContext,
+    filters,
+    currentGridData,
+    roomAvailabilityState,
+    toolbarPosition,
+    cardViewMode,
+    filterPanelCollapsed,
+  ]);
+
   const solverStatusIcon = useMemo(() => {
     if (solverStatusModal.status === 'running') {
       return <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />;
@@ -2655,8 +3194,43 @@ export function RosterDashboard({
     if (solverStatusModal.status === 'success') {
       return <CheckCircle2 className="h-10 w-10 text-emerald-500" />;
     }
+    if (solverStatusModal.status === 'cancelled') {
+      return <CircleSlash2 className="h-10 w-10 text-gray-500" />;
+    }
     return <AlertTriangle className="h-10 w-10 text-red-500" />;
   }, [solverStatusModal.status]);
+  const solverElapsedSeconds = solverStatusModal.elapsedSeconds ?? 0;
+
+  useEffect(() => {
+    if (solverStatusModal.status === 'running' && solverStatusModal.startedAt) {
+      if (solverProgressInterval.current) {
+        clearInterval(solverProgressInterval.current);
+      }
+      solverProgressInterval.current = setInterval(() => {
+        setSolverStatusModal(prev => {
+          if (prev.status !== 'running' || !prev.startedAt) {
+            return prev;
+          }
+          const elapsedSeconds = (Date.now() - prev.startedAt) / 1000;
+          if (Math.abs(elapsedSeconds - prev.elapsedSeconds) < 0.05) {
+            return prev;
+          }
+          return { ...prev, elapsedSeconds };
+        });
+      }, 250);
+      return () => {
+        if (solverProgressInterval.current) {
+          clearInterval(solverProgressInterval.current);
+          solverProgressInterval.current = null;
+        }
+      };
+    }
+    if (solverProgressInterval.current) {
+      clearInterval(solverProgressInterval.current);
+      solverProgressInterval.current = null;
+    }
+    return undefined;
+  }, [solverStatusModal.status, solverStatusModal.startedAt]);
 
   const getCellKey = useCallback((day: string, time: string) => `${day}-${time}`, []);
 
@@ -2689,6 +3263,26 @@ export function RosterDashboard({
     const key = `${day}-${time}`;
     return activeCardIndex[key] || 0;
   }, [activeCardIndex]);
+
+  const handleRoomSlotSelect = useCallback(
+    (roomId: string, day: string, timeSlot: string) => {
+      setHighlightedSlot({ day, timeSlot });
+      scrollElementIntoScheduleView(timeSlotRefs.current.get(timeSlot) ?? null);
+      const normalizedRoom = slugifyRoomId(roomId);
+      const cellEvents = getEventsForCell(day, timeSlot);
+      if (cellEvents.length === 0) return;
+      const matchIndex = cellEvents.findIndex(event => slugifyRoomId(event.room || '') === normalizedRoom);
+      const targetEvent = matchIndex >= 0 ? cellEvents[matchIndex] : cellEvents[0];
+      if (!targetEvent) return;
+      const cellKey = getCellKey(day, timeSlot);
+      setActiveCardIndex(prev => ({
+        ...prev,
+        [cellKey]: Math.max(matchIndex, 0),
+      }));
+      handleEventClick(targetEvent.id);
+    },
+    [getEventsForCell, scrollElementIntoScheduleView, getCellKey, handleEventClick]
+  );
 
   // Color scheme state with handler for FilterPanel
   const [colorScheme, setColorScheme] = useState<Record<string, string>>({
@@ -2818,7 +3412,7 @@ export function RosterDashboard({
                                 onAddEvent={handleAddDefence}
                               >
                             {cellEvents.length > 0 && cardViewMode === 'individual' && (
-                              <div className="relative min-h-[120px]">
+                              <div className="relative min-h-[100px]">
                                 <div className="relative">
                                   {cellEvents.map((event, idx) => {
                                     const isActive = idx === activeIndex;
@@ -2840,9 +3434,10 @@ export function RosterDashboard({
                                         conflictSeverity={conflictMeta.severity}
                                         hasDoubleBooking={conflictMeta.hasDoubleBooking}
                                         doubleBookingCount={conflictMeta.doubleBookingCount}
+                                        programmeId={event.programmeId}
                                         cardStyle={{
                                           width: '100%',
-                                          minHeight: '64px',
+                                          minHeight: '100px',
                                           padding: '12px 10px 0px 10px',
                                           fontSize: 'text-xs',
                                           showFullDetails: false,
@@ -2926,6 +3521,7 @@ export function RosterDashboard({
                                       conflictSeverity={conflictMeta.severity}
                                       hasDoubleBooking={conflictMeta.hasDoubleBooking}
                                       doubleBookingCount={conflictMeta.doubleBookingCount}
+                                      programmeId={event.programmeId}
                                       cardStyle={{
                                         width: '100%',
                                         minHeight: '42px',
@@ -3031,7 +3627,7 @@ export function RosterDashboard({
                 }}
                 onSolverSettings={() => logger.debug('Solver settings')}
                 onImportData={() => setDatasetModalOpen(true)}
-                onExportResults={() => logger.debug('Export results')}
+                onExportResults={handleExportRoster}
                 onSaveSnapshot={() => {
                   setSnapshotModalMode('save');
                   setSnapshotModalOpen(true);
@@ -3087,7 +3683,7 @@ export function RosterDashboard({
                 }}
                 onSolverSettings={() => logger.debug('Solver settings')}
                 onImportData={() => setDatasetModalOpen(true)}
-                onExportResults={() => logger.debug('Export results')}
+                onExportResults={handleExportRoster}
                 onSaveSnapshot={() => {
                   setSnapshotModalMode('save');
                   setSnapshotModalOpen(true);
@@ -3096,8 +3692,8 @@ export function RosterDashboard({
                   setSnapshotModalMode('list');
                   setSnapshotModalOpen(true);
                 }}
-                  onShowConflicts={() => setShowConflictsPanel(true)}
-                  onValidateSchedule={() => logger.debug('Validate schedule')}
+                onShowConflicts={() => setShowConflictsPanel(true)}
+                onValidateSchedule={() => logger.debug('Validate schedule')}
                   onViewStatistics={() => logger.debug('View statistics')}
                   onExplainInfeasibility={() => logger.debug('Explain infeasibility')}
                   onDeleteSelection={handleDeleteSelection}
@@ -3115,8 +3711,28 @@ export function RosterDashboard({
                   onRosterDelete={handleRosterDelete}
                   onRosterRename={handleRosterRename}
                   onNewRoster={handleNewRoster}
-                  isSolving={solverRunning}
-                />
+                isSolving={solverRunning}
+              />
+            )}
+              {partialScheduleNotice && (
+                <div className="mx-6 mt-3 mb-2 p-4 rounded-xl border border-amber-200 bg-amber-50 shadow-sm">
+                  <div className="flex items-center gap-2 text-amber-900">
+                    <AlertTriangle className="w-5 h-5" />
+                    <span className="font-semibold">Partial schedule active</span>
+                  </div>
+                  <p className="text-sm text-amber-900 mt-1">
+                    {partialScheduleNotice.unscheduled} of {partialScheduleNotice.total} defenses still require manual placement.
+                  </p>
+                  <div className="mt-2">
+                    <button
+                      type="button"
+                      onClick={handleShowUnscheduled}
+                      className="px-3 py-1.5 text-sm font-medium text-amber-900 border border-amber-300 rounded-lg bg-white/70 hover:bg-white transition-colors"
+                    >
+                      Review unscheduled defenses
+                    </button>
+                  </div>
+                </div>
               )}
 
               {renderScheduleGrid()}
@@ -3341,8 +3957,6 @@ export function RosterDashboard({
             scheduledBookings={scheduledBookings}
             workloadStats={participantWorkload}
             columnHighlights={columnHighlights}
-            roomAvailabilityRooms={roomAvailabilityRooms}
-            roomDrawerSlot={highlightedSlot}
             sharedHeight={sharedPanelHeight}
             onHeightChange={handleSharedHeightChange}
             registerResizeHandle={
@@ -3360,6 +3974,11 @@ export function RosterDashboard({
 
             globalObjectives={globalObjectives}
             localObjectives={localObjectives}
+            solverPreferences={{
+              mustPlanAllDefenses,
+              onMustPlanAllDefensesChange: setMustPlanAllDefenses,
+            }}
+            objectiveHighlights={objectiveHighlights}
             scheduleStats={{
               totalEvents: events.length,
               scheduledEvents: scheduledEventsCount,
@@ -3392,6 +4011,8 @@ export function RosterDashboard({
                 : undefined
             }
             hideInternalHandle={bottomPanelTab === 'objectives' && objectivesExpanded}
+            comparisonSchedules={scheduleComparisonEntries}
+            activeScheduleId={activeRosterId}
           />
         )}
 
@@ -3408,9 +4029,11 @@ export function RosterDashboard({
             }
             hideInternalHandle={bottomPanelTab === 'rooms' && roomsExpanded}
             onRoomToggle={handleRoomToggle}
+            onSlotStatusChange={handleRoomSlotToggle}
+            onSlotSelect={handleRoomSlotSelect}
+            programmeColors={{ ...colorScheme }}
           />
         )}
-
 
         {bottomPanelTab === 'conflicts' && (
           <ConflictsPanelV2
@@ -3537,11 +4160,6 @@ export function RosterDashboard({
           <div
             className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
             aria-hidden="true"
-            onClick={() => {
-              if (solverStatusModal.status !== 'running') {
-                closeSolverStatusModal();
-              }
-            }}
           />
           <div className="relative z-10 w-full max-w-md px-4">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl p-8 text-center space-y-5">
@@ -3550,33 +4168,91 @@ export function RosterDashboard({
                 <h3 className="text-xl font-semibold text-gray-900">
                   {solverStatusModal.title || 'Running solver'}
                 </h3>
-                <p className="text-sm text-gray-600">
-                  {solverStatusModal.message ||
-                    (solverStatusModal.status === 'running'
-                      ? 'Searching for a feasible defense roster...'
-                      : '')}
-                </p>
+                {solverStatusPrimaryText && (
+                  <p className="text-lg text-gray-700">{solverStatusPrimaryText}</p>
+                )}
+                {solverStatusModal.adjacencyLabel && solverStatusModal.status !== 'running' && (
+                  <p className="text-lg text-gray-700">{solverStatusModal.adjacencyLabel}</p>
+                )}
               </div>
               {solverStatusModal.status === 'running' ? (
-                <div className="space-y-3">
-                  <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-600 animate-pulse w-3/4" />
+                <div className="space-y-4">
+                  <div className="solver-progress solver-progress--indeterminate" aria-hidden="true">
+                    <div className="solver-progress__indicator" />
                   </div>
-                  <p className="text-xs text-gray-500">
-                    You can keep reviewing the roster; we'll notify you once the solver finishes.
+                  <p className="text-base text-gray-700 font-semibold">
+                    Elapsed time: {solverElapsedSeconds.toFixed(1)}s
                   </p>
+                  <button
+                    type="button"
+                    onClick={handleCancelSolverRun}
+                    disabled={!activeSolverRunId || cancellingSolverRun}
+                    className="px-4 py-2 rounded-full text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:text-gray-500 transition-colors"
+                  >
+                    {cancellingSolverRun ? 'Cancelling…' : 'Cancel solve'}
+                  </button>
                 </div>
               ) : (
                 <div className="flex justify-center">
                   <button
                     type="button"
                     onClick={closeSolverStatusModal}
-                    className="px-4 py-2 rounded-full text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                    className="px-4 py-2 rounded-full text-sm font-medium text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors"
                   >
                     Close
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      {pendingSolverResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" aria-hidden="true" />
+          <div className="relative z-10 w-full max-w-lg px-4">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl p-8 space-y-4">
+              <div className="text-center space-y-1">
+                <h3 className="text-2xl font-semibold text-gray-900">Apply partial schedule?</h3>
+                <p className="text-lg text-gray-700">
+                  The solver scheduled {pendingSolverResult.summary.scheduled} of {pendingSolverResult.summary.total} defenses.{` `}
+                  {pendingSolverResult.summary.unscheduled} still require manual placement.
+                </p>
+                {pendingAdjacencyLabel && (
+                  <p className="text-lg text-gray-700">{pendingAdjacencyLabel}</p>
+                )}
+              </div>
+              {pendingSolverResult.result.unscheduled && pendingSolverResult.result.unscheduled.length > 0 && (
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 max-h-48 overflow-auto">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Unscheduled defenses</p>
+                  <ul className="space-y-1 text-sm text-gray-800">
+                    {pendingSolverResult.result.unscheduled.slice(0, 6).map(item => (
+                      <li key={item.entity_id || item.entity_name}>{item.entity_name || item.entity_id}</li>
+                    ))}
+                    {pendingSolverResult.result.unscheduled.length > 6 && (
+                      <li className="text-xs text-gray-500">
+                        +{pendingSolverResult.result.unscheduled.length - 6} more…
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              )}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={handleDiscardPartialResult}
+                  className="w-full sm:w-1/2 px-4 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Keep previous schedule
+                </button>
+                <button
+                  type="button"
+                  onClick={handleApplyPartialResult}
+                  className="w-full sm:w-1/2 px-4 py-2.5 rounded-full text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                >
+                  Apply partial schedule
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -3604,6 +4280,9 @@ export function RosterDashboard({
     </div>
   );
 }
+
+/*
+Legacy ConflictsPanel implementation kept for reference.
 
 type ConflictsConstraintStatus = 'ok' | 'neutral' | 'conflict';
 type ConflictsConstraintType =
@@ -3655,8 +4334,6 @@ const conflictStatusStyles: Record<ConflictsConstraintStatus, string> = {
   conflict: 'bg-rose-500 border-rose-600 animate-pulse',
 };
 
-// Legacy ConflictsPanel - replaced by ConflictsPanelV2
-// @ts-expect-error - unused legacy code kept for reference
 function _ConflictsPanel_LEGACY({
   isExpanded,
   onToggleExpanded,
@@ -3899,6 +4576,7 @@ function _ConflictsPanel_LEGACY({
       </div>
     </div>
   );
+}
 }
 
 function ConflictsRowDrawer({
@@ -4272,3 +4950,4 @@ function useMockConflictRows(): ConflictsDefenseRow[] {
     []
   );
 }
+*/

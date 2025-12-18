@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * availability Grid - shows person x time availability matrix
  * test and verify slot-level markers and day-level gradient?? views with inline editing??
@@ -10,7 +11,6 @@ import { PersonAvailability, ViewGranularity, AvailabilityStatus, SlotAvailabili
 import StatusErrorIcon from '@atlaskit/icon/core/status-error';
 import PersonWarningIcon from '@atlaskit/icon/core/person-warning';
 import { Conflict } from '../../types/schedule';
-import { RoomAvailabilityDrawer, RoomAvailabilityRoom } from '../panels/RoomAvailabilityDrawer';
 
 const normalizeName = (value?: string | null) => (value || '').trim().toLowerCase();
 
@@ -45,27 +45,27 @@ export interface AvailabilityGridProps {
   workloadStats?: Map<string, { required: number; scheduled: number }>;
   columnHighlights?: Record<string, Record<string, 'primary' | 'match'>>;
   warningIconScale?: number;
-  roomDrawerRooms?: RoomAvailabilityRoom[];
-  roomDrawerSlot?: { day: string; timeSlot: string } | null;
-  roomDrawerOpen?: boolean;
-  onRoomDrawerToggle?: () => void;
+  showLegend?: boolean;
 }
 
-const editableStatuses: AvailabilityStatus[] = ['available', 'unavailable', 'empty'];
+const editableStatuses: AvailabilityStatus[] = ['available', 'unavailable'];
 
-const statusClasses: Record<AvailabilityStatus, string> = {
+export const AVAILABILITY_STATUS_CLASSES: Record<AvailabilityStatus, string> = {
   available: 'bg-emerald-300',
   unavailable: 'bg-red-300',
   booked: 'bg-blue-400',
-  empty: 'bg-gray-400',
+  empty: 'bg-emerald-300',
 };
 
-const statusLabels: Record<AvailabilityStatus, string> = {
+export const AVAILABILITY_STATUS_LABELS: Record<AvailabilityStatus, string> = {
   available: 'Available',
   unavailable: 'Unavailable',
   booked: 'Booked',
-  empty: 'Not Set',
+  empty: 'Available',
 };
+
+const normalizeStatus = (status: AvailabilityStatus): AvailabilityStatus =>
+  status === 'empty' ? 'available' : status;
 
 export const AvailabilityGrid = memo(function AvailabilityGrid({
   availabilities,
@@ -90,11 +90,8 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
   workloadStats,
   columnHighlights,
   warningIconScale = 2,
-  roomDrawerRooms,
-  roomDrawerSlot,
-  roomDrawerOpen = true,
-  onRoomDrawerToggle,
   columnWidth = 220,
+  showLegend = true,
 }: AvailabilityGridProps) {
   const [editingSlot, setEditingSlot] = useState<{ personId: string; day: string; slot: string } | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -114,6 +111,43 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
       transformOrigin: 'center',
     }),
     [warningIconScale]
+  );
+
+  const visibleDaysSet = useMemo(() => new Set(days), [days]);
+  const visibleSlotsSet = useMemo(() => new Set(timeSlots), [timeSlots]);
+
+  const personHasVisibleConflicts = useCallback(
+    (person: PersonAvailability): boolean => {
+      if (slotConflicts && slotConflicts.size > 0) {
+        for (const day of days) {
+          const dayKey = `${person.name}_${day}`;
+          if (slotConflicts.get(dayKey)?.length) {
+            return true;
+          }
+          for (const slot of timeSlots) {
+            const slotKey = `${person.name}_${day}_${slot}`;
+            if (slotConflicts.get(slotKey)?.length) {
+              return true;
+            }
+          }
+        }
+      }
+
+      if (!person.conflicts || person.conflicts.length === 0) {
+        return false;
+      }
+
+      return person.conflicts.some(conflict => {
+        if (conflict.day && !visibleDaysSet.has(conflict.day)) {
+          return false;
+        }
+        if (!conflict.timeSlot) {
+          return true;
+        }
+        return visibleSlotsSet.has(conflict.timeSlot);
+      });
+    },
+    [slotConflicts, days, timeSlots, visibleDaysSet, visibleSlotsSet]
   );
 
   const toggleEditingSlot = useCallback((personId: string, day: string, slot: string) => {
@@ -174,18 +208,23 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
 
   const getSlotData = (person: PersonAvailability, day: string, slot: string): SlotAvailability => {
     const data = person.availability[day]?.[slot];
-    if (!data) return { status: 'empty', locked: false };
-    if (typeof data === 'string') return { status: data, locked: false };
-    return data;
+    if (!data) return { status: 'available', locked: false };
+    if (typeof data === 'string') {
+      return { status: normalizeStatus(data), locked: false };
+    }
+    return {
+      ...data,
+      status: normalizeStatus(data.status),
+    };
   };
 
   // Get slot data from a specific roster's availability
   const getSlotDataFromRoster = (rosterId: string, personName: string, day: string, slot: string): SlotAvailability => {
     const roster = rosters.find(r => r.id === rosterId);
-    if (!roster) return { status: 'empty', locked: false };
+    if (!roster) return { status: 'available', locked: false };
 
     const person = roster.availabilities.find(p => p.name === personName);
-    if (!person) return { status: 'empty', locked: false };
+    if (!person) return { status: 'available', locked: false };
 
     return getSlotData(person, day, slot);
   };
@@ -258,15 +297,15 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              const newStatus = slotData.status === status ? 'empty' : status;
+              const newStatus = status;
               onSlotEdit?.(person.id, day, slot, newStatus, slotData.locked || false);
               setEditingSlot(null);
             }}
           >
             <div
-              className={clsx('w-4 h-4 rounded-full flex-shrink-0', statusClasses[status])}
+              className={clsx('w-4 h-4 rounded-full flex-shrink-0', AVAILABILITY_STATUS_CLASSES[status])}
             />
-            <span className="text-sm text-gray-900">{statusLabels[status]}</span>
+            <span className="text-sm text-gray-900">{AVAILABILITY_STATUS_LABELS[status]}</span>
             {slotData.status === status && (
               <Check className="h-4 w-4 ml-auto text-green-600" />
             )}
@@ -403,12 +442,6 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
 
   const columnCount = days.length + 1;
   const shouldVirtualize = sortedAvailabilities.length > 40;
-  const shouldShowRoomDrawer = Boolean(
-    roomDrawerRooms &&
-    roomDrawerRooms.length > 0 &&
-    roomDrawerSlot &&
-    highlightedPersons.length > 0
-  );
 
   useEffect(() => {
     setRowHeight(granularity === 'slot' ? 56 : 84);
@@ -632,6 +665,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
               granularity === 'day' && (requiredCount > 0 || scheduledCount > 0);
             const nameCellPadding = isGapRow ? 'pt-2 pb-7 sm:pt-3 sm:pb-8' : 'py-2 sm:py-3';
             const slotCellPadding = isGapRow ? 'pt-1.5 pb-6 sm:pt-2 sm:pb-7' : 'py-1.5 sm:py-2';
+            const showConflictBadge = personHasVisibleConflicts(person) && (requiredCount > 0 || scheduledCount > 0);
             return (
               <Fragment key={person.id}>
                 <tr
@@ -653,7 +687,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                     <div className="font-medium text-gray-900 text-base sm:text-lg md:text-lg truncate">{person.name}</div>
                     <div className="text-[10px] sm:text-sm text-gray-500">{formatRole(person.role)}</div>
                   </div>
-                  {person.conflicts && person.conflicts.length > 0 && (requiredCount > 0 || scheduledCount > 0) && (
+                  {showConflictBadge && (
                     <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-400 flex-shrink-0 -mt-5" />
                   )}
                   {showWorkloadBar && (
@@ -761,7 +795,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                             title={
                               editable
                                 ? 'Click to edit, double-click to lock/unlock'
-                                : `${slot}: ${statusLabels[displayStatus]}${slotData.locked ? ' (LOCKED)' : ''}${
+                                : `${slot}: ${AVAILABILITY_STATUS_LABELS[displayStatus]}${slotData.locked ? ' (LOCKED)' : ''}${
                                     conflict ? ' (CONFLICT)' : ''
                                   }${bookingInfo ? ' (BOOKED)' : ''}`
                             }
@@ -770,7 +804,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                                 className={clsx(
                                   'w-6 h-6 sm:w-7 sm:h-7 rounded-lg shadow-sm flex items-center justify-center border-2 transition-opacity pointer-events-auto',
                                   isHighlightedSlot ? 'border-gray-700' : 'border-white',
-                                  statusClasses[displayStatus],
+                                  AVAILABILITY_STATUS_CLASSES[displayStatus],
                                   columnHighlightType === 'primary' && 'outline outline-2 outline-blue-900 outline-offset-[-8px] shadow-lg',
                                   columnHighlightType === 'match' && 'outline outline-[1.5px] outline-emerald-600 outline-offset-1 shadow-md',
                                   shouldDimColumn && 'opacity-30'
@@ -842,11 +876,11 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                                   data-availability-slot="true"
                                   className={clsx(
                                     'flex-1 min-w-0 cursor-pointer transition-opacity relative overflow-visible pointer-events-auto',
-                                    statusClasses[displayStatus],
+                                    AVAILABILITY_STATUS_CLASSES[displayStatus],
                                     columnHighlightType === 'primary' && 'outline outline-2 outline-blue-900 outline-offset-2 shadow-lg',
                                     columnHighlightType === 'match' && 'outline outline-[1.5px] outline-emerald-600 outline-offset-1 shadow-md'
                                   )}
-                                  title={`${roster.label} - ${slot}: ${statusLabels[displayStatus]}${bookingInfo ? ' (BOOKED)' : ''}`}
+                                  title={`${roster.label} - ${slot}: ${AVAILABILITY_STATUS_LABELS[displayStatus]}${bookingInfo ? ' (BOOKED)' : ''}`}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     if (editable) {
@@ -895,7 +929,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                             data-availability-slot="true"
                             className={clsx(
                               'flex-1 min-w-0 cursor-pointer transition-opacity relative overflow-visible rounded-sm pointer-events-auto',
-                              statusClasses[displayStatus],
+                              AVAILABILITY_STATUS_CLASSES[displayStatus],
                               columnHighlightType === 'primary' && 'outline outline-2 outline-blue-900 outline-offset-2 shadow-lg',
                               columnHighlightType === 'match' && 'outline outline-[1.5px] outline-emerald-600 outline-offset-1 shadow-md'
                             )}
@@ -907,7 +941,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                               outlineOffset: '-2px',
                               zIndex: isEditing ? 100 : 1,
                             }}
-                            title={`${slot}: ${statusLabels[displayStatus]}${conflict ? ' (CONFLICT)' : ''}${bookingInfo ? ' (BOOKED)' : ''}`}
+                            title={`${slot}: ${AVAILABILITY_STATUS_LABELS[displayStatus]}${conflict ? ' (CONFLICT)' : ''}${bookingInfo ? ' (BOOKED)' : ''}`}
                             onClick={(e) => {
                               e.stopPropagation();
                               if (editable) {
@@ -943,23 +977,6 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
               );
               })}
             </tr>
-            {shouldShowRoomDrawer && isGapRow && roomDrawerRooms && roomDrawerSlot && (
-              <tr key={`${person.id}-room-drawer`}>
-                <td colSpan={columnCount} className="bg-white px-4 py-4">
-                  <div className="max-h-80 overflow-auto">
-                    <RoomAvailabilityDrawer
-                      rooms={roomDrawerRooms}
-                      days={days}
-                      timeSlots={timeSlots}
-                      highlightedSlot={roomDrawerSlot}
-                      columnWidth={columnWidth}
-                      isOpen={roomDrawerOpen}
-                      onToggle={onRoomDrawerToggle}
-                    />
-                  </div>
-                </td>
-              </tr>
-            )}
             </Fragment>
             );
           })}
@@ -971,19 +988,21 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
         </tbody>
       </table>
 
-      {/* Legend */}
-      <div className="sticky bottom-0 left-0 right-0 bg-white border-t p-2 sm:p-3 mt-2 sm:mt-4 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+      {showLegend && (
+      <div className="sticky bottom-0 left-0 right-0 bg-white border-t p-2 sm:p-3 mt-2 sm:mt-4 z-10 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
         <div className="flex flex-wrap items-center gap-3 sm:gap-4 md:gap-6 text-xs sm:text-sm">
           <span className="font-semibold text-gray-700 hidden sm:inline">Legend:</span>
-          {(Object.keys(statusClasses) as AvailabilityStatus[]).map((status) => (
+          {(Object.keys(AVAILABILITY_STATUS_CLASSES) as AvailabilityStatus[])
+            .filter(status => status !== 'empty')
+            .map((status) => (
             <div key={status} className="flex items-center gap-1.5 sm:gap-2">
               <div
                 className={clsx(
                   'w-4 h-4 sm:w-5 sm:h-5 border-2 border-white shadow-sm flex-shrink-0 rounded',
-                  statusClasses[status]
+                  AVAILABILITY_STATUS_CLASSES[status]
                 )}
               />
-              <span className="text-gray-700 capitalize whitespace-nowrap">{statusLabels[status]}</span>
+              <span className="text-gray-700 capitalize whitespace-nowrap">{AVAILABILITY_STATUS_LABELS[status]}</span>
             </div>
           ))}
           <div className="flex items-center gap-1.5 sm:gap-2">
@@ -1033,6 +1052,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
           )}
         </div>
       </div>
+      )}
     </div>
   );
 });

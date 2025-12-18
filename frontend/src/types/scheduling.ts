@@ -7,7 +7,7 @@ export interface Entity {
   entity_id: string;
   name: string;
   owner_id?: string;
-  raw?: Record<string, any>;
+  raw?: Record<string, unknown>;
 }
 
 export interface Resource {
@@ -52,8 +52,8 @@ export interface ScheduleData {
     start_time: string;
     end_time: string;
   }>;
-  timeslot_info?: Record<string, any>;
-  rooms?: Record<string, any>;
+  timeslot_info?: Record<string, unknown>;
+  rooms?: Record<string, unknown>;
 }
 
 export interface Assignment {
@@ -121,6 +121,19 @@ export interface SolveResult {
   utilization?: Record<string, unknown>;
   slack?: Record<string, unknown>;
   capacity_gaps?: Array<Record<string, unknown>>;
+  objectives?: {
+    adjacency?: {
+      score?: number | null;
+      possible?: number | null;
+    };
+    [key: string]: unknown;
+  };
+  planned_count?: number;
+  total_defenses?: number;
+  unscheduled?: Array<{
+    entity_id?: string;
+    entity_name?: string;
+  }>;
 }
 
 export interface Constraint {
@@ -186,7 +199,7 @@ export interface RepairOption {
 export interface SolverRunStatus {
   run_id: string;
   dataset_id: string;
-  status: 'pending' | 'running' | 'succeeded' | 'failed';
+  status: 'pending' | 'running' | 'succeeded' | 'failed' | 'cancelled';
   solver: string;
   timeout: number;
   created_at: number;

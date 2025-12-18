@@ -1,0 +1,244 @@
+{
+  "blocking": [
+    {
+      "defense_id": 2,
+      "student": "Sirbu Traian-Florin",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            14,
+            15
+          ]
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            14
+          ]
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": [
+            15
+          ]
+        },
+        {
+          "resource": "Stefano Viazzi",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            12,
+            13,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 3,
+      "student": "Demuynck Dieter",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            14,
+            15
+          ]
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            14
+          ]
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": [
+            15
+          ]
+        },
+        {
+          "resource": "Stefano Viazzi",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            11,
+            12,
+            13,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "defense_id": 5,
+      "student": "Hamelink Frederic",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            14,
+            15
+          ]
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            14
+          ]
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": [
+            15
+          ]
+        },
+        {
+          "resource": "Mariya Ishteva",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ]
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            14,
+            15,
+            16
+          ]
+        }
+      ]
+    }
+  ],
+  "relax_candidates": [
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 9,
+      "blocked_count": 3
+    },
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 10,
+      "blocked_count": 3
+    },
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 11,
+      "blocked_count": 3
+    },
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 14,
+      "blocked_count": 3
+    },
+    {
+      "resource": "all_rooms",
+      "type": "room_pool",
+      "slot": 15,
+      "blocked_count": 3
+    },
+    {
+      "resource": "200C 00.01",
+      "type": "room",
+      "slot": 9,
+      "blocked_count": 3
+    },
+    {
+      "resource": "200C 00.01",
+      "type": "room",
+      "slot": 10,
+      "blocked_count": 3
+    },
+    {
+      "resource": "200C 00.01",
+      "type": "room",
+      "slot": 11,
+      "blocked_count": 3
+    },
+    {
+      "resource": "200C 00.01",
+      "type": "room",
+      "slot": 14,
+      "blocked_count": 3
+    },
+    {
+      "resource": "200C 00.02",
+      "type": "room",
+      "slot": 15,
+      "blocked_count": 3
+    },
+    {
+      "resource": "Stefano Viazzi",
+      "type": "person",
+      "slot": 9,
+      "blocked_count": 2
+    },
+    {
+      "resource": "Stefano Viazzi",
+      "type": "person",
+      "slot": 11,
+      "blocked_count": 2
+    },
+    {
+      "resource": "Stefano Viazzi",
+      "type": "person",
+      "slot": 12,
+      "blocked_count": 2
+    },
+    {
+      "resource": "Stefano Viazzi",
+      "type": "person",
+      "slot": 13,
+      "blocked_count": 2
+    },
+    {
+      "resource": "Stefano Viazzi",
+      "type": "person",
+      "slot": 16,
+      "blocked_count": 2
+    }
+  ]
+}

@@ -3,10 +3,11 @@ from __future__ import annotations
 import csv
 import json
 from datetime import datetime, timedelta
+import re
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
-from .config import DATA_INPUT_DIR
+from .config import DATA_INPUT_DIR, DATA_OUTPUT_DIR
 from .datasets import DEFENCE_COLUMNS, UNAVAIL_COLUMNS
 
 SCHEDULE_COLUMNS = ["day", "start_time", "end_time", "room"]
@@ -20,27 +21,61 @@ ROLE_TYPE_MAP = {
 }
 
 
-def apply_dashboard_state(dataset_name: str, state: Dict[str, Any]) -> None:
-    dataset_dir = DATA_INPUT_DIR / dataset_name
-    dataset_dir.mkdir(parents=True, exist_ok=True)
-
+def _select_roster(state: Dict[str, Any], roster_id: Optional[str] = None) -> Dict[str, Any]:
     rosters: List[Dict[str, Any]] = state.get("rosters") or []
     if not rosters:
         raise ValueError("No rosters provided in session state")
+    target_id = roster_id or state.get("activeRosterId")
+    roster = None
+    if target_id:
+        roster = next((r for r in rosters if r.get("id") == target_id), None)
+    if roster is None:
+        roster = rosters[0]
+    return roster
 
-    active_id = state.get("activeRosterId")
-    roster = next((r for r in rosters if r.get("id") == active_id), rosters[0])
+
+def _write_state_bundle(dataset_dir: Path, state: Dict[str, Any], roster: Dict[str, Any]) -> None:
+    dataset_dir.mkdir(parents=True, exist_ok=True)
     roster_state = roster.get("state", {})
     events = roster_state.get("events", [])
     availabilities = roster.get("availabilities", [])
+    room_availability = state.get("roomAvailability") or []
     grid = state.get("gridData", {})
     days = grid.get("days", [])
     time_slots = grid.get("timeSlots", [])
 
     _write_defences(dataset_dir, events)
-    _write_unavailabilities(dataset_dir, availabilities)
+    _write_unavailabilities(dataset_dir, availabilities, room_availability)
     _write_timeslot_info(dataset_dir, state, days, time_slots)
     _write_rooms(dataset_dir, state)
+
+
+def apply_dashboard_state(dataset_name: str, state: Dict[str, Any]) -> None:
+    dataset_dir = DATA_INPUT_DIR / dataset_name
+    roster = _select_roster(state)
+    _write_state_bundle(dataset_dir, state, roster)
+
+
+def _sanitize_folder_name(name: str) -> str:
+    cleaned = re.sub(r"[^a-zA-Z0-9._-]+", "-", name.strip())
+    cleaned = cleaned.strip("-_")
+    return cleaned or "schedule"
+
+
+def export_roster_snapshot(
+    dataset_name: str,
+    state: Dict[str, Any],
+    target_name: str,
+    roster_id: Optional[str] = None,
+) -> Path:
+    roster = _select_roster(state, roster_id)
+    schedule_name = _sanitize_folder_name(target_name)
+    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    base_dir = DATA_OUTPUT_DIR / dataset_name
+    base_dir.mkdir(parents=True, exist_ok=True)
+    target_dir = base_dir / f"{schedule_name}_{timestamp}"
+    _write_state_bundle(target_dir, state, roster)
+    return target_dir
 
 
 def _write_defences(dataset_dir: Path, events: Iterable[Dict[str, Any]]) -> None:
@@ -80,7 +115,11 @@ def _write_defences(dataset_dir: Path, events: Iterable[Dict[str, Any]]) -> None
             writer.writerow(row)
 
 
-def _write_unavailabilities(dataset_dir: Path, availabilities: Iterable[Dict[str, Any]]) -> None:
+def _write_unavailabilities(
+    dataset_dir: Path,
+    availabilities: Iterable[Dict[str, Any]],
+    room_availability: Iterable[Dict[str, Any]] | None = None,
+) -> None:
     rows = []
     for person in availabilities:
         name = person.get("name") or ""
@@ -111,6 +150,30 @@ def _write_unavailabilities(dataset_dir: Path, availabilities: Iterable[Dict[str
                         "status": status,
                     }
                 )
+
+    if room_availability:
+        for room in room_availability:
+            label = (room or {}).get("label") or (room or {}).get("id")
+            slots: Dict[str, Dict[str, str]] = (room or {}).get("slots") or {}
+            if not label or not isinstance(slots, dict):
+                continue
+            for day, day_slots in slots.items():
+                if not isinstance(day_slots, dict):
+                    continue
+                for slot, status in day_slots.items():
+                    if status != "unavailable":
+                        continue
+                    slot_str = str(slot)
+                    rows.append(
+                        {
+                            "name": label,
+                            "type": "room",
+                            "day": str(day),
+                            "start_time": slot_str,
+                            "end_time": _increment_hour(slot_str),
+                            "status": "unavailable",
+                        }
+                    )
 
     path = dataset_dir / "unavailabilities.csv"
     with path.open("w", newline="", encoding="utf-8") as f:

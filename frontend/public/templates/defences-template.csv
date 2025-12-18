@@ -1,3 +1,3 @@
-student,title,supervisor,co_supervisor,assessor1,assessor2,mentor1,mentor2,mentor3,mentor4,day,start_time,end_time,room,defense_id,programme
-Jane Doe,Exploring Distributed Systems,Prof. Alice,,Dr. Bob,Dr. Carol,Mentor One,Mentor Two,,,2025-06-16,09:00,10:00,Room 101,def-001,CS
-John Smith,Modern Control Strategies,Prof. David,Dr. Emily,Dr. Fiona,,Mentor Three,,,,2025-06-16,10:00,11:00,Room 102,def-002,TI
+student,title,supervisor,co_supervisor,assessor1,assessor2,mentor1,mentor2,mentor3,mentor4
+Jane Doe,Exploring Distributed Systems,Prof. Alice,,Dr. Bob,Dr. Carol,Mentor One,Mentor Two,,
+John Smith,Modern Control Strategies,Prof. David,Dr. Emily,Dr. Fiona,,Mentor Three,,,

@@ -186,28 +186,34 @@ export function DatasetModal({ isOpen, onClose, onSelect, activeDatasetId }: Dat
                   className="mt-1 w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </label>
-              <label className="block text-xs font-medium text-gray-600">
-                Template ZIP
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".zip"
-                  onChange={handleFileChange}
-                  className="mt-1 w-full text-sm"
-                />
-              </label>
+              <div>
+                <label className="block text-xs font-medium text-gray-600">
+                  Template ZIP
+                </label>
+                <div className="mt-1 flex items-center gap-3">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".zip"
+                    onChange={handleFileChange}
+                    className="flex-1 text-sm"
+                  />
+                  <button
+                    type="submit"
+                    disabled={uploading}
+                    className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md ${
+                      uploading
+                        ? 'bg-gray-200 text-blue-400 cursor-not-allowed'
+                        : 'bg-blue-500 text-white hover:bg-blue-500'
+                    }`}
+                  >
+                    <Upload className="w-4 h-4" />
+                    {uploading ? 'Uploading…' : 'Upload dataset'}
+                  </button>
+                </div>
+              </div>
               {uploadError && <p className="text-xs text-red-600">{uploadError}</p>}
               {uploadMessage && <p className="text-xs text-emerald-600">{uploadMessage}</p>}
-              <button
-                type="submit"
-                disabled={uploading}
-                className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md text-white ${
-                  uploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-                }`}
-              >
-                <Upload className="w-4 h-4" />
-                {uploading ? 'Uploading…' : 'Upload dataset'}
-              </button>
             </form>
           </div>
         </div>
@@ -271,8 +277,8 @@ export function DatasetModal({ isOpen, onClose, onSelect, activeDatasetId }: Dat
                     onClick={() => handleSelect(dataset.name)}
                     className={`mt-2 inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                       dataset.name === activeDatasetId
-                        ? 'bg-green-600 text-white hover:bg-green-700'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                        ? 'bg-gray-700 text-white hover:bg-gray-800'
+                        : 'bg-gray-500 text-white hover:bg-gray-600'
                     }`}
                   >
                     {dataset.name === activeDatasetId ? 'Reload dataset' : 'Load dataset'}

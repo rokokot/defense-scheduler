@@ -10,7 +10,7 @@ services:
       - "8000:8000"
     volumes:
       # Mount data directory for persistence
-      - ./data:/app/data
+      - ./data:/app/data:z
     environment:
       - PYTHONUNBUFFERED=1
       - DATA_DIR=/app/data
@@ -55,7 +55,7 @@ services:
       dockerfile: Dockerfile
     container_name: defense-scheduler-solver
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data:z
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped

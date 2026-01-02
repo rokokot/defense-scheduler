@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { GripHorizontal } from 'lucide-react';
-import { RoomAvailabilityDrawer, RoomAvailabilityRoom } from './RoomAvailabilityDrawer';
+import clsx from 'clsx';
+import { AlertCircle, GripHorizontal } from 'lucide-react';
+import {
+  RoomAvailabilityDrawer,
+  RoomAvailabilityRoom,
+  ROOM_STATUS_CLASS,
+  ROOM_STATUS_LABELS,
+} from './RoomAvailabilityDrawer';
 
 interface RoomAvailabilityPanelProps {
   rooms: RoomAvailabilityRoom[];
@@ -12,6 +18,9 @@ interface RoomAvailabilityPanelProps {
   registerResizeHandle?: (handler: ((event: React.MouseEvent) => void) | null) => void;
   hideInternalHandle?: boolean;
   onRoomToggle?: (roomId: string, enabled: boolean) => void;
+  onSlotStatusChange?: (roomId: string, day: string, timeSlot: string, status: 'available' | 'unavailable') => void;
+  onSlotSelect?: (roomId: string, day: string, timeSlot: string) => void;
+  programmeColors?: Record<string, string>;
 }
 
 export function RoomAvailabilityPanel({
@@ -24,6 +33,9 @@ export function RoomAvailabilityPanel({
   registerResizeHandle,
   hideInternalHandle = false,
   onRoomToggle,
+  onSlotStatusChange,
+  onSlotSelect,
+  programmeColors,
 }: RoomAvailabilityPanelProps) {
   const [panelHeight, setPanelHeight] = useState(sharedHeight ?? 520);
   const [drawerOpen, setDrawerOpen] = useState(true);
@@ -100,7 +112,10 @@ export function RoomAvailabilityPanel({
     <div
       ref={panelRef}
       className={`relative w-full bg-white border-t border-gray-200 shadow-inner ${isDragging ? '' : 'transition-all duration-300 ease-in-out'}`}
-      style={{ height: isExpanded ? `${panelHeight}px` : '0px', overflow: 'hidden' }}
+      style={{
+        height: isExpanded ? `${panelHeight}px` : '0px',
+        overflow: isExpanded ? 'visible' : 'hidden',
+      }}
     >
       {isExpanded && !hideInternalHandle && (
         <div
@@ -141,7 +156,23 @@ export function RoomAvailabilityPanel({
               onToggle={() => setDrawerOpen(open => !open)}
               onRoomToggle={onRoomToggle}
               showRoomToggles={Boolean(onRoomToggle)}
+              onSlotToggle={onSlotStatusChange}
+              onSlotSelect={onSlotSelect}
+              programmeColors={programmeColors}
             />
+          </div>
+          <div className="sticky bottom-0 left-0 right-0 px-4 py-3 bg-gray-50 border-t border-gray-100 text-xs sm:text-sm text-gray-700 flex flex-wrap items-center gap-3 sm:gap-4 z-10">
+            <span className="font-semibold hidden sm:inline">Legend:</span>
+            {(Object.keys(ROOM_STATUS_LABELS) as Array<keyof typeof ROOM_STATUS_LABELS>).map(status => (
+              <div key={status} className="flex items-center gap-2">
+                <span className={clsx('w-4 h-4 rounded border shadow-sm', ROOM_STATUS_CLASS[status])} />
+                <span className="capitalize">{ROOM_STATUS_LABELS[status]}</span>
+              </div>
+            ))}
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-red-500" />
+              <span>Conflict</span>
+            </div>
           </div>
         </div>
       </div>

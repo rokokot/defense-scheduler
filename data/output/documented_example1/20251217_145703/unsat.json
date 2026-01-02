@@ -1,0 +1,102 @@
+{
+  "blocking": [
+    {
+      "defense_id": 5,
+      "student": "Hamelink Frederic",
+      "blocking_resources": [
+        {
+          "resource": "all_rooms",
+          "type": "room_pool",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "blocked_slots": []
+        },
+        {
+          "resource": "Mariya Ishteva",
+          "type": "person",
+          "blocked_slots": [
+            10,
+            11,
+            12,
+            13,
+            14
+          ]
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "blocked_slots": [
+            9,
+            10,
+            11,
+            14
+          ]
+        }
+      ]
+    }
+  ],
+  "relax_candidates": [
+    {
+      "resource": "Mariya Ishteva",
+      "type": "person",
+      "slot": 10,
+      "blocked_count": 1
+    },
+    {
+      "resource": "Mariya Ishteva",
+      "type": "person",
+      "slot": 11,
+      "blocked_count": 1
+    },
+    {
+      "resource": "Mariya Ishteva",
+      "type": "person",
+      "slot": 12,
+      "blocked_count": 1
+    },
+    {
+      "resource": "Mariya Ishteva",
+      "type": "person",
+      "slot": 13,
+      "blocked_count": 1
+    },
+    {
+      "resource": "Mariya Ishteva",
+      "type": "person",
+      "slot": 14,
+      "blocked_count": 1
+    },
+    {
+      "resource": "Wannes Meert",
+      "type": "person",
+      "slot": 9,
+      "blocked_count": 1
+    },
+    {
+      "resource": "Wannes Meert",
+      "type": "person",
+      "slot": 10,
+      "blocked_count": 1
+    },
+    {
+      "resource": "Wannes Meert",
+      "type": "person",
+      "slot": 11,
+      "blocked_count": 1
+    },
+    {
+      "resource": "Wannes Meert",
+      "type": "person",
+      "slot": 14,
+      "blocked_count": 1
+    }
+  ]
+}

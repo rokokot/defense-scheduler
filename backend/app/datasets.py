@@ -131,10 +131,17 @@ def _dataset_stats(dataset_dir: Path) -> Dict[str, Any]:
 
 
 def _ensure_defense_ids(defences: List[Dict[str, str]]) -> None:
+    seen: set[str] = set()
     for idx, row in enumerate(defences):
-        defense_id = row.get("defense_id") or row.get("defence_id")
-        if not defense_id:
-            row["defense_id"] = f"def-{idx+1}"
+        defense_id = row.get("defense_id") or row.get("defence_id") or f"def-{idx+1}"
+        base_id = defense_id
+        suffix = 1
+        # ensure uniqueness even if dataset provides duplicates
+        while defense_id in seen:
+            suffix += 1
+            defense_id = f"{base_id}-{suffix}"
+        row["defense_id"] = defense_id
+        seen.add(defense_id)
 
 
 __all__ = [

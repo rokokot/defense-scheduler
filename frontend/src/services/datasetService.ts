@@ -2,8 +2,7 @@ import { schedulingAPI } from '../api/scheduling';
 import { mapScheduleToDashboard, DashboardData } from './dashboardDataMapper';
 import { ScheduleData } from '../types/scheduling';
 import { logger } from '../utils/logger';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+import { API_BASE_URL } from '../lib/apiConfig';
 
 export interface DatasetMetadata {
   name: string;

@@ -80,6 +80,7 @@ function App() {
         initialTimeHorizon={dashboardData.timeHorizon}
         initialRooms={dashboardData.rooms}
         initialRoomOptions={dashboardData.roomOptions}
+        initialRoomAvailability={dashboardData.roomAvailability}
       />
     );
   };

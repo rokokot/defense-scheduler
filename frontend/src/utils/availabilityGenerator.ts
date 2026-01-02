@@ -6,7 +6,7 @@ import { GridStructure } from './gridGenerator';
 
 /**
  * Generate empty availability entries for all participants
- * All slots default to 'empty' (grey) status
+ * All slots default to 'available' status
  */
 export function generateEmptyAvailabilities(
   participants: { id: string; name: string; role: 'student' | 'supervisor' | 'assessor' | 'mentor' }[],
@@ -18,11 +18,11 @@ export function generateEmptyAvailabilities(
     role: participant.role,
     availability: gridStructure.days.reduce((acc, day) => {
       acc[day] = gridStructure.timeSlots.reduce((slotAcc, slot) => {
-        slotAcc[slot] = { status: 'empty' as const, locked: false };
+        slotAcc[slot] = { status: 'available' as const, locked: false };
         return slotAcc;
-      }, {} as Record<string, { status: 'empty'; locked: false }>);
+      }, {} as Record<string, { status: 'available'; locked: false }>);
       return acc;
-    }, {} as Record<string, Record<string, { status: 'empty'; locked: false }>>),
+    }, {} as Record<string, Record<string, { status: 'available'; locked: false }>>),
     dayLocks: {},
     conflicts: [],
   }));

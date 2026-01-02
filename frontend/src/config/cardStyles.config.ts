@@ -69,7 +69,7 @@ export const defaultDefenceCardTheme: DefenceCardTheme = {
   },
   spacing: {
     card: {
-      padding: '10px', // Matches current DraggableDefenceCard
+      padding: '16px', // Matches current DraggableDefenceCard
       internalGap: '8px', // Gap between student/supervisor lines
     },
     cell: {
@@ -151,7 +151,7 @@ export const defaultDefenceCardTheme: DefenceCardTheme = {
   },
   modes: {
     individual: {
-      minHeight: '64px',
+      minHeight: '100px',
       showFullDetails: false,
     },
     compact: {

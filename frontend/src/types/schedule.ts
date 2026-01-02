@@ -10,6 +10,7 @@ export interface DefenceEvent {
   startTime: string;
   endTime: string;
   programme: string;
+  programmeId?: string;
   room?: string;
   color?: string;
   locked?: boolean;
@@ -47,6 +48,8 @@ export interface SolverRunInfo {
   mode: 're-optimize' | 'solve-from-scratch';
   runtime: number;
   objectiveValue?: number;
+  adjacencyScore?: number | null;
+  adjacencyPossible?: number | null;
   lockCount: number;
 }
 
@@ -63,6 +66,12 @@ export interface RoomOption {
   enabled: boolean;
   capacity?: number;
   metadata?: Record<string, unknown>;
+}
+
+export interface RoomAvailabilityState {
+  id: string;
+  label: string;
+  slots: Record<string, Record<string, 'available' | 'unavailable'>>;
 }
 
 export interface LockInfo {

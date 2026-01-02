@@ -1,4 +1,5 @@
 import { memo, useEffect, useRef, useState, useMemo } from 'react';
+import type { CSSProperties } from 'react';
 import clsx from 'clsx';
 import { draggable, dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
@@ -14,6 +15,99 @@ import { defaultDefenceCardTheme } from '../../config/cardStyles.config';
 import { mergeThemes, shadowToCss, applyTypography, getTextColor } from '../../config/cardStyles.utils';
 import { formatParticipantNames } from '../../utils/participantNames';
 import { RoomTag } from '../common/RoomTag';
+
+type CardTextStyleOverrides = {
+  student?: CSSProperties;
+  supervisor?: CSSProperties;
+  programme?: CSSProperties;
+  compactContainer?: CSSProperties;
+  programmeContainer?: CSSProperties;
+  roomTag?: CSSProperties;
+  programmeIdWrapper?: CSSProperties;
+  programmeIdText?: CSSProperties;
+  programmeIdContainer?: CSSProperties;
+};
+
+/**
+ *  typography overrides per card view.
+ * 
+ */
+const CARD_VIEW_TEXT_STYLE_OVERRIDES: Record<'compact' | 'individual', CardTextStyleOverrides> = {
+  compact: {
+    compactContainer: {
+      alignItems: 'flex-start',
+    },
+    student: {
+      fontSize: '1.05rem',
+      fontWeight: 600,
+      lineHeight: '1.2',
+      marginTop: '-6px',
+    },
+    supervisor: {
+      fontSize: '0.95rem',
+      fontWeight: 500,
+      lineHeight: '1.2',
+      opacity: 0.95,
+      marginTop: '-8px',
+
+    },
+    roomTag: {
+      top: '4px',
+      right: '-4px',
+    },
+    programmeIdWrapper: {
+      marginRight: '10px',
+    },
+    programmeIdText: {
+      fontSize: '1.0rem',
+      fontWeight: 800,
+      color: '#ece3e3ff',
+      letterSpacing: '0.01em',
+    },
+    programmeIdContainer: {
+      marginRight: '6px',
+    },
+  },
+  individual: {
+    programmeContainer: {
+      alignItems: 'center',
+    },
+    programme: {
+      fontSize: '0.9rem',
+      fontWeight: 600,
+      letterSpacing: '0.01em',
+    },
+    student: {
+      fontSize: '1.35rem',
+      fontWeight: 600,
+      lineHeight: '1.25',
+      marginTop: '-20px'
+    },
+    supervisor: {
+      fontSize: '1.15rem',
+      fontWeight: 500,
+      lineHeight: '1.25',
+    },
+    roomTag: {
+      minHeight: '35px',
+      marginTop: '-12px',
+      marginBottom: '5px',
+      marginRight: '10px',
+    },
+    programmeIdWrapper: {
+      marginRight: '6px',
+    },
+    programmeIdText: {
+      fontSize: '1.3rem',
+      fontWeight: 600,
+      color: '#ffffff',
+      letterSpacing: '0.08em',
+    },
+    programmeIdContainer: {
+      marginRight: '1px',
+    },
+  },
+};
 
 export interface DraggableDefenceCardProps {
   event: DefenceEvent;
@@ -41,6 +135,7 @@ export interface DraggableDefenceCardProps {
   conflictSeverity?: 'error' | 'warning' | 'info';
   hasDoubleBooking?: boolean;
   doubleBookingCount?: number;
+  programmeId?: string;
 }
 
 function DraggableDefenceCardComponent({
@@ -62,11 +157,14 @@ function DraggableDefenceCardComponent({
   conflictSeverity,
   hasDoubleBooking = false,
   doubleBookingCount = 0,
+  programmeId,
 }: DraggableDefenceCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
   const coSupervisorDisplay = formatParticipantNames(event.coSupervisor);
+  const viewStyleOverrides = compact ? CARD_VIEW_TEXT_STYLE_OVERRIDES.compact : CARD_VIEW_TEXT_STYLE_OVERRIDES.individual;
+  const programmeIdentifier = programmeId || event.programme;
 
   // Merge theme with defaults - memoized to prevent recalculation
   const resolvedTheme = useMemo(
@@ -232,7 +330,7 @@ function DraggableDefenceCardComponent({
       supervisorStyle: computedSupervisorStyle,
       lockedIconColor: computedLockedIconColor,
     };
-  }, [resolvedTheme, compact, stackOffset, event.color, event.locked, event.conflicts, event.programme, colorScheme, cardStyle, isDragging, zIndex, isActive, isSelected, highlighted, conflictCount, conflictSeverity, hasDoubleBooking]);
+  }, [resolvedTheme, compact, stackOffset, event.color, event.locked, event.programme, colorScheme, cardStyle, isDragging, zIndex, isActive, isSelected, highlighted, conflictCount, conflictSeverity, hasDoubleBooking]);
 
   const warningItems = useMemo(() => {
     const items: { key: string; count: number; title: string; icon: JSX.Element }[] = [];
@@ -346,7 +444,10 @@ function DraggableDefenceCardComponent({
       {/* Compact mode: condensed info with all participants */}
       {compact ? (
         <>
-        <div className="flex items-center justify-between" style={{ gap: resolvedTheme.spacing.card.internalGap }}>
+        <div
+          className="flex items-center justify-between"
+          style={{ gap: resolvedTheme.spacing.card.internalGap, ...viewStyleOverrides.compactContainer }}
+        >
           {/* Selection checkbox */}
           <div
             className={`w-4 h-4 rounded border flex items-center justify-center cursor-pointer flex-shrink-0 ${
@@ -370,7 +471,7 @@ function DraggableDefenceCardComponent({
           <div className="flex-1 min-w-0">
             <div
               className="break-words whitespace-normal"
-              style={{ ...studentStyle, wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+              style={{ ...studentStyle, ...viewStyleOverrides.student, wordBreak: 'break-word', overflowWrap: 'anywhere' }}
             >
               {event.student}
             </div>
@@ -378,6 +479,7 @@ function DraggableDefenceCardComponent({
               className="break-words whitespace-normal"
               style={{
                 ...supervisorStyle,
+                ...viewStyleOverrides.supervisor,
                 marginTop: resolvedTheme.spacing.card.internalGap,
                 wordBreak: 'break-word',
                 overflowWrap: 'anywhere',
@@ -392,25 +494,67 @@ function DraggableDefenceCardComponent({
           {event.locked && (
             <Lock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: lockedIconColor }} strokeWidth={2} />
           )}
-          <RoomTag room={event.room} showPlaceholder />
+        </div>
+        <div
+          className="absolute flex items-center"
+          style={{
+            top: '4px',
+            right: '8px',
+            ...viewStyleOverrides.roomTag,
+          }}
+        >
+          {programmeIdentifier && (
+            <div style={{ ...viewStyleOverrides.programmeIdContainer }}>
+              <span style={{ ...programmeStyle, ...viewStyleOverrides.programme, ...viewStyleOverrides.programmeIdText }}>
+                {programmeIdentifier}
+              </span>
+            </div>
+          )}
+          <div style={{ ...viewStyleOverrides.programmeIdWrapper }}>
+            <RoomTag room={event.room} showPlaceholder />
+          </div>
         </div>
         </>
       ) : (
         <>
-          {/* Programme badge */}
+        {/* Programme controls */}
+        <div
+          className="flex items-center"
+          style={{
+            marginBottom: resolvedTheme.spacing.card.internalGap,
+            gap: resolvedTheme.spacing.card.internalGap,
+            ...viewStyleOverrides.programmeContainer,
+          }}
+        >
           <div
-            className="flex items-center gap-2"
-            style={{ marginBottom: resolvedTheme.spacing.card.internalGap }}
+            className="ml-auto flex items-center gap-2"
+            style={{
+              minHeight: 35,
+              marginTop: '-12px',
+              marginBottom: '5px',
+              marginRight: '17px',
+              ...viewStyleOverrides.roomTag,
+            }}
           >
-            <span style={programmeStyle}>{event.programme}</span>
-            <RoomTag room={event.room} showPlaceholder />
+            {programmeIdentifier && (
+              <div style={{ ...viewStyleOverrides.programmeIdContainer }}>
+                <span style={{ ...programmeStyle, ...viewStyleOverrides.programme, ...viewStyleOverrides.programmeIdText }}>
+                  {programmeIdentifier}
+                </span>
+              </div>
+            )}
+            <div style={{ ...viewStyleOverrides.programmeIdWrapper }}>
+              <RoomTag room={event.room} showPlaceholder />
+            </div>
           </div>
+        </div>
 
           {/* Student name with lock icon */}
           <div
             className="flex items-center flex-wrap"
             style={{
               ...studentStyle,
+              ...viewStyleOverrides.student,
               gap: resolvedTheme.spacing.card.internalGap,
               wordBreak: 'break-word',
               overflowWrap: 'anywhere',
@@ -426,6 +570,7 @@ function DraggableDefenceCardComponent({
           <div
             style={{
               ...supervisorStyle,
+              ...viewStyleOverrides.supervisor,
               marginTop: resolvedTheme.spacing.card.internalGap,
               wordBreak: 'break-word',
               overflowWrap: 'anywhere',

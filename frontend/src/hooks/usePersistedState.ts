@@ -1,9 +1,11 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { Roster } from '../types/roster';
-import { LockInfo } from '../types/schedule';
+import { LockInfo, RoomAvailabilityState } from '../types/schedule';
 import { SchedulingContext } from '../components/panels/SetupPanel';
 import { FilterState } from '../components/panels/FilterPanel';
 import { logger } from '../utils/logger';
+import { API_BASE_URL } from '../lib/apiConfig';
+import { PersonAvailability, SlotAvailability } from '../components/availability/types';
 
 export interface PersistedDashboardState {
   datasetId: string;
@@ -17,6 +19,7 @@ export interface PersistedDashboardState {
     dayLabels: string[];
     timeSlots: string[];
   };
+  roomAvailability: RoomAvailabilityState[];
   uiPreferences: {
     toolbarPosition: 'top' | 'right';
     cardViewMode: 'individual' | 'compact';
@@ -38,6 +41,7 @@ export interface PersistedStateInput {
     dayLabels: string[];
     timeSlots: string[];
   };
+  roomAvailability?: RoomAvailabilityState[];
   uiPreferences: {
     toolbarPosition: 'top' | 'right';
     cardViewMode: 'individual' | 'compact';
@@ -47,7 +51,6 @@ export interface PersistedStateInput {
 }
 
 export const STORAGE_KEY = 'xcos-dashboard-state';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const STORAGE_VERSION = 1;
 const DEBOUNCE_MS = 800;
 const MAX_STORAGE_SIZE = 4 * 1024 * 1024; // 4MB safety limit (localStorage usually 5-10MB)
@@ -60,6 +63,20 @@ type SerializableDashboardState = Omit<PersistedDashboardState, 'rosters'> & {
   rosters: SerializableRoster[];
 };
 
+function cloneRoomAvailability(source?: RoomAvailabilityState[]): RoomAvailabilityState[] {
+  if (!source) return [];
+  return source.map(room => ({
+    ...room,
+    slots: Object.entries(room.slots || {}).reduce<Record<string, Record<string, RoomAvailabilityState['slots'][string][string]>>>(
+      (acc, [day, slots]) => {
+        acc[day] = { ...slots };
+        return acc;
+      },
+      {}
+    ),
+  }));
+}
+
 export function createPersistedStateSnapshot(input: PersistedStateInput): PersistedDashboardState {
   return {
     datasetId: input.datasetId,
@@ -69,6 +86,7 @@ export function createPersistedStateSnapshot(input: PersistedStateInput): Persis
     schedulingContext: input.schedulingContext,
     filters: input.filters,
     gridData: input.gridData,
+    roomAvailability: cloneRoomAvailability(input.roomAvailability),
     uiPreferences: input.uiPreferences,
     version: STORAGE_VERSION,
     lastSaved: input.lastSaved ?? Date.now(),
@@ -81,6 +99,7 @@ export function createPersistedStateSnapshot(input: PersistedStateInput): Persis
 function compressState(state: PersistedDashboardState): PersistedDashboardState {
   return {
     ...state,
+    roomAvailability: cloneRoomAvailability(state.roomAvailability),
     rosters: state.rosters.map(roster => ({
       ...roster,
       // Remove computed conflict data - will be recalculated
@@ -97,16 +116,17 @@ function compressState(state: PersistedDashboardState): PersistedDashboardState 
   };
 }
 
-function buildAvailabilitySignature(availabilities: any[]): string {
+function buildAvailabilitySignature(availabilities: PersonAvailability[]): string {
   return availabilities
     .map(person => {
-      const dayEntries = Object.entries(person.availability || {}) as Array<[string, Record<string, any>]>;
-      const daySignature = dayEntries
-        .sort(([dayA], [dayB]) => dayA.localeCompare(dayB))
-        .map(([day, slots]) => {
-          const slotSignature = Object.entries(slots || {})
-            .sort(([slotA], [slotB]) => slotA.localeCompare(slotB))
-            .map(([slot, value]) => {
+      const days = Object.keys(person.availability || {}).sort((a, b) => a.localeCompare(b));
+      const daySignature = days
+        .map(day => {
+          const slots = person.availability?.[day] || {};
+          const slotSignature = Object.keys(slots)
+            .sort((slotA, slotB) => slotA.localeCompare(slotB))
+            .map(slot => {
+              const value = slots[slot] as SlotAvailability | string;
               if (typeof value === 'string') {
                 return `${slot}:${value}`;
               }
@@ -118,6 +138,26 @@ function buildAvailabilitySignature(availabilities: any[]): string {
         .join('~');
       return `${person.id}:${daySignature}`;
     })
+    .join(';');
+}
+
+function buildRoomAvailabilitySignature(rooms: RoomAvailabilityState[] | undefined): string {
+  if (!rooms || rooms.length === 0) return '';
+  return rooms
+    .map(room => {
+      const daySignature = Object.entries(room.slots || {})
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([day, slots]) => {
+          const slotSignature = Object.entries(slots || {})
+            .sort(([slotA], [slotB]) => slotA.localeCompare(slotB))
+            .map(([slot, status]) => `${slot}:${status}`)
+            .join(',');
+          return `${day}|${slotSignature}`;
+        })
+        .join('~');
+      return `${room.id}:${daySignature}`;
+    })
+    .sort((a, b) => a.localeCompare(b))
     .join(';');
 }
 
@@ -152,7 +192,7 @@ export function loadPersistedState(): PersistedDashboardState | null {
     }
 
     // Reconstruct Map objects that were serialized as plain objects
-    const rostersRaw = ((parsed.rosters as any[]) || []).map((roster: any) => {
+    const rostersRaw = (parsed.rosters || []).map((roster): Roster => {
       const normalizedState: Roster['state'] = {
         ...roster.state,
         locks: new Map<string, LockInfo>(
@@ -170,7 +210,7 @@ export function loadPersistedState(): PersistedDashboardState | null {
         gridData: roster.gridData,
       };
     });
-    const rosters = rostersRaw as Roster[];
+    const rosters = rostersRaw;
 
     console.log('✓ Loaded state from localStorage', {
       rosterCount: rosters.length,
@@ -182,7 +222,8 @@ export function loadPersistedState(): PersistedDashboardState | null {
     return {
       ...parsed,
       datasetId,
-      rosters: rosters as Roster[],
+      roomAvailability: parsed.roomAvailability || [],
+      rosters,
     } as PersistedDashboardState;
   } catch (error) {
     logger.error('Failed to load persisted state:', error);
@@ -195,7 +236,7 @@ export function loadPersistedState(): PersistedDashboardState | null {
 /**
  * Save state to localStorage with compression and size checks
  */
-function saveToLocalStorage(state: PersistedDashboardState): any | null {
+function saveToLocalStorage(state: PersistedDashboardState): SerializableDashboardState | null {
   try {
     const compressed = compressState(state);
     const serializable = serializeStateForStorage(compressed);
@@ -233,6 +274,7 @@ export function usePersistedState(
     cardViewMode: 'individual' | 'compact';
     filterPanelCollapsed: boolean;
   },
+  roomAvailability: RoomAvailabilityState[],
   datasetVersion?: string
 ) {
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
@@ -243,7 +285,7 @@ export function usePersistedState(
     datasetRef.current = datasetId;
   }, [datasetId]);
 
-  const syncStateWithBackend = useCallback((payload: any): Promise<void> | undefined => {
+  const syncStateWithBackend = useCallback((payload: SerializableDashboardState): Promise<void> | undefined => {
     if (!datasetRef.current) return undefined;
     const body = {
       dataset_id: datasetRef.current,
@@ -270,6 +312,7 @@ export function usePersistedState(
       schedulingContext,
       filters,
       gridData,
+      roomAvailability,
       uiPreferences,
     });
 
@@ -323,6 +366,7 @@ export function usePersistedState(
           .map(opt => `${opt.id ?? opt.name}:${opt.enabled !== false ? 1 : 0}`)
           .join('|'),
       },
+      roomAvailabilitySignature: buildRoomAvailabilitySignature(roomAvailability),
       uiPreferences,
     });
 
@@ -339,7 +383,7 @@ export function usePersistedState(
       return syncStateWithBackend(serialized);
     }
     return undefined;
-  }, [datasetId, datasetVersion, rosters, activeRosterId, schedulingContext, filters, gridData, uiPreferences, syncStateWithBackend]);
+  }, [datasetId, datasetVersion, rosters, activeRosterId, schedulingContext, filters, gridData, roomAvailability, uiPreferences, syncStateWithBackend]);
 
   // Debounced auto-save on state changes
   // CRITICAL: Only depend on persistState callback, not raw state

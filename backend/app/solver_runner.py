@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import importlib
 import importlib.util
+import logging
 import sys
 import time
 from dataclasses import dataclass
@@ -10,6 +11,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import yaml
 from .config import DATA_OUTPUT_DIR, SOLVER_SRC_DIR
 from .datasets import load_dataset, ensure_dataset
 
@@ -48,6 +50,7 @@ def _load_solver_module():
 
 
 solver_module = _load_solver_module()
+logger = logging.getLogger(__name__)
 
 DEFAULT_SOLVER_SETTINGS = {
     "input_data": "examples/medium",
@@ -74,7 +77,9 @@ class SolverOptions:
     timeout: int = 180
     solver: str = "ortools"
     explain: bool = False
-    must_plan_all: bool = True
+    must_plan_all: Optional[bool] = None
+    adjacency_objective: Optional[bool] = None
+    allow_online_defenses: Optional[bool] = None
 
 
 class SolverRunner:
@@ -89,19 +94,46 @@ class SolverRunner:
         enabled_room_count: Optional[int] = None,
     ) -> Dict:
         cfg = dict(getattr(self._module, "DEFAULT_SETTINGS", DEFAULT_SOLVER_SETTINGS))
+        dataset_cfg = self._load_dataset_config(dataset_path)
+        if dataset_cfg:
+            cfg.update(dataset_cfg)
         cfg.update(
             {
                 "input_data": str(dataset_path),
                 "output_dir": str(run_dir),
                 "solver": opts.solver,
-                "must_plan_all_defenses": opts.must_plan_all,
                 "explain": opts.explain,
                 "no_plots": True,
             }
         )
+        if opts.must_plan_all is not None:
+            cfg["must_plan_all_defenses"] = opts.must_plan_all
+        elif "must_plan_all_defenses" not in cfg:
+            cfg["must_plan_all_defenses"] = True
+        if opts.adjacency_objective is not None:
+            cfg["adjacency_objective"] = opts.adjacency_objective
+        if opts.allow_online_defenses is not None:
+            cfg["allow_online_defenses"] = opts.allow_online_defenses
         if enabled_room_count is not None and enabled_room_count > 0:
             cfg["max_rooms"] = min(cfg.get("max_rooms", enabled_room_count), enabled_room_count)
         return cfg
+
+    @staticmethod
+    def _load_dataset_config(dataset_path: Path) -> Dict[str, Any]:
+        candidates = ["solver.yml", "solver.yaml", "config.yml", "config.yaml"]
+        for name in candidates:
+            path = dataset_path / name
+            if not path.exists():
+                continue
+            try:
+                with path.open("r", encoding="utf-8") as handle:
+                    data = yaml.safe_load(handle) or {}
+                    if isinstance(data, dict):
+                        return data
+                    logger.warning("Ignoring solver config %s because it does not contain key/value mappings", path)
+            except Exception as exc:  # pragma: no cover - defensive
+                logger.warning("Failed to parse solver config %s: %s", path, exc)
+        return {}
 
     def _assignment_rows(
         self,
@@ -233,6 +265,8 @@ class SolverRunner:
             "unscheduled": [],
             "summary": {},
             "utilization": None,
+            "planned_count": 0,
+            "total_defenses": int(getattr(model, "no_defenses", 0)),
         }
         if status:
             assignments = self._assignment_rows(model, timeslot_info, defences)
@@ -257,6 +291,14 @@ class SolverRunner:
             util = self._module.compute_utilization(model)
             slack = self._module.compute_slack(model)
             gaps = self._module.compute_capacity_gaps(model)
+            adjacency_metrics = None
+            if cfg.get("adjacency_objective") and hasattr(model, "adj_obj"):
+                adjacency_metrics = {
+                    "score": int(model.adj_obj.value()),
+                    "possible": int(getattr(model, "adj_obj_ub", 0)),
+                }
+                summary["adjacency_score"] = adjacency_metrics["score"]
+                summary["adjacency_possible"] = adjacency_metrics["possible"]
             payload = {
                 "assignments": assignments,
                 "unscheduled": unscheduled,
@@ -267,6 +309,8 @@ class SolverRunner:
             }
             (Path(run_folder) / "result.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
             result.update(payload)
+            result["planned_count"] = len(assignments)
+            result["objectives"] = {"adjacency": adjacency_metrics} if adjacency_metrics else {}
         else:
             blocking = self._module.compute_blocking_reasons(model)
             relax = self._module.aggregate_relax_candidates(blocking, top_k=10, top_k_per_type=5)

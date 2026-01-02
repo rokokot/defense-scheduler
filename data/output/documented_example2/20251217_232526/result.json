@@ -1,0 +1,470 @@
+{
+  "assignments": [
+    {
+      "assignment_id": "assign-0",
+      "entity_id": "def-1",
+      "entity_name": "Personalised cultural heritage: using recommendation techniques to select relevant content",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-12",
+      "day_index": 1,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "naz-\u00e7elik",
+        "katrien-verbert",
+        "nan",
+        "nan",
+        "nan",
+        "maxwell-szymansky",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 12
+    },
+    {
+      "assignment_id": "assign-1",
+      "entity_id": "def-2",
+      "entity_name": "[internship] at the Royal Library of Belgium",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "zuzana-zern\u00e1kov\u00e1",
+        "margherita-fantoli",
+        "nan",
+        "nan",
+        "nan",
+        "maxwell-szymansky",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-2",
+      "entity_id": "def-3",
+      "entity_name": "Interactions between Kolmogorov Arnold networks and tensor decompositions",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-12",
+      "day_index": 1,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "rochkoulets-maxime",
+        "hendrik-blockeel",
+        "wannes-meert",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 12
+    },
+    {
+      "assignment_id": "assign-3",
+      "entity_id": "def-2-2",
+      "entity_name": "Tricking AI: comparison of adversarial examples",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "senica-dailen",
+        "hendrik-blockeel",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    },
+    {
+      "assignment_id": "assign-4",
+      "entity_id": "def-3-2",
+      "entity_name": "Semi-supervised classification of IoT failure Data",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-14",
+      "day_index": 1,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "sirbu-traian-florin",
+        "stefano-viazzi",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 14
+    },
+    {
+      "assignment_id": "assign-5",
+      "entity_id": "def-4",
+      "entity_name": "Tricking AI: comparison of adversarial examples",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-15",
+      "day_index": 1,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "demuynck-dieter",
+        "stefano-viazzi",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 15
+    },
+    {
+      "assignment_id": "assign-6",
+      "entity_id": "def-5",
+      "entity_name": "Decomposing KAN networks: A tensor decomposition analysis of Kolmogorov-Arnold neural networks",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "geybels-maarten",
+        "mariya-ishteva",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-7",
+      "entity_id": "def-6",
+      "entity_name": "Time series motif discovery: the faster the better",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-13",
+      "day_index": 1,
+      "date": "2020-01-01",
+      "day_name": "Wednesday",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "participant_ids": [
+        "hamelink-frederic",
+        "mariya-ishteva",
+        "wannes-meert",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 13
+    }
+  ],
+  "unscheduled": [],
+  "summary": {
+    "total": 8,
+    "scheduled": 8,
+    "unscheduled": 0
+  },
+  "utilization": {
+    "rooms": [
+      {
+        "resource": "200C 00.01",
+        "type": "room",
+        "available_hours": 12,
+        "busy_hours": 2,
+        "utilization": 0.16666666666666666
+      },
+      {
+        "resource": "200C 00.02",
+        "type": "room",
+        "available_hours": 15,
+        "busy_hours": 6,
+        "utilization": 0.4
+      }
+    ],
+    "people": [
+      {
+        "resource": "Hendrik Blockeel",
+        "type": "person",
+        "available_hours": 7,
+        "busy_hours": 2,
+        "utilization": 0.2857142857142857
+      },
+      {
+        "resource": "Katrien Verbert",
+        "type": "person",
+        "available_hours": 10,
+        "busy_hours": 1,
+        "utilization": 0.1
+      },
+      {
+        "resource": "Margherita Fantoli",
+        "type": "person",
+        "available_hours": 8,
+        "busy_hours": 1,
+        "utilization": 0.125
+      },
+      {
+        "resource": "Mariya Ishteva",
+        "type": "person",
+        "available_hours": 12,
+        "busy_hours": 2,
+        "utilization": 0.16666666666666666
+      },
+      {
+        "resource": "Stefano Viazzi",
+        "type": "person",
+        "available_hours": 9,
+        "busy_hours": 2,
+        "utilization": 0.2222222222222222
+      },
+      {
+        "resource": "Wannes Meert",
+        "type": "person",
+        "available_hours": 10,
+        "busy_hours": 2,
+        "utilization": 0.2
+      },
+      {
+        "resource": "Maxwell Szymansky",
+        "type": "person",
+        "available_hours": 16,
+        "busy_hours": 2,
+        "utilization": 0.125
+      }
+    ]
+  },
+  "slack": [
+    {
+      "defense_id": 0,
+      "student": "Naz \u00c7elik",
+      "start_slot": 12,
+      "min_slack_hours": 2,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Katrien Verbert",
+          "type": "person",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Maxwell Szymansky",
+          "type": "person",
+          "slack_hours": 35
+        }
+      ]
+    },
+    {
+      "defense_id": 1,
+      "student": "Zuzana Zern\u00e1kov\u00e1",
+      "start_slot": 10,
+      "min_slack_hours": 2,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Margherita Fantoli",
+          "type": "person",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Maxwell Szymansky",
+          "type": "person",
+          "slack_hours": 37
+        }
+      ]
+    },
+    {
+      "defense_id": 2,
+      "student": "Rochkoulets Maxime",
+      "start_slot": 12,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Hendrik Blockeel",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 3,
+      "student": "Senica Dailen",
+      "start_slot": 11,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Hendrik Blockeel",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 4,
+      "student": "Sirbu Traian-Florin",
+      "start_slot": 14,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Stefano Viazzi",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 5,
+      "student": "Demuynck Dieter",
+      "start_slot": 15,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Stefano Viazzi",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 6,
+      "student": "Geybels Maarten",
+      "start_slot": 9,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Mariya Ishteva",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 7,
+      "student": "Hamelink Frederic",
+      "start_slot": 13,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Mariya Ishteva",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    }
+  ],
+  "capacity_gaps": []
+}

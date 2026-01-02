@@ -1,5 +1,7 @@
 services:
   backend:
+    env_file:
+      - .env
     build:
       context: .
       dockerfile: backend/Dockerfile
@@ -8,10 +10,12 @@ services:
       - "8000:8000"
     volumes:
       # Mount data directory for persistence
-      - ./data:/app/data
+      - ./data:/app/data:z
     environment:
       - PYTHONUNBUFFERED=1
       - DATA_DIR=/app/data
+      - FRONTEND_HOSTS=${FRONTEND_HOSTS:-}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -21,20 +25,24 @@ services:
       start_period: 10s
 
   frontend:
+    env_file:
+      - .env
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
     container_name: defense-scheduler-frontend
     ports:
-      - "3000:80"
+      - "80:80"
     depends_on:
       backend:
         condition: service_healthy
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/"]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -47,7 +55,7 @@ services:
       dockerfile: Dockerfile
     container_name: defense-scheduler-solver
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data:z
     environment:
       - PYTHONUNBUFFERED=1
     restart: unless-stopped

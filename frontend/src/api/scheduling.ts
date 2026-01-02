@@ -13,13 +13,19 @@ import {
   ParticipantConflict,
   SolverRunStatus,
 } from '../types/scheduling';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+import { API_BASE_URL } from '../lib/apiConfig';
 
 interface SolveOptions {
   timeout?: number;
   solver?: 'ortools' | 'exact' | 'z3';
   findAll?: boolean;
+  adjacencyObjective?: boolean;
+  mustPlanAllDefenses?: boolean;
+  allowOnlineDefenses?: boolean;
+}
+
+interface SolveCallbacks {
+  onRunId?: (runId: string) => void;
 }
 
 export class SchedulingAPI {
@@ -54,16 +60,26 @@ export class SchedulingAPI {
    */
   private async startSolverRun(
     data: ScheduleData,
-    options?: { timeout?: number; solver?: string }
+    options?: SolveOptions
   ): Promise<SolverRunStatus> {
+    const payload: Record<string, unknown> = {
+      data,
+      timeout: options?.timeout || 180,
+      solver: options?.solver || 'ortools',
+    };
+    if (options?.adjacencyObjective !== undefined) {
+      payload.adjacency_objective = options.adjacencyObjective;
+    }
+    if (options?.mustPlanAllDefenses !== undefined) {
+      payload.must_plan_all_defenses = options.mustPlanAllDefenses;
+    }
+    if (options?.allowOnlineDefenses !== undefined) {
+      payload.allow_online_defenses = options.allowOnlineDefenses;
+    }
     const response = await fetch(`${this.baseUrl}/api/solver/runs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        data,
-        timeout: options?.timeout || 180,
-        solver: options?.solver || 'ortools',
-      }),
+      body: JSON.stringify(payload),
     });
     if (!response.ok) {
       throw new Error(`Failed to start solver run: ${response.statusText}`);
@@ -79,19 +95,29 @@ export class SchedulingAPI {
     return response.json();
   }
 
+  async cancelSolverRun(runId: string): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/api/solver/runs/${runId}/cancel`, {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to cancel solver run: ${response.statusText}`);
+    }
+  }
+
   async solve(
     data: ScheduleData,
-    options?: {
-      timeout?: number;
-      solver?: string;
-    }
+    options?: SolveOptions,
+    callbacks?: SolveCallbacks
   ): Promise<SolveResult> {
     const run = await this.startSolverRun(data, options);
+    if (callbacks?.onRunId) {
+      callbacks.onRunId(run.run_id);
+    }
     const runId = run.run_id;
     let delay = 500;
     const maxWait = (options?.timeout || 180) * 1000 + 60000;
     const startTime = Date.now();
-    while (true) {
+    while (Date.now() - startTime <= maxWait) {
       const status = await this.getSolverRun(runId);
       if (status.status === 'succeeded' && status.result) {
         return status.result;
@@ -99,12 +125,13 @@ export class SchedulingAPI {
       if (status.status === 'failed') {
         throw new Error(status.error || 'Solver run failed');
       }
-      if (Date.now() - startTime > maxWait) {
-        throw new Error('Solver run timed out');
+      if (status.status === 'cancelled') {
+        throw new Error('Solver run cancelled');
       }
       await this.sleep(delay);
       delay = Math.min(delay * 1.5, 4000);
     }
+    throw new Error('Solver run timed out');
   }
 
   /**
@@ -283,8 +310,9 @@ export const schedulingAPI = new SchedulingAPI();
 
 // Export convenience functions
 export const loadScheduleData = (dataPath?: string) => schedulingAPI.loadData(dataPath);
-export const solveSchedule = (data: ScheduleData, options?: SolveOptions) =>
-  schedulingAPI.solve(data, options);
+export const solveSchedule = (data: ScheduleData, options?: SolveOptions, callbacks?: SolveCallbacks) =>
+  schedulingAPI.solve(data, options, callbacks);
+export const cancelSolverRun = (runId: string) => schedulingAPI.cancelSolverRun(runId);
 export const generateMUS = (data: ScheduleData) => schedulingAPI.generateMUS(data);
 export const generateMCS = (data: ScheduleData, musId: string) =>
   schedulingAPI.generateMCS(data, musId);

@@ -1,6 +1,6 @@
 import { ScheduleData } from '../types/scheduling';
-import { DefenceEvent, RoomOption } from '../types/schedule';
-import { resolveRoomName } from '../utils/roomNames';
+import { DefenceEvent, RoomOption, RoomAvailabilityState } from '../types/schedule';
+import { resolveRoomName, slugifyRoomName } from '../utils/roomNames';
 import { PersonAvailability, PersonRole, SlotAvailability } from '../components/availability/types';
 
 export interface DashboardData {
@@ -19,6 +19,7 @@ export interface DashboardData {
   };
   rooms: string[];
   roomOptions: RoomOption[];
+  roomAvailability: RoomAvailabilityState[];
 }
 
 const ROLE_BY_FIELD: Record<string, PersonRole> = {
@@ -48,6 +49,16 @@ function slugify(value: string): string {
     .trim()
     .replace(/[\s/|.]+/g, '-');
 }
+
+const toTrimmedString = (value: unknown): string => {
+  if (typeof value === 'string') {
+    return value.trim();
+  }
+  if (value === undefined || value === null) {
+    return '';
+  }
+  return String(value).trim();
+};
 
 function formatDayLabel(day: string): string {
   const date = new Date(day);
@@ -155,30 +166,141 @@ function createRoomOptions(schedule: ScheduleData): RoomOption[] {
   return options;
 }
 
+function createRoomSlotTemplate(days: string[], timeSlots: string[]) {
+  const slots: Record<string, Record<string, 'available' | 'unavailable'>> = {};
+  days.forEach(day => {
+    slots[day] = {};
+    timeSlots.forEach(slot => {
+      slots[day][slot] = 'available';
+    });
+  });
+  return slots;
+}
+
+function cloneRoomSlots(template: Record<string, Record<string, 'available' | 'unavailable'>>) {
+  const copy: Record<string, Record<string, 'available' | 'unavailable'>> = {};
+  Object.entries(template).forEach(([day, slots]) => {
+    copy[day] = {};
+    Object.entries(slots).forEach(([slot, value]) => {
+      copy[day][slot] = value;
+    });
+  });
+  return copy;
+}
+
+function createRoomAvailabilityState(
+  schedule: ScheduleData,
+  days: string[],
+  timeSlots: string[],
+  roomOptions: RoomOption[]
+): RoomAvailabilityState[] {
+  const template = createRoomSlotTemplate(days, timeSlots);
+  const statesById = new Map<string, RoomAvailabilityState>();
+  const slugIndex = new Map<string, string>();
+  const orderMap = new Map<string, number>();
+
+  const registerState = (state: RoomAvailabilityState, orderHint?: number) => {
+    const normalizedId = state.id.toLowerCase();
+    statesById.set(normalizedId, state);
+    const slug = slugifyRoomName(state.label);
+    if (slug) {
+      slugIndex.set(slug, normalizedId);
+    }
+    if (orderHint !== undefined) {
+      orderMap.set(state.id, orderHint);
+    }
+    return state;
+  };
+
+  const findStateByLabel = (label: string): RoomAvailabilityState | undefined => {
+    const slug = slugifyRoomName(label);
+    if (!slug) return undefined;
+    const idKey = slugIndex.get(slug);
+    if (!idKey) return undefined;
+    return statesById.get(idKey);
+  };
+
+  const ensureState = (id: string | undefined, label: string, orderHint?: number): RoomAvailabilityState => {
+    const normalizedId = id ? id.toLowerCase() : undefined;
+    const existing =
+      (normalizedId && statesById.get(normalizedId)) ||
+      findStateByLabel(label);
+    if (existing) {
+      return existing;
+    }
+    const derivedId = id || slugifyRoomName(label) || `room-${statesById.size + 1}`;
+    const state: RoomAvailabilityState = {
+      id: derivedId,
+      label,
+      slots: cloneRoomSlots(template),
+    };
+    return registerState(state, orderHint);
+  };
+
+  roomOptions.forEach((option, index) => {
+    const label = resolveRoomName(option?.name ?? option?.id ?? `Room ${index + 1}`) || `Room ${index + 1}`;
+    ensureState(option.id, label, index);
+  });
+
+  (schedule.unavailabilities || []).forEach(record => {
+    if (!record) return;
+    const type = typeof record.type === 'string' ? record.type.toLowerCase() : '';
+    if (type !== 'room') return;
+    const label = resolveRoomName(record.name);
+    if (!label) return;
+    const day = record.day;
+    if (!day || !days.includes(day)) return;
+    const matchedById =
+      (typeof record.name === 'string' && statesById.get(record.name.toLowerCase())) ||
+      findStateByLabel(label);
+    const state = matchedById || ensureState(undefined, label);
+    const slots = getSlotsInRange(
+      timeSlots,
+      typeof record.start_time === 'string' ? record.start_time : '',
+      typeof record.end_time === 'string' ? record.end_time : ''
+    );
+    slots.forEach(slot => {
+      if (!state.slots[day]) {
+        state.slots[day] = {};
+      }
+      state.slots[day][slot] = 'unavailable';
+    });
+  });
+
+  const states = Array.from(statesById.values());
+  states.sort(
+    (a, b) =>
+      (orderMap.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (orderMap.get(b.id) ?? Number.MAX_SAFE_INTEGER) ||
+      a.label.localeCompare(b.label)
+  );
+  return states;
+}
+
 function createEvents(schedule: ScheduleData): DefenceEvent[] {
   const entities = schedule.entities || [];
   return entities.map(entity => {
-    const raw = (entity as any).raw || {};
+    const raw = entity.raw ?? {};
     const mentors = ['mentor1', 'mentor2', 'mentor3', 'mentor4']
-      .map((field) => (raw[field] ? String(raw[field]).trim() : ''))
-      .filter((value: string | undefined): value is string => Boolean(value));
+      .map(field => toTrimmedString(raw[field as keyof typeof raw]))
+      .filter((value): value is string => value.length > 0);
     const assessors = ['assessor1', 'assessor2']
-      .map((field) => (raw[field] ? String(raw[field]).trim() : ''))
-      .filter((value: string | undefined): value is string => Boolean(value));
+      .map(field => toTrimmedString(raw[field as keyof typeof raw]))
+      .filter((value): value is string => value.length > 0);
 
     return {
       id: entity.entity_id,
-      title: raw.title || entity.name,
-      student: raw.student || entity.name,
-      supervisor: raw.supervisor || '',
-      coSupervisor: raw.co_supervisor || undefined,
+      title: toTrimmedString(raw.title) || entity.name,
+      student: toTrimmedString(raw.student) || entity.name,
+      supervisor: toTrimmedString(raw.supervisor),
+      coSupervisor: toTrimmedString(raw.co_supervisor) || undefined,
       assessors,
       mentors,
-      day: raw.day || '',
-      startTime: raw.start_time || '',
-      endTime: raw.end_time || '',
-      programme: raw.programme || 'General',
-      room: resolveRoomName(raw.room || raw.room_name || '') || undefined,
+      day: toTrimmedString(raw.day),
+      startTime: toTrimmedString(raw.start_time),
+      endTime: toTrimmedString(raw.end_time),
+      programme: toTrimmedString(raw.programme) || 'CS',
+      programmeId: toTrimmedString(raw.programme_id) || toTrimmedString(raw.programme) || 'CS',
+      room: resolveRoomName(toTrimmedString(raw.room) || toTrimmedString(raw.room_name)) || undefined,
       locked: false,
     };
   });
@@ -208,11 +330,12 @@ function createAvailabilities(schedule: ScheduleData, days: string[], timeSlots:
 
   // Ensure all participants appear at least once
   (schedule.entities || []).forEach(entity => {
-    const raw = (entity as any).raw || {};
+    const raw = entity.raw ?? {};
     Object.entries(ROLE_BY_FIELD).forEach(([field, role]) => {
-      const name = raw[field];
-      if (name && String(name).trim() !== '') {
-        ensurePerson(String(name), role);
+      const name = raw[field as keyof typeof raw];
+      const normalized = toTrimmedString(name);
+      if (normalized) {
+        ensurePerson(normalized, role);
       }
     });
   });
@@ -258,11 +381,24 @@ function deriveDays(schedule: ScheduleData): string[] {
       return (a.start_offset ?? 0) - (b.start_offset ?? 0);
     })
     .forEach(slot => {
-      if (!seen.has(slot.date)) {
+      if (slot.date && !seen.has(slot.date)) {
         seen.add(slot.date);
         ordered.push(slot.date);
       }
     });
+
+  if (ordered.length === 0 && schedule.timeslot_info?.first_day) {
+    const baseDate = new Date(`${schedule.timeslot_info.first_day}T00:00:00`);
+    if (!Number.isNaN(baseDate.getTime())) {
+      const totalDays = Math.max(1, Number(schedule.timeslot_info.number_of_days) || 1);
+      for (let offset = 0; offset < totalDays; offset++) {
+        const next = new Date(baseDate);
+        next.setDate(baseDate.getDate() + offset);
+        ordered.push(next.toISOString().split('T')[0]);
+      }
+    }
+  }
+
   return ordered;
 }
 
@@ -278,6 +414,20 @@ function deriveTimeSlots(schedule: ScheduleData): string[] {
         slots.push(slot.start_time);
       }
     });
+
+  if (slots.length === 0 && schedule.timeslot_info) {
+    const startHour = Number.isFinite(Number(schedule.timeslot_info.start_hour))
+      ? Number(schedule.timeslot_info.start_hour)
+      : 8;
+    const endHourRaw = Number.isFinite(Number(schedule.timeslot_info.end_hour))
+      ? Number(schedule.timeslot_info.end_hour)
+      : startHour + 8;
+    const endHour = endHourRaw > startHour ? endHourRaw : startHour + 1;
+    for (let hour = startHour; hour < endHour; hour++) {
+      slots.push(`${hour.toString().padStart(2, '0')}:00`);
+    }
+  }
+
   return slots;
 }
 
@@ -289,18 +439,23 @@ export function mapScheduleToDashboard(schedule: ScheduleData): DashboardData {
   const events = createEvents(schedule);
   const availabilities = createAvailabilities(schedule, days, timeSlots);
   const roomOptions = createRoomOptions(schedule);
+  const roomAvailability = createRoomAvailabilityState(schedule, days, timeSlots, roomOptions);
   const roomNames = roomOptions
     .filter(room => room.enabled !== false)
     .map(room => room.name);
-  const firstDay = days[0] || schedule.timeslot_info?.first_day || new Date().toISOString().slice(0, 10);
+  const firstDay = days[0] || String(schedule.timeslot_info?.first_day || new Date().toISOString().slice(0, 10));
   const lastDay = days[days.length - 1] || firstDay;
   const defaultStartHour = timeSlots.length > 0 ? parseInt(timeSlots[0].split(':')[0], 10) : 9;
   const defaultEndHour = timeSlots.length > 0 ? parseInt(timeSlots[timeSlots.length - 1].split(':')[0], 10) + 1 : defaultStartHour + 8;
+  const parsedStartHour = Number(schedule.timeslot_info?.start_hour);
+  const parsedEndHour = Number(schedule.timeslot_info?.end_hour);
+  const startHourValue = Number.isFinite(parsedStartHour) ? parsedStartHour : defaultStartHour;
+  const endHourValue = Number.isFinite(parsedEndHour) ? parsedEndHour : defaultEndHour;
   const timeHorizon = {
-    startDate: firstDay,
-    endDate: lastDay,
-    startHour: schedule.timeslot_info?.start_hour ?? defaultStartHour,
-    endHour: schedule.timeslot_info?.end_hour ?? defaultEndHour,
+    startDate: String(firstDay),
+    endDate: String(lastDay),
+    startHour: startHourValue,
+    endHour: endHourValue,
   };
   return {
     datasetId,
@@ -313,5 +468,6 @@ export function mapScheduleToDashboard(schedule: ScheduleData): DashboardData {
     timeHorizon,
     rooms: roomNames,
     roomOptions,
+    roomAvailability,
   };
 }

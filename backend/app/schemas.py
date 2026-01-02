@@ -21,6 +21,9 @@ class SolveOptions(BaseModel):
     timeout: Optional[int] = 180
     solver: Optional[str] = "ortools"
     explain: Optional[bool] = False
+    adjacency_objective: Optional[bool] = None
+    must_plan_all_defenses: Optional[bool] = None
+    allow_online_defenses: Optional[bool] = None
 
 
 class SolveRequest(BaseModel):
@@ -28,6 +31,9 @@ class SolveRequest(BaseModel):
     data: ScheduleData
     timeout: Optional[int] = 180
     solver: Optional[str] = "ortools"
+    adjacency_objective: Optional[bool] = None
+    must_plan_all_defenses: Optional[bool] = None
+    allow_online_defenses: Optional[bool] = None
 
 
 class SolveResult(BaseModel):

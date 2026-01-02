@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import { useMemo, useState } from 'react';
 
 interface AxisConfig {
   id: string;
@@ -25,7 +26,45 @@ export interface ParallelChartStyle {
   activeOpacity: number;
   inactiveOpacity: number;
   backgroundColor?: string;
+  chartPadding?: number;
+  axisLabelOffset?: number;
+  axisLabelBoxWidth?: number;
+  axisLabelBoxHeight?: number;
+  axisLabelLineHeight?: number;
+  axisLabelOffsets?: Record<string, { dx?: number; dy?: number }>;
 }
+
+const formatAxisLabelLines = (rawLabel: string): string[] => {
+  if (!rawLabel) return [''];
+  const cleaned = rawLabel.replace(/\s+/g, ' ').trim();
+  const manualBreaks = cleaned.split(/\n+/).filter(Boolean);
+  let lines: string[] = [];
+  if (manualBreaks.length >= 2) {
+    lines = manualBreaks.slice(0, 2);
+  } else if (manualBreaks.length === 1) {
+    const single = manualBreaks[0];
+    const words = single.split(' ');
+    if (words.length <= 3) {
+      const midpoint = Math.ceil(words.length / 2);
+      lines = [
+        words.slice(0, midpoint).join(' '),
+        words.slice(midpoint).join(' '),
+      ];
+    } else {
+      const midpoint = Math.ceil(words.length / 2);
+      lines = [
+        words.slice(0, midpoint).join(' '),
+        words.slice(midpoint).join(' '),
+      ];
+    }
+  } else {
+    lines = ['', ''];
+  }
+  while (lines.length < 2) {
+    lines.push('');
+  }
+  return lines.slice(0, 2);
+};
 
 export interface ParallelCoordinatesChartProps {
   axes: AxisConfig[];
@@ -51,146 +90,205 @@ export const DEFAULT_PARALLEL_CHART_STYLE: ParallelChartStyle = {
   activeOpacity: 0.9,
   inactiveOpacity: 0.25,
   backgroundColor: '#F8FAFC',
+  chartPadding: 60,
+  axisLabelOffset: 5,
+  axisLabelBoxWidth: 132,
+  axisLabelBoxHeight: 70,
+  axisLabelLineHeight: 1.25,
+  axisLabelOffsets: {},
 };
 
-const CHART_MARGIN = { top: 50, right: 200, bottom: 60, left: 125 };
 
 export function ParallelCoordinatesChart({
   axes,
   data,
   selectedId,
   onSelect,
-  minHeight = 300,
+  minHeight = 315,
   styleOverrides,
   valueFormatter,
   axisFormatter,
 }: ParallelCoordinatesChartProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const styles = { ...DEFAULT_PARALLEL_CHART_STYLE, ...styleOverrides };
+  const width = 360;
+  const height = Math.max(minHeight, 300);
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const radius = Math.max(40, Math.min(width, height) / 2 - (styles.chartPadding ?? 60));
+  const maxValue = 10;
+  const ringCount = 4;
+  const angleStep = axes.length > 0 ? (2 * Math.PI) / axes.length : 0;
 
-  const axisSpacing = 400;
-  const effectiveWidth = axes.length > 1 ? axisSpacing * (axes.length - 1) : axisSpacing;
-  const chartWidth = effectiveWidth + CHART_MARGIN.left + CHART_MARGIN.right;
-  const chartHeight = minHeight;
-  const innerWidth = chartWidth - CHART_MARGIN.left - CHART_MARGIN.right;
-  const innerHeight = chartHeight - CHART_MARGIN.top - CHART_MARGIN.bottom;
-
-  const axisPositions = useMemo(() => {
-    if (axes.length === 0) return [];
-    if (axes.length === 1) return [CHART_MARGIN.left + innerWidth / 2];
-    return axes.map((_, idx) => CHART_MARGIN.left + (innerWidth / (axes.length - 1)) * idx);
-  }, [axes, innerWidth]);
-
-  const getY = (value: number) => {
-    const clamped = Math.max(0, Math.min(10, value));
-    const ratio = clamped / 10;
-    return CHART_MARGIN.top + innerHeight - ratio * innerHeight;
+  const getPoint = (axisIndex: number, value: number) => {
+    const clamped = Math.max(0, Math.min(maxValue, value));
+    const ratio = clamped / maxValue;
+    const angle = angleStep * axisIndex - Math.PI / 2;
+    return {
+      x: centerX + Math.cos(angle) * radius * ratio,
+      y: centerY + Math.sin(angle) * radius * ratio,
+    };
   };
 
-  const tickValues = [0, 5, 10];
+  const buildPath = (datum: ParallelDatum) => {
+    const points = axes.map((axis, idx) => getPoint(idx, datum.values[axis.id] ?? 0));
+    if (points.length === 0) return '';
+    return points
+      .map((point, idx) => `${idx === 0 ? 'M' : 'L'} ${point.x} ${point.y}`)
+      .join(' ') + ' Z';
+  };
+
+  const ringPolygons = useMemo(() => {
+    return Array.from({ length: ringCount }, (_, levelIdx) => {
+      const rRatio = ((levelIdx + 1) / ringCount) * radius;
+      const points = axes.map((_, idx) => {
+        const angle = angleStep * idx - Math.PI / 2;
+        return {
+          x: centerX + Math.cos(angle) * rRatio,
+          y: centerY + Math.sin(angle) * rRatio,
+        };
+      });
+      return points;
+    });
+  }, [axes, angleStep, centerX, centerY, radius]);
 
   return (
     <div
-      ref={containerRef}
-      className="flex-1 self-start relative rounded-lg border border-gray-200"
-      style={{ minHeight, height: minHeight, maxHeight: minHeight, backgroundColor: styles.backgroundColor }}
+      className="flex-1 relative rounded-xl border border-gray-200 bg-gradient-to-br from-white via-slate-50 to-slate-100 shadow-inner"
+      style={{ minHeight: height, height }}
     >
-      <div className="h-full overflow-x-auto overflow-y-hidden">
-        <svg width={chartWidth} height={chartHeight} viewBox={`0 0 ${chartWidth} ${chartHeight}`}>
-        {/* Axes */}
-        {axes.map((axis, idx) => (
-          <g key={axis.id}>
-            <line
-              x1={axisPositions[idx]}
-              x2={axisPositions[idx]}
-              y1={CHART_MARGIN.top}
-              y2={chartHeight - CHART_MARGIN.bottom}
-              stroke={styles.axisColor}
-              strokeWidth={styles.axisStrokeWidth}
-            />
-            {tickValues.map(tick => (
-              <g key={`${axis.id}-${tick}`}>
-                <line
-                  x1={axisPositions[idx] - styles.tickLength / 2}
-                  x2={axisPositions[idx] + styles.tickLength / 2}
-                  y1={getY(tick)}
-                  y2={getY(tick)}
-                  stroke={styles.tickColor}
-                  strokeWidth={1}
-                />
-                <text
-                  x={axisPositions[idx] - styles.tickLength / 2 - 2}
-                  y={getY(tick) + 4}
-                  fontSize={styles.tickFontSize}
-                  fill={styles.tickColor}
-                  textAnchor="end"
-                >
-                  {valueFormatter ? valueFormatter(tick) : tick}
-                </text>
-              </g>
-            ))}
-            <text
-              x={axisPositions[idx]}
-              y={chartHeight - CHART_MARGIN.bottom + 28}
-              textAnchor="middle"
-              fontSize={styles.axisLabelFontSize}
-              fill={styles.axisLabelColor}
-            >
-              {(axisFormatter ? axisFormatter(axis.label) : axis.label)
-                .toString()
-                .split('\n')
-                .map((line, lineIdx) => (
-                  <tspan
-                    key={`${axis.id}-label-${lineIdx}`}
-                    x={axisPositions[idx]}
-                    dy={lineIdx === 0 ? 0 : styles.axisLabelFontSize * 1.1}
-                  >
-                    {line}
-                  </tspan>
-                ))}
-            </text>
-          </g>
+      <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}>
+        <defs>
+          <radialGradient id="radar-grid-gradient" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="rgba(148,163,184,0.25)" />
+            <stop offset="100%" stopColor="rgba(241,245,249,0.05)" />
+          </radialGradient>
+        </defs>
+
+        {/* Grid rings */}
+        {ringPolygons.map((ring, idx) => (
+          <polygon
+            key={`ring-${idx}`}
+            points={ring.map(p => `${p.x},${p.y}`).join(' ')}
+            fill={idx % 2 === 0 ? 'url(#radar-grid-gradient)' : 'none'}
+            stroke="#CBD5F5"
+            strokeWidth={1}
+          />
         ))}
 
-        {/* Lines */}
-        {data.map(item => {
-          const path = axes
-            .map((axis, axisIdx) => {
-              const val = item.values[axis.id] ?? 0;
-              return `${axisIdx === 0 ? 'M' : 'L'} ${axisPositions[axisIdx]} ${getY(val)}`;
-            })
-            .join(' ');
-
-          const isActive = item.id === selectedId;
-          const isHovered = item.id === hoveredId;
-          const strokeWidth = isActive || isHovered ? styles.activeStrokeWidth : styles.inactiveStrokeWidth;
-          const strokeOpacity = isActive || isHovered ? styles.activeOpacity : styles.inactiveOpacity;
-
+        {/* Axes */}
+        {axes.map((axis, idx) => {
+          const axisPoint = getPoint(idx, maxValue);
+          const labelPoint = getPoint(idx, maxValue + (styles.axisLabelOffset ?? 2.6));
+          const labelText = axisFormatter ? axisFormatter(axis.label) : axis.label;
+          const resolvedLines = formatAxisLabelLines(labelText);
+          const labelBoxWidth = styles.axisLabelBoxWidth ?? 120;
+          const labelBoxHeight = styles.axisLabelBoxHeight ?? 60;
+          const labelLineHeight = styles.axisLabelLineHeight ?? 1.2;
+          const perAxisOffset = styles.axisLabelOffsets?.[axis.id] ?? {};
+          const labelX = (labelPoint.x + (perAxisOffset.dx ?? 0)) - labelBoxWidth / 2;
+          const labelY = (labelPoint.y + (perAxisOffset.dy ?? 0)) - labelBoxHeight / 2;
           return (
-            <path
-              key={item.id}
-              d={path}
-              fill="none"
-              stroke={item.color}
-              strokeWidth={strokeWidth}
-              strokeOpacity={strokeOpacity}
-              className="cursor-pointer transition-all duration-150"
-              onMouseEnter={() => setHoveredId(item.id)}
-              onMouseLeave={() => setHoveredId(null)}
-              onClick={() => onSelect(item.id)}
-            />
+            <g key={axis.id}>
+              <line
+                x1={centerX}
+                y1={centerY}
+                x2={axisPoint.x}
+                y2={axisPoint.y}
+                stroke={styles.axisColor}
+                strokeWidth={1.5}
+              />
+              <foreignObject
+                x={labelX}
+                y={labelY}
+                width={labelBoxWidth}
+                height={labelBoxHeight}
+              >
+                <div
+                  style={{
+                    width: labelBoxWidth,
+                    height: labelBoxHeight,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    fontSize: styles.axisLabelFontSize * 0.6,
+                    lineHeight: labelLineHeight,
+                    fontFamily: "Inter, 'Inter var', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                    color: styles.axisLabelColor,
+                    transform: 'translateZ(0)',
+                    pointerEvents: 'none',
+                    whiteSpace: 'pre-line',
+                  }}
+                >
+                  {resolvedLines.map((line, lineIdx) => (
+                    <span key={`${axis.id}-line-${lineIdx}`} style={{ display: 'block' }}>
+                      {line}
+                    </span>
+                  ))}
+                </div>
+              </foreignObject>
+            </g>
           );
         })}
-        </svg>
-      </div>
-      <div className="absolute top-3 right-3 text-sm text-gray-600 bg-white/80 px-2 py-1 rounded border border-gray-200 shadow-sm">
-        {hoveredId
-          ? data.find(d => d.id === hoveredId)?.label
-          : selectedId
-            ? `Selected: ${data.find(d => d.id === selectedId)?.label}`
-            : 'Click a line to highlight'}
-      </div>
+
+        {/* Data polygons */}
+        {data.map(datum => {
+          const path = buildPath(datum);
+          if (!path) return null;
+          const isActive = datum.id === selectedId;
+          const isHovered = datum.id === hoveredId;
+          const opacity = isActive || isHovered ? styles.activeOpacity : styles.inactiveOpacity;
+          const strokeWidth = isActive || isHovered ? styles.activeStrokeWidth : styles.inactiveStrokeWidth;
+          const tooltip =
+            valueFormatter && axes.length > 0
+              ? axes
+                  .map(axis => {
+                    const rawValue = datum.values[axis.id] ?? 0;
+                    return `${axisFormatter ? axisFormatter(axis.label) : axis.label}: ${valueFormatter(rawValue)}`;
+                  })
+                  .join('\n')
+              : null;
+          return (
+            <path
+              key={datum.id}
+              d={path}
+              fill={datum.color + '26'}
+              stroke={datum.color}
+              strokeWidth={strokeWidth}
+              strokeLinejoin="round"
+              opacity={opacity}
+              className="cursor-pointer transition-all duration-150"
+              onMouseEnter={() => setHoveredId(datum.id)}
+              onMouseLeave={() => setHoveredId(null)}
+              onClick={() => onSelect(datum.id)}
+            >
+              {tooltip && <title>{tooltip}</title>}
+            </path>
+          );
+        })}
+
+        {/* Active points */}
+        {data.map(datum => {
+          const isSelected = datum.id === selectedId || datum.id === hoveredId;
+          if (!isSelected) return null;
+          return axes.map((axis, idx) => {
+            const point = getPoint(idx, datum.values[axis.id] ?? 0);
+            return (
+              <circle
+                key={`${datum.id}-${axis.id}`}
+                cx={point.x}
+                cy={point.y}
+                r={5}
+                fill="#fff"
+                stroke={datum.color}
+                strokeWidth={2}
+              />
+            );
+          });
+        })}
+      </svg>
     </div>
   );
 }

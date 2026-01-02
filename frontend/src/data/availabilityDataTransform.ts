@@ -2,7 +2,7 @@
  * Transform flat CSV availability data into PersonAvailability format
  * for AvailabilityPanel component
  */
-import { PersonAvailability, SlotAvailability } from '../components/availability/types';
+import { PersonAvailability, SlotAvailability, AvailabilityStatus } from '../components/availability/types';
 import { AvailabilityRecord } from './thesisDefenceData';
 
 export function transformAvailabilityData(records: AvailabilityRecord[]): PersonAvailability[] {
@@ -24,8 +24,11 @@ export function transformAvailabilityData(records: AvailabilityRecord[]): Person
       person.availability[record.day] = {};
     }
 
+    const rawStatus = record.status as string | undefined;
+    const normalizedStatus: AvailabilityStatus =
+      rawStatus === 'unavailable' || rawStatus === 'booked' ? rawStatus : 'available';
     const slotData: SlotAvailability = {
-      status: record.status || 'empty',
+      status: normalizedStatus,
       locked: false,
     };
 

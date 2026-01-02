@@ -71,3 +71,5 @@ event_id,student,title,supervisor,assessors,programme
 ```csv
 person_id,name,day,time_slot,status
 ```
+
+To load the new datasets, run docker compose down, and then docker compose up again to reload the container with new data.

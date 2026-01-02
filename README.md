@@ -1,4 +1,3 @@
-le# Defense Scheduler
 
 ## quick start
 
@@ -16,8 +15,6 @@ docker-compose up --build
 
 ### Local Development
 ```bash
-# One-command setup
-./setup.sh
 
 # Start backend (terminal 1)
 cd backend

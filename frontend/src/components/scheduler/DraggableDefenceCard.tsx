@@ -13,7 +13,7 @@ import { DefenceEvent } from '../../types/schedule';
 import { DefenceCardTheme } from '../../config/cardStyles.types';
 import { defaultDefenceCardTheme } from '../../config/cardStyles.config';
 import { mergeThemes, shadowToCss, applyTypography, getTextColor } from '../../config/cardStyles.utils';
-import { formatParticipantNames } from '../../utils/participantNames';
+import { splitParticipantNames } from '../../utils/participantNames';
 import { RoomTag } from '../common/RoomTag';
 
 type CardTextStyleOverrides = {
@@ -38,13 +38,13 @@ const CARD_VIEW_TEXT_STYLE_OVERRIDES: Record<'compact' | 'individual', CardTextS
       alignItems: 'flex-start',
     },
     student: {
-      fontSize: '1.05rem',
+      fontSize: '15.36px',
       fontWeight: 600,
       lineHeight: '1.2',
-      marginTop: '-6px',
+      marginTop: '-8px',
     },
     supervisor: {
-      fontSize: '0.95rem',
+      fontSize: '13px',
       fontWeight: 500,
       lineHeight: '1.2',
       opacity: 0.95,
@@ -53,10 +53,9 @@ const CARD_VIEW_TEXT_STYLE_OVERRIDES: Record<'compact' | 'individual', CardTextS
     },
     roomTag: {
       top: '4px',
-      right: '-4px',
     },
     programmeIdWrapper: {
-      marginRight: '10px',
+      marginRight: '0px',
     },
     programmeIdText: {
       fontSize: '1.0rem',
@@ -73,29 +72,29 @@ const CARD_VIEW_TEXT_STYLE_OVERRIDES: Record<'compact' | 'individual', CardTextS
       alignItems: 'center',
     },
     programme: {
-      fontSize: '0.9rem',
-      fontWeight: 600,
+      fontSize: '0rem',
       letterSpacing: '0.01em',
     },
     student: {
-      fontSize: '1.35rem',
+      fontSize: '17.6px',
       fontWeight: 600,
       lineHeight: '1.25',
-      marginTop: '-20px'
+      marginTop: '-30px'
     },
     supervisor: {
-      fontSize: '1.15rem',
+      fontSize: '13px',
       fontWeight: 500,
       lineHeight: '1.25',
+      marginBottom: '10px'
     },
     roomTag: {
       minHeight: '35px',
       marginTop: '-12px',
       marginBottom: '5px',
-      marginRight: '10px',
+      marginRight: '-20px',
     },
     programmeIdWrapper: {
-      marginRight: '6px',
+      marginRight: '16px',
     },
     programmeIdText: {
       fontSize: '1.3rem',
@@ -136,6 +135,8 @@ export interface DraggableDefenceCardProps {
   hasDoubleBooking?: boolean;
   doubleBookingCount?: number;
   programmeId?: string;
+  onParticipantClick?: (participantName: string) => void;
+  onRoomClick?: (room: unknown) => void;
 }
 
 function DraggableDefenceCardComponent({
@@ -157,14 +158,102 @@ function DraggableDefenceCardComponent({
   conflictSeverity,
   hasDoubleBooking = false,
   doubleBookingCount = 0,
-  programmeId,
+  programmeId: _programmeId, // eslint-disable-line @typescript-eslint/no-unused-vars
+  onParticipantClick,
+  onRoomClick,
 }: DraggableDefenceCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
-  const coSupervisorDisplay = formatParticipantNames(event.coSupervisor);
   const viewStyleOverrides = compact ? CARD_VIEW_TEXT_STYLE_OVERRIDES.compact : CARD_VIEW_TEXT_STYLE_OVERRIDES.individual;
-  const programmeIdentifier = programmeId || event.programme;
+  const programmeSwatchColor = event.color || colorScheme[event.programme] || '#94a3b8';
+  const clickableNameClass = compact
+    ? 'underline decoration-transparent hover:decoration-slate-400 hover:text-slate-900'
+    : 'underline decoration-transparent hover:decoration-slate-400 hover:text-slate-900';
+  const roomClickableClass = compact
+    ? 'underline decoration-transparent hover:decoration-slate-400 hover:text-slate-900'
+    : undefined;
+  const splitOnDelimiters = (value: string) =>
+    value
+      .split(/[\n•·∙]+/g)
+      .map(name => name.trim())
+      .filter(Boolean);
+
+  const splitListWithBullets = (value?: string | null) =>
+    splitParticipantNames(value)
+      .flatMap(name => splitOnDelimiters(name));
+
+  const normalizeNameList = (names: string[]) =>
+    names.flatMap(name => splitOnDelimiters(name));
+
+  const participantLineNames = [
+    ...splitListWithBullets(event.supervisor),
+    ...splitListWithBullets(event.coSupervisor),
+    ...normalizeNameList(event.assessors || []),
+    ...normalizeNameList(event.mentors || []),
+  ];
+  const coSupervisorNames = splitListWithBullets(event.coSupervisor);
+
+  const renderParticipantName = (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return null;
+    if (!onParticipantClick) {
+      return <span>{trimmed}</span>;
+    }
+    return (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onParticipantClick(trimmed);
+        }}
+        className={`inline-flex items-center bg-transparent border-0 p-0 ${clickableNameClass}`}
+      >
+        {trimmed}
+      </button>
+    );
+  };
+
+  const renderParticipantList = (names: string[]) => {
+    if (!names || names.length === 0) return null;
+    return names.map((name, index) => (
+      <span key={`${name}-${index}`} className="inline-flex items-center">
+        {index > 0 && <span className="mx-1 text-current opacity-70">•</span>}
+        {renderParticipantName(name)}
+      </span>
+    ));
+  };
+
+  const handleRoomTagClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onRoomClick?.(event.room);
+  };
+
+  const renderRoomTag = () => {
+    const tag = (
+      <RoomTag
+        room={event.room}
+        showPlaceholder
+        className={onRoomClick ? clsx('cursor-pointer', roomClickableClass) : undefined}
+        style={{
+          backgroundColor: 'rgb(214, 216, 222)',
+          color: 'rgb(15, 23, 42)',
+          borderColor: 'rgb(203, 213, 225)',
+        }}
+      />
+    );
+    if (!onRoomClick) return tag;
+    return (
+      <button
+        type="button"
+        className={clsx('inline-flex cursor-pointer', roomClickableClass)}
+        onClick={handleRoomTagClick}
+        aria-label="Show room availability"
+      >
+        {tag}
+      </button>
+    );
+  };
 
   // Merge theme with defaults - memoized to prevent recalculation
   const resolvedTheme = useMemo(
@@ -225,35 +314,59 @@ function DraggableDefenceCardComponent({
   }, [event, isActive]);
 
   // Memoize expensive calculations
-  const { style, programmeStyle, studentStyle, supervisorStyle, lockedIconColor } = useMemo(() => {
+  const { style, studentStyle, supervisorStyle, lockedIconColor, swatchRadius, swatchWidth, swatchGap } = useMemo(() => {
     // Determine mode-specific config
     const modeConfig = compact ? resolvedTheme.modes.compact : resolvedTheme.modes.individual;
 
     // Calculate stacking offset from theme
     const themeStackOffset = compact ? 0 : resolvedTheme.spacing.stacking.offset;
     const actualStackOffset = stackOffset ?? themeStackOffset;
+    const stackOffsetPx = typeof actualStackOffset === 'number' ? `${actualStackOffset}px` : `${actualStackOffset}`;
 
     // Base card style with theme
-    const baseColor = event.color || colorScheme[event.programme] || '#aeb6c4ff';
+    const isInactiveStack = !compact && !isActive;
+    const baseColor = isInactiveStack ? '#f1f5f9' : '#ffffff';
 
     // Get padding and fontSize from appropriate source
     const effectivePadding = cardStyle.padding || (compact ? resolvedTheme.modes.compact.padding : resolvedTheme.spacing.card.padding);
     const effectiveFontSize = cardStyle.fontSize || (compact ? resolvedTheme.modes.compact.fontSize : undefined);
 
+    const resolvePaddingRightPx = (paddingValue: string | undefined) => {
+      if (!paddingValue) return 0;
+      const parts = paddingValue.split(' ').filter(Boolean);
+      const pick = (index: number) => {
+        const value = parts[index] || parts[0];
+        if (!value) return 0;
+        if (value.endsWith('px')) {
+          const numeric = Number.parseFloat(value.slice(0, -2));
+          return Number.isNaN(numeric) ? 0 : numeric;
+        }
+        return 0;
+      };
+      if (parts.length === 1) return pick(0);
+      if (parts.length === 2) return pick(1);
+      if (parts.length === 3) return pick(1);
+      return pick(1);
+    };
+    const computedSwatchWidth = compact ? '19.78px' : '26.37px';
+    const computedSwatchWidthPx = Number.parseFloat(computedSwatchWidth);
+    const basePaddingRight = resolvePaddingRightPx(effectivePadding);
+    const swatchGap = compact ? 4 : 8;
+
+    const isFlowingCard = compact || isActive;
     const computedStyle: React.CSSProperties = {
       backgroundColor: baseColor,
-      color: getTextColor(resolvedTheme.colors.text.student.color, resolvedTheme.colors.background.opacity),
-      top: compact ? '0' : `${actualStackOffset}px`,
-      position: compact ? 'relative' : 'absolute',
+      top: isFlowingCard ? '0' : `${actualStackOffset}px`,
+      position: isFlowingCard ? 'relative' : 'absolute',
       width: cardStyle.width || '100%',
-      left: compact ? undefined : 0,
-      right: compact ? undefined : 0,
+      left: isFlowingCard ? undefined : 0,
+      right: isFlowingCard ? undefined : 0,
       minHeight: cardStyle.minHeight || modeConfig.minHeight,
       padding: effectivePadding,
       borderRadius: resolvedTheme.borders.card.radius,
       fontSize: effectiveFontSize,
       zIndex: isDragging ? 1000 : zIndex,
-      opacity: event.locked ? resolvedTheme.states.locked.opacity : (isActive ? 1 : 0.4),
+      opacity: event.locked ? resolvedTheme.states.locked.opacity : (isActive ? 1 : (compact ? 0.4 : 0.35)),
       transform: isDragging ? 'scale(0.98)' : 'scale(1)',
       cursor: event.locked ? 'default' : (isActive ? (isDragging ? 'grabbing' : 'grab') : 'pointer'),
       transition: isDragging ? 'none' : 'opacity 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease',
@@ -262,22 +375,48 @@ function DraggableDefenceCardComponent({
         ? shadowToCss(resolvedTheme.shadows.active)
         : (event.locked ? shadowToCss(resolvedTheme.shadows.locked) : shadowToCss(resolvedTheme.shadows.default)),
     };
+    computedStyle.paddingRight = `${basePaddingRight + computedSwatchWidthPx + swatchGap}px`;
+    if (!compact && !isActive) {
+      computedStyle.maxHeight = `calc(100% - ${stackOffsetPx})`;
+      computedStyle.overflow = 'hidden';
+    }
+    if (isInactiveStack) {
+      computedStyle.filter = 'blur(0.6px)';
+    }
 
-    // Apply gradient if specified
-    if (resolvedTheme.colors.background.gradient) {
+    // Apply gradient only for non-light card styles
+    if (resolvedTheme.colors.background.gradient && baseColor !== '#ffffff') {
       computedStyle.background = resolvedTheme.colors.background.gradient;
     }
 
     const hasConflicts = conflictCount > 0;
 
     // Build dynamic classes for selection and conflicts
-    const borderWidth = isSelected ? resolvedTheme.states.selected.border.width : resolvedTheme.borders.card.width;
-    const borderColor = isSelected ? resolvedTheme.states.selected.border.color : resolvedTheme.borders.card.color;
-    const borderStyle = isSelected ? resolvedTheme.states.selected.border.style : resolvedTheme.borders.card.style;
+    const baseBorder = { ...resolvedTheme.borders.card, width: '2px', color: '#cbd5e1' };
+    const scalePx = (value: string | undefined, factor: number) => {
+      if (!value) return value;
+      if (value.endsWith('px')) {
+        const numeric = Number.parseFloat(value.slice(0, -2));
+        if (!Number.isNaN(numeric)) {
+          return `${numeric * factor}px`;
+        }
+      }
+      return value;
+    };
+    const selectedBorderWidth = scalePx(resolvedTheme.states.selected.border.width, 0.5);
+    const borderWidth = isSelected ? selectedBorderWidth : baseBorder.width;
+    const borderColor = isSelected ? resolvedTheme.states.selected.border.color : baseBorder.color;
+    const borderStyle = isSelected ? resolvedTheme.states.selected.border.style : baseBorder.style;
+    const effectiveBorderWidth = borderWidth || '0px';
+    const computedSwatchRadius = `calc(${resolvedTheme.borders.card.radius} - ${effectiveBorderWidth})`;
 
     // Apply selection shadow
     if (isSelected) {
-      const selectionShadow = shadowToCss(resolvedTheme.states.selected.shadow);
+      const selectionShadow = shadowToCss({
+        ...resolvedTheme.states.selected.shadow,
+        blur: scalePx(resolvedTheme.states.selected.shadow.blur, 0.5),
+        spread: scalePx(resolvedTheme.states.selected.shadow.spread, 0.5),
+      });
       computedStyle.boxShadow = `${computedStyle.boxShadow}, ${selectionShadow}`;
       computedStyle.border = `${borderWidth} ${borderStyle} ${borderColor}`;
     } else {
@@ -309,28 +448,35 @@ function DraggableDefenceCardComponent({
     }
 
     // Typography styles for different elements
-    const computedProgrammeStyle = applyTypography({
-      color: getTextColor(resolvedTheme.colors.text.programme.color, resolvedTheme.colors.text.programme.opacity),
-    }, resolvedTheme.typography.programme);
+    const textPalette = {
+      programme: { color: '#0f172a', opacity: 1 },
+      student: { color: '#0f172a', opacity: 1 },
+      supervisor: { color: '#334155', opacity: 1 },
+      locked: { color: '#475569', opacity: 1 },
+    };
+
+    computedStyle.color = getTextColor(textPalette.student.color, textPalette.student.opacity);
 
     const computedStudentStyle = applyTypography({
-      color: getTextColor(resolvedTheme.colors.text.student.color, resolvedTheme.colors.text.student.opacity),
+      color: getTextColor(textPalette.student.color, textPalette.student.opacity),
     }, resolvedTheme.typography.student);
 
     const computedSupervisorStyle = applyTypography({
-      color: getTextColor(resolvedTheme.colors.text.supervisor.color, resolvedTheme.colors.text.supervisor.opacity),
+      color: getTextColor(textPalette.supervisor.color, textPalette.supervisor.opacity),
     }, resolvedTheme.typography.supervisor);
 
-    const computedLockedIconColor = resolvedTheme.states.locked.iconColor;
+    const computedLockedIconColor = '#475569';
 
     return {
       style: computedStyle,
-      programmeStyle: computedProgrammeStyle,
       studentStyle: computedStudentStyle,
       supervisorStyle: computedSupervisorStyle,
       lockedIconColor: computedLockedIconColor,
+      swatchRadius: computedSwatchRadius,
+      swatchWidth: computedSwatchWidth,
+      swatchGap,
     };
-  }, [resolvedTheme, compact, stackOffset, event.color, event.locked, event.programme, colorScheme, cardStyle, isDragging, zIndex, isActive, isSelected, highlighted, conflictCount, conflictSeverity, hasDoubleBooking]);
+  }, [resolvedTheme, compact, stackOffset, event.locked, cardStyle, isDragging, zIndex, isActive, isSelected, highlighted, conflictCount, conflictSeverity, hasDoubleBooking]);
 
   const warningItems = useMemo(() => {
     const items: { key: string; count: number; title: string; icon: JSX.Element }[] = [];
@@ -369,7 +515,9 @@ function DraggableDefenceCardComponent({
       data-prevent-clear="true"
       style={{
         ...style,
-        filter: isActive && !isDragging ? `brightness(${resolvedTheme.states.hover.brightness})` : undefined,
+        filter: isActive && !isDragging
+          ? `brightness(${resolvedTheme.states.hover.brightness})`
+          : style.filter,
       }}
       onClick={(e) => {
         e.stopPropagation();
@@ -388,14 +536,30 @@ function DraggableDefenceCardComponent({
         e.currentTarget.style.filter = '';
       }}
     >
+      {(compact || !compact) && (
+        <div
+          className="absolute right-0"
+          style={{
+            top: 0,
+            height: '100%',
+            width: swatchWidth,
+            backgroundColor: programmeSwatchColor,
+            borderTopRightRadius: swatchRadius,
+            borderBottomRightRadius: swatchRadius,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
       {/* Selection checkbox - only show in non-compact mode */}
       {!compact && (
         <div
-          className={`absolute top-1.5 right-1.5 w-5 h-5 rounded border-2 flex items-center justify-center cursor-pointer ${
+          className={`absolute top-1.5 right-1.5 rounded border flex items-center justify-center cursor-pointer ${
             isSelected
-              ? 'bg-white border-white'
-              : 'bg-transparent border-white/50 hover:border-white'
+              ? 'bg-white border-slate-900'
+              : 'bg-white/80 border-slate-300 hover:border-slate-400'
           }`}
+          style={{ width: '13.5px', height: '13.5px' }}
           onClick={(e) => {
             e.stopPropagation();
             if (onCheckboxClick) {
@@ -406,7 +570,7 @@ function DraggableDefenceCardComponent({
             }
           }}
         >
-          {isCheckboxSelected && <Check className="w-3.5 h-3.5 text-gray-800" strokeWidth={3} />}
+          {isCheckboxSelected && <Check className="text-slate-900" style={{ width: '9.5px', height: '9.5px' }} strokeWidth={3} />}
         </div>
       )}
 
@@ -450,11 +614,12 @@ function DraggableDefenceCardComponent({
         >
           {/* Selection checkbox */}
           <div
-            className={`w-4 h-4 rounded border flex items-center justify-center cursor-pointer flex-shrink-0 ${
+            className={`rounded border flex items-center justify-center cursor-pointer flex-shrink-0 ${
               isSelected
-                ? 'bg-white border-white'
-                : 'bg-transparent border-white/60 hover:border-white'
+                ? 'bg-white border-slate-900'
+                : 'bg-white/80 border-slate-300 hover:border-slate-400'
             }`}
+            style={{ width: '13.5px', height: '13.5px' }}
             onClick={(e) => {
               e.stopPropagation();
               if (onCheckboxClick) {
@@ -465,7 +630,7 @@ function DraggableDefenceCardComponent({
               }
             }}
           >
-            {isCheckboxSelected && <Check className="w-3 h-3 text-gray-800" strokeWidth={3} />}
+            {isCheckboxSelected && <Check className="text-slate-900" style={{ width: '9.5px', height: '9.5px' }} strokeWidth={3} />}
           </div>
 
           <div className="flex-1 min-w-0">
@@ -483,12 +648,13 @@ function DraggableDefenceCardComponent({
                 marginTop: resolvedTheme.spacing.card.internalGap,
                 wordBreak: 'break-word',
                 overflowWrap: 'anywhere',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
               }}
             >
-              {event.supervisor}
-              {coSupervisorDisplay && ` • ${coSupervisorDisplay}`}
-              {event.assessors.length > 0 && ` • ${event.assessors.join(', ')}`}
-              {event.mentors && event.mentors.length > 0 && ` • ${event.mentors.join(', ')}`}
+              {renderParticipantList(participantLineNames)}
             </div>
           </div>
           {event.locked && (
@@ -499,19 +665,14 @@ function DraggableDefenceCardComponent({
           className="absolute flex items-center"
           style={{
             top: '4px',
-            right: '8px',
+            right: `calc(${swatchWidth} + ${swatchGap}px)`,
             ...viewStyleOverrides.roomTag,
+            transform: 'scale(0.8)',
+            transformOrigin: 'right center',
           }}
         >
-          {programmeIdentifier && (
-            <div style={{ ...viewStyleOverrides.programmeIdContainer }}>
-              <span style={{ ...programmeStyle, ...viewStyleOverrides.programme, ...viewStyleOverrides.programmeIdText }}>
-                {programmeIdentifier}
-              </span>
-            </div>
-          )}
           <div style={{ ...viewStyleOverrides.programmeIdWrapper }}>
-            <RoomTag room={event.room} showPlaceholder />
+            {renderRoomTag()}
           </div>
         </div>
         </>
@@ -536,15 +697,8 @@ function DraggableDefenceCardComponent({
               ...viewStyleOverrides.roomTag,
             }}
           >
-            {programmeIdentifier && (
-              <div style={{ ...viewStyleOverrides.programmeIdContainer }}>
-                <span style={{ ...programmeStyle, ...viewStyleOverrides.programme, ...viewStyleOverrides.programmeIdText }}>
-                  {programmeIdentifier}
-                </span>
-              </div>
-            )}
             <div style={{ ...viewStyleOverrides.programmeIdWrapper }}>
-              <RoomTag room={event.room} showPlaceholder />
+              {renderRoomTag()}
             </div>
           </div>
         </div>
@@ -576,7 +730,7 @@ function DraggableDefenceCardComponent({
               overflowWrap: 'anywhere',
             }}
           >
-            {event.supervisor}
+            {renderParticipantList(participantLineNames)}
           </div>
         </>
       )}
@@ -584,12 +738,13 @@ function DraggableDefenceCardComponent({
       {/* Full details */}
       {cardStyle.showFullDetails && (
         <>
-          {coSupervisorDisplay && (
+          {coSupervisorNames.length > 0 && (
             <div
               className={`${cardStyle.fontSize} opacity-90 whitespace-normal break-words`}
               style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
             >
-              Co-supervisor: {coSupervisorDisplay}
+              <span className="font-semibold">Co-supervisor:</span>
+              <span className="ml-1">{renderParticipantList(coSupervisorNames)}</span>
             </div>
           )}
 
@@ -599,11 +754,7 @@ function DraggableDefenceCardComponent({
               style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
             >
               <span className="font-semibold">Assessors:</span>
-              <div className="ml-1">
-                {event.assessors.map((assessor, idx) => (
-                  <div key={idx}>• {assessor}</div>
-                ))}
-              </div>
+              <span className="ml-1">{renderParticipantList(normalizeNameList(event.assessors || []))}</span>
             </div>
           )}
 
@@ -613,11 +764,7 @@ function DraggableDefenceCardComponent({
               style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
             >
               <span className="font-semibold">Mentors:</span>
-              <div className="ml-1">
-                {event.mentors.map((mentor, idx) => (
-                  <div key={idx}>• {mentor}</div>
-                ))}
-              </div>
+              <span className="ml-1">{renderParticipantList(normalizeNameList(event.mentors || []))}</span>
             </div>
           )}
         </>
@@ -647,6 +794,8 @@ export const DraggableDefenceCard = memo(DraggableDefenceCardComponent, (prevPro
       prevProps.conflictSeverity === nextProps.conflictSeverity &&
       prevProps.hasDoubleBooking === nextProps.hasDoubleBooking &&
       prevProps.doubleBookingCount === nextProps.doubleBookingCount &&
+      prevProps.onParticipantClick === nextProps.onParticipantClick &&
+      prevProps.onRoomClick === nextProps.onRoomClick &&
       prevProgrammeColor === nextProgrammeColor) {
     return true;
   }
@@ -680,6 +829,8 @@ export const DraggableDefenceCard = memo(DraggableDefenceCardComponent, (prevPro
     prevProps.conflictSeverity === nextProps.conflictSeverity &&
     prevProps.hasDoubleBooking === nextProps.hasDoubleBooking &&
     prevProps.doubleBookingCount === nextProps.doubleBookingCount &&
+    prevProps.onParticipantClick === nextProps.onParticipantClick &&
+    prevProps.onRoomClick === nextProps.onRoomClick &&
     prevProgrammeColor === nextProgrammeColor
   );
 });

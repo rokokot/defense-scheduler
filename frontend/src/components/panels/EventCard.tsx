@@ -1,6 +1,6 @@
 import { useEffect, useRef, memo } from 'react';
 import { draggable } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
-import { Edit2 } from 'lucide-react';
+import { Edit2, X } from 'lucide-react';
 import { DefenceEvent } from '../../types/schedule';
 import { formatParticipantNames } from '../../utils/participantNames';
 import { RoomTag } from '../common/RoomTag';
@@ -9,8 +9,10 @@ interface EventCardProps {
   event: DefenceEvent;
   highlighted?: boolean;
   selected?: boolean;
+  autoScroll?: boolean;
   onClick: () => void;
   onEditClick?: () => void;
+  onDeleteClick?: () => void;
   colorScheme: Record<string, string>;
   isDraggable: boolean;
   showTimeBadge: boolean;
@@ -30,8 +32,10 @@ function EventCardComponent({
   event,
   highlighted,
   selected,
+  autoScroll = false,
   onClick,
   onEditClick,
+  onDeleteClick,
   colorScheme,
   isDraggable,
   showTimeBadge,
@@ -54,10 +58,10 @@ function EventCardComponent({
 
   // Scroll into view when highlighted from grid
   useEffect(() => {
-    if (highlighted && cardRef.current) {
+    if (autoScroll && cardRef.current) {
       cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-  }, [highlighted]);
+  }, [autoScroll]);
 
   // Get programme color from colorScheme
   const bgColor = colorScheme[event.programme] || '#aeb6c4ff';
@@ -81,12 +85,12 @@ function EventCardComponent({
       onClick={onClick}
       data-prevent-clear="true"
       className={`
-        bg-white border border-gray-200 rounded p-3 relative
+        border rounded p-3 relative
+        ${highlighted ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'}
         ${isDraggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'}
         hover:border-blue-400 hover:shadow-sm
         transition-all
-        ${highlighted ? 'ring-2 ring-gray-600' : ''}
-        ${selected ? 'ring-2 ring-gray-600' : ''}
+        ${selected ? 'ring-1 ring-gray-400' : ''}
       `}
     >
       <div className="flex items-start justify-between mb-1">
@@ -94,7 +98,7 @@ function EventCardComponent({
           {event.student}
         </div>
         {timeBadge && (
-          <div className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium whitespace-nowrap">
+          <div className="ml-2 mr-6 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded font-medium whitespace-nowrap">
             {timeBadge}
           </div>
         )}
@@ -106,7 +110,7 @@ function EventCardComponent({
       )}
       <div className="flex items-center gap-2">
         <div
-          className="inline-block px-2 py-0.5 rounded text-xs uppercase font-medium"
+          className="inline-flex items-center px-[8.5px] py-[1.7px] rounded-[5px] text-[10.5px] uppercase font-semibold whitespace-nowrap shadow-sm"
           style={{
             backgroundColor: bgColor,
             color: textColor,
@@ -122,10 +126,25 @@ function EventCardComponent({
             e.stopPropagation();
             onEditClick();
           }}
+          onMouseDown={(e) => e.stopPropagation()}
           className="absolute bottom-2 right-2 p-1.5 bg-white/90 hover:bg-white rounded-md shadow-sm border border-gray-200 transition-all hover:shadow-md"
           title="Edit defense"
         >
           <Edit2 className="w-3.5 h-3.5 text-gray-600" />
+        </button>
+      )}
+      {onDeleteClick && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDeleteClick();
+          }}
+          onMouseDown={(e) => e.stopPropagation()}
+          className="absolute top-2 right-2 p-1 rounded-full bg-white/90 hover:bg-white border border-gray-200 text-gray-500 hover:text-red-600 transition-colors"
+          title="Delete defense"
+          aria-label="Delete defense"
+        >
+          <X className="w-3 h-3" />
         </button>
       )}
     </div>
@@ -138,8 +157,10 @@ export const EventCard = memo(EventCardComponent, (prevProps, nextProps) => {
   if (prevProps.event.id !== nextProps.event.id) return false;
   if (prevProps.highlighted !== nextProps.highlighted) return false;
   if (prevProps.selected !== nextProps.selected) return false;
+  if (prevProps.autoScroll !== nextProps.autoScroll) return false;
   if (prevProps.isDraggable !== nextProps.isDraggable) return false;
   if (prevProps.showTimeBadge !== nextProps.showTimeBadge) return false;
+  if (Boolean(prevProps.onDeleteClick) !== Boolean(nextProps.onDeleteClick)) return false;
 
   // Check if the color for THIS event's programme changed
   if (prevProps.colorScheme[prevProps.event.programme] !== nextProps.colorScheme[nextProps.event.programme]) {

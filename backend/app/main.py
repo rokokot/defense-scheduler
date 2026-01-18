@@ -11,9 +11,12 @@ from typing import Any, Dict, Optional
 
 from fastapi import Body, FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+import queue
+import time
+import yaml
 
-from .analysis import detect_conflicts, validate_drag_drop
+from .analysis import detect_conflicts, validate_schedule_state, ScheduleValidationError
 from .config import DATA_INPUT_DIR
 from .datasets import list_datasets
 from .schedule_builder import build_schedule_payload
@@ -29,15 +32,14 @@ from .schemas import (
     SessionSaveRequest,
     SolveRequest,
     SolverRunResponse,
-    ValidateRequest,
 )
 from .snapshot_store import delete_snapshot, list_snapshots, load_snapshot, save_snapshot
 from .solver_runner import SolverOptions, runner
-from .solver_tasks import run_manager
+from .solver_tasks import run_manager, stream_manager, debug_manager
 from .solver_utils import format_solver_response
 from .state_writer import apply_dashboard_state, export_roster_snapshot
 
-app = FastAPI(title="Defense Scheduler API", version="0.1.0")
+app = FastAPI(title="Defense Scheduler API", version="0.1.1")
 
 
 def _unique(seq: list[str]) -> list[str]:
@@ -80,6 +82,8 @@ def _resolve_allowed_origins() -> list[str]:
         "http://127.0.0.1:3000",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:5175",
+        "http://127.0.0.1:5175",
         "http://localhost:4173",
         "http://127.0.0.1:4173",
     ]
@@ -92,6 +96,22 @@ def _resolve_allowed_origins() -> list[str]:
             normalized.append(resolved)
 
     return _unique(default_origins + normalized)
+
+
+def _extract_solver_config(req: SolveRequest) -> tuple[Dict[str, Any], Optional[str]]:
+    overrides: Dict[str, Any] = {}
+    config_yaml = req.solver_config_yaml
+    if req.solver_config and isinstance(req.solver_config, dict):
+        overrides.update(req.solver_config)
+    if config_yaml:
+        try:
+            loaded = yaml.safe_load(config_yaml) or {}
+        except yaml.YAMLError as exc:
+            raise HTTPException(status_code=400, detail=f"Invalid solver_config_yaml: {exc}")
+        if not isinstance(loaded, dict):
+            raise HTTPException(status_code=400, detail="solver_config_yaml must define a mapping")
+        overrides.update(loaded)
+    return overrides, config_yaml
 
 
 app.add_middleware(
@@ -202,6 +222,7 @@ def load_schedule(payload: Dict[str, Any] = Body(...)):
 @app.post("/api/schedule/solve")
 async def solve_schedule(req: SolveRequest):
     dataset_id = req.data.dataset_id
+    config_overrides, config_yaml = _extract_solver_config(req)
     opts = SolverOptions(
         dataset=dataset_id,
         timeout=req.timeout or 180,
@@ -209,6 +230,10 @@ async def solve_schedule(req: SolveRequest):
         adjacency_objective=req.adjacency_objective,
         must_plan_all=req.must_plan_all_defenses,
         allow_online_defenses=req.allow_online_defenses,
+        stream=bool(getattr(req, "stream", False)),
+        include_metrics=False,
+        config_overrides=config_overrides,
+        config_yaml=config_yaml,
     )
     loop = asyncio.get_event_loop()
     raw = await loop.run_in_executor(None, runner.solve, opts)
@@ -227,12 +252,14 @@ def _run_to_response(record) -> SolverRunResponse:
         timeout=record.timeout,
         error=record.error,
         result=record.result,
+        solutions=record.solutions,
     )
 
 
 @app.post("/api/solver/runs")
 def create_solver_run(req: SolveRequest) -> SolverRunResponse:
     dataset_id = req.data.dataset_id
+    config_overrides, config_yaml = _extract_solver_config(req)
     opts = SolverOptions(
         dataset=dataset_id,
         timeout=req.timeout or 180,
@@ -240,9 +267,96 @@ def create_solver_run(req: SolveRequest) -> SolverRunResponse:
         adjacency_objective=req.adjacency_objective,
         must_plan_all=req.must_plan_all_defenses,
         allow_online_defenses=req.allow_online_defenses,
+        stream=bool(getattr(req, "stream", False)),
+        include_metrics=False,
+        config_overrides=config_overrides,
+        config_yaml=config_yaml,
     )
     record = run_manager.submit(opts)
     return _run_to_response(record)
+
+
+@app.get("/api/solver/runs/{run_id}/stream")
+def stream_solver_run(run_id: str):
+    import logging
+    sse_logger = logging.getLogger("uvicorn.error")
+    record = run_manager.get(run_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="Run not found")
+    channel = stream_manager.get(run_id)
+    if not channel:
+        raise HTTPException(status_code=404, detail="Streaming not enabled for this run")
+
+    def event_stream():
+        sse_logger.info("sse.start run_id=%s", run_id)
+        q = channel.subscribe()
+        sse_logger.info("sse.subscribed run_id=%s qsize=%d", run_id, q.qsize())
+        yield _sse_event("meta", {"run_id": run_id})
+        event_count = 0
+        while True:
+            try:
+                payload = q.get(timeout=10)
+            except queue.Empty:
+                sse_logger.info("sse.heartbeat run_id=%s events_so_far=%d", run_id, event_count)
+                yield _sse_event("heartbeat", {"ts": time.time()})
+                continue
+            if payload is None:
+                sse_logger.info("sse.end run_id=%s total_events=%d", run_id, event_count)
+                break
+            event_type = payload.get("type", "snapshot")
+            data = payload.get("payload", payload)
+            event_count += 1
+            sse_logger.info("sse.yield run_id=%s type=%s count=%d", run_id, event_type, event_count)
+            yield _sse_event(event_type, data)
+            if event_type in {"final", "solver-error", "close"}:
+                sse_logger.info("sse.terminal run_id=%s type=%s", run_id, event_type)
+                break
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@app.get("/api/solver/runs/{run_id}/debug")
+def stream_solver_debug(run_id: str):
+    record = run_manager.get(run_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="Run not found")
+    channel = debug_manager.get(run_id)
+    if not channel:
+        raise HTTPException(status_code=404, detail="Debug stream not available for this run")
+
+    def event_stream():
+        history = list(record.debug_lines)
+        for line in history:
+            yield _sse_event("log", {"line": line})
+        if record.status in {"succeeded", "failed", "cancelled"}:
+            yield _sse_event("close", {"status": record.status})
+            return
+        q = channel.subscribe()
+        yield _sse_event("meta", {"run_id": run_id})
+        while True:
+            try:
+                line = q.get(timeout=10)
+            except queue.Empty:
+                yield _sse_event("heartbeat", {"ts": time.time()})
+                continue
+            if line is None:
+                yield _sse_event("close", {"status": record.status})
+                break
+            yield _sse_event("log", {"line": line})
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+def _sse_event(event_type: str, data: Dict[str, Any]) -> str:
+    return f"event: {event_type}\ndata: {json.dumps(data)}\n\n"
 
 
 @app.get("/api/solver/runs/{run_id}")
@@ -251,6 +365,17 @@ def read_solver_run(run_id: str) -> SolverRunResponse:
     if not record:
         raise HTTPException(status_code=404, detail="Run not found")
     return _run_to_response(record)
+
+
+@app.get("/api/solver/runs/{run_id}/debug-lines")
+def read_solver_debug_lines(run_id: str) -> Dict[str, Any]:
+    record = run_manager.get(run_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="Run not found")
+    return JSONResponse(
+        {"lines": list(record.debug_lines)},
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 @app.post("/api/solver/runs/{run_id}/cancel")
@@ -323,12 +448,6 @@ def generate_repairs(req: RepairsRequest):
     return {"repairs": repairs}
 
 
-@app.post("/api/schedule/validate")
-def validate_move(req: ValidateRequest):
-    result = validate_drag_drop([], req.operation)
-    return result
-
-
 @app.post("/api/schedule/apply-repair")
 def apply_repair(req: ApplyRepairRequest):
     # For now simply echo data
@@ -394,6 +513,15 @@ def remove_snapshot(snapshot_id: str):
 
 @app.post("/api/session/save")
 def save_session_state(req: SessionSaveRequest):
+    # Validate schedule before saving - reject constraint violations
+    try:
+        validate_schedule_state(req.state)
+    except ScheduleValidationError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={"message": str(exc), "conflicts": exc.conflicts}
+        )
+
     try:
         apply_dashboard_state(req.dataset_id, req.state)
     except ValueError as exc:
@@ -408,6 +536,15 @@ def save_session_state(req: SessionSaveRequest):
 
 @app.post("/api/session/export")
 def export_session_state(req: SessionSaveRequest):
+    # Validate schedule before exporting - reject constraint violations
+    try:
+        validate_schedule_state(req.state, req.state.get("activeRosterId"))
+    except ScheduleValidationError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={"message": str(exc), "conflicts": exc.conflicts}
+        )
+
     dataset_id = req.dataset_id
     roster_label = req.state.get("rosters", [{}])[0].get("label", "schedule")
     target_label = req.snapshot_name or roster_label

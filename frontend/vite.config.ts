@@ -18,6 +18,20 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:8000',
+        changeOrigin: true,
+        // Required for SSE streams to work properly
+        configure: (proxy) => {
+          proxy.on('proxyRes', (proxyRes, req) => {
+            // Disable buffering for SSE endpoints
+            if (req.url?.includes('/stream') || req.url?.includes('/debug')) {
+              proxyRes.headers['cache-control'] = 'no-cache';
+              proxyRes.headers['x-accel-buffering'] = 'no';
+            }
+          });
+        },
+      },
+      '/health': {
+        target: 'http://localhost:8000',
         changeOrigin: true
       }
     }

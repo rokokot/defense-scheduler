@@ -115,12 +115,17 @@ export interface SolveResult {
   assignments?: Assignment[];
   num_assignments: number;
   objective_value?: number;
+  solution_index?: number;
   participant_conflicts?: ParticipantConflict[];
   error_message?: string;
   summary?: Record<string, unknown>;
   utilization?: Record<string, unknown>;
   slack?: Record<string, unknown>;
   capacity_gaps?: Array<Record<string, unknown>>;
+  blocking?: Array<Record<string, unknown>>;
+  relax_candidates?: Array<Record<string, unknown>>;
+  conflicts?: Array<Record<string, unknown>>;
+  num_conflicts?: number;
   objectives?: {
     adjacency?: {
       score?: number | null;
@@ -207,6 +212,7 @@ export interface SolverRunStatus {
   finished_at?: number;
   error?: string;
   result?: SolveResult;
+  solutions?: SolveResult[];
 }
 
 export interface DragDropOperation {

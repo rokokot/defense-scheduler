@@ -39,7 +39,7 @@ export interface AdaptiveToolbarProps {
   onShowUnscheduled?: () => void;
   unscheduledCount?: number;
   onAddDefence?: () => void;
-  onGenerateSchedule?: () => void;
+  onGenerateSchedule?: (mustScheduleAll: boolean) => void;
   onReoptimize?: () => void;
   onQuickSolve?: (preset: 'fast' | 'optimal' | 'enumerate') => void;
   onSolverSettings?: () => void;
@@ -90,7 +90,7 @@ export function AdaptiveToolbar({
   onAddDefence,
   onGenerateSchedule,
   onReoptimize,
-  onQuickSolve,
+  onQuickSolve: _onQuickSolve, // eslint-disable-line @typescript-eslint/no-unused-vars
   onSolverSettings,
   onImportData,
   onExportResults,
@@ -122,6 +122,7 @@ export function AdaptiveToolbar({
   const [editingRosterId, setEditingRosterId] = useState<string | null>(null);
   const [editingLabel, setEditingLabel] = useState<string>('');
   const [unscheduleMenuOpen, setUnscheduleMenuOpen] = useState(false);
+  const [allowPartialScheduling, setAllowPartialScheduling] = useState(true);
 
   const solveRef = useRef<HTMLDivElement>(null);
   const dataRef = useRef<HTMLDivElement>(null);
@@ -249,11 +250,21 @@ export function AdaptiveToolbar({
         </button>
 
         <button
-          onClick={onGenerateSchedule}
-          className="p-2 text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors"
+          onClick={() => {
+            if (isSolving) return;
+            onGenerateSchedule?.(!allowPartialScheduling);
+          }}
+          disabled={isSolving}
+          className={`p-2 text-white rounded transition-colors ${
+            isSolving ? 'bg-blue-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700'
+          }`}
           title="Solve"
         >
-          <Play className="w-5 h-5" />
+          {isSolving ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <Play className="w-5 h-5" />
+          )}
         </button>
 
         <button
@@ -485,71 +496,54 @@ export function AdaptiveToolbar({
             )}
           </button>
 
-          <button
-            onClick={onAddDefence}
-            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-            title="Add new defense"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Add</span>
-          </button>
-
-          <div className="relative flex items-center" ref={solveRef}>
+          <div className="relative" ref={solveRef}>
             <button
-              onClick={onGenerateSchedule}
+              onClick={() => {
+                if (isSolving) return;
+                if (!solveMenuOpen) {
+                  setSolveMenuOpen(true);
+                } else {
+                  onGenerateSchedule?.(!allowPartialScheduling);
+                  setSolveMenuOpen(false);
+                }
+              }}
               disabled={isSolving}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 py-1 text-xs font-medium text-white rounded-l ${isSolving ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} transition-colors`}
+              className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-white rounded transition-colors ${
+                isSolving ? 'bg-blue-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700'
+              }`}
               title="Solve schedule"
             >
               {isSolving ? (
-                <Loader2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
               ) : (
-                <Play className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <Play className="w-3.5 h-3.5" />
               )}
-              <span className="hidden sm:inline">{isSolving ? 'Solving...' : 'Solve'}</span>
-            </button>
-            <button
-              onClick={() => setSolveMenuOpen(open => !open)}
-              disabled={isSolving}
-              className={`px-1.5 py-1 text-xs font-medium text-white rounded-r border-l border-blue-700 ${isSolving ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} transition-colors`}
-              aria-label="Solver options"
-            >
-              <ChevronDown className="w-3 h-3" />
+              <span>{isSolving ? 'Solving...' : 'Solve'}</span>
+              {!isSolving && <ChevronDown className="w-3 h-3" />}
             </button>
             {solveMenuOpen && !isSolving && (
-              <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+              <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-200 rounded-md shadow-lg z-50">
                 <div className="py-1">
-                  <button
-                    onClick={() => {
-                      onQuickSolve?.('fast');
-                      setSolveMenuOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <div className="font-medium">Fast</div>
-                    <div className="text-xs text-gray-500">Quick solution</div>
-                  </button>
-                  <button
-                    onClick={() => {
-                      onQuickSolve?.('optimal');
-                      setSolveMenuOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <div className="font-medium">Optimal</div>
-                    <div className="text-xs text-gray-500">Best quality</div>
-                  </button>
-                  <button
-                    onClick={() => {
-                      onQuickSolve?.('enumerate');
-                      setSolveMenuOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <div className="font-medium">Enumerate</div>
-                    <div className="text-xs text-gray-500">Multiple solutions</div>
-                  </button>
-                  <div className="border-t border-gray-200 my-1" />
+                  <div className="px-4 py-3">
+                    <div className="text-xs font-semibold text-gray-700 mb-3">Scheduling Mode</div>
+                    <label className="flex items-start gap-3 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={allowPartialScheduling}
+                        onChange={(e) => setAllowPartialScheduling(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 rounded border-gray-300"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-sm text-gray-900">Allow partial scheduling</div>
+                        <div className="text-xs text-gray-500 mt-0.5">
+                          {allowPartialScheduling
+                            ? 'Schedule as many defenses as possible'
+                            : 'Must schedule every defense'}
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                  <div className="border-t border-gray-200" />
                   <button
                     onClick={() => {
                       onSolverSettings?.();
@@ -558,7 +552,7 @@ export function AdaptiveToolbar({
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                   >
                     <Settings className="w-4 h-4" />
-                    <span>Solver Settings</span>
+                    <span>Configure solver</span>
                   </button>
                 </div>
               </div>
@@ -723,6 +717,15 @@ export function AdaptiveToolbar({
               </div>
             )}
           </div>
+
+          <button
+            onClick={onAddDefence}
+            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+            title="Add new defense"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add</span>
+          </button>
         </div>
 
         {/* Analysis & Debugging */}

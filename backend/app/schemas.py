@@ -8,13 +8,13 @@ from pydantic import BaseModel, Field, ConfigDict
 class ScheduleData(BaseModel):
     model_config = ConfigDict(extra="allow")
     dataset_id: str = Field(..., description="Dataset identifier")
-    entities: List[Dict[str, Any]]
-    resources: List[Dict[str, Any]]
-    timeslots: List[Dict[str, Any]]
-    participants: List[Dict[str, Any]]
-    max_entities_per_resource: Optional[int]
-    max_entities_per_timeslot: Optional[int]
-    resource_capacity: Optional[int]
+    entities: List[Dict[str, Any]] = Field(default_factory=list)
+    resources: List[Dict[str, Any]] = Field(default_factory=list)
+    timeslots: List[Dict[str, Any]] = Field(default_factory=list)
+    participants: List[Dict[str, Any]] = Field(default_factory=list)
+    max_entities_per_resource: Optional[int] = None
+    max_entities_per_timeslot: Optional[int] = None
+    resource_capacity: Optional[int] = None
 
 
 class SolveOptions(BaseModel):
@@ -24,6 +24,7 @@ class SolveOptions(BaseModel):
     adjacency_objective: Optional[bool] = None
     must_plan_all_defenses: Optional[bool] = None
     allow_online_defenses: Optional[bool] = None
+    two_phase_adjacency: Optional[bool] = None  # Default True when adjacency enabled
 
 
 class SolveRequest(BaseModel):
@@ -34,6 +35,10 @@ class SolveRequest(BaseModel):
     adjacency_objective: Optional[bool] = None
     must_plan_all_defenses: Optional[bool] = None
     allow_online_defenses: Optional[bool] = None
+    two_phase_adjacency: Optional[bool] = None  # Default True when adjacency enabled
+    stream: Optional[bool] = False
+    solver_config_yaml: Optional[str] = None
+    solver_config: Optional[Dict[str, Any]] = None
 
 
 class SolveResult(BaseModel):
@@ -48,6 +53,10 @@ class SolveResult(BaseModel):
     utilization: Optional[Dict[str, Any]] = None
     slack: Optional[List[Dict[str, Any]]] = None
     capacity_gaps: Optional[List[Dict[str, Any]]] = None
+    blocking: Optional[List[Dict[str, Any]]] = None
+    relax_candidates: Optional[List[Dict[str, Any]]] = None
+    conflicts: Optional[List[Dict[str, Any]]] = None
+    num_conflicts: Optional[int] = None
 
 
 class ExplainRequest(BaseModel):
@@ -60,12 +69,6 @@ class RepairsRequest(BaseModel):
     model_config = ConfigDict(extra="allow")
     data: ScheduleData
     mus_id: Optional[str]
-
-
-class ValidateRequest(BaseModel):
-    model_config = ConfigDict(extra="allow")
-    data: ScheduleData
-    operation: Dict[str, Any]
 
 
 class ApplyRepairRequest(BaseModel):
@@ -85,7 +88,7 @@ class ParticipantRequest(BaseModel):
 
 class ConflictsRequest(BaseModel):
     model_config = ConfigDict(extra="allow")
-    data: ScheduleData
+    data: Optional[ScheduleData] = None
     solution: Dict[str, Any]
 
 
@@ -113,3 +116,4 @@ class SolverRunResponse(BaseModel):
     timeout: int
     error: Optional[str] = None
     result: Optional[Dict[str, Any]] = None
+    solutions: Optional[List[Dict[str, Any]]] = None

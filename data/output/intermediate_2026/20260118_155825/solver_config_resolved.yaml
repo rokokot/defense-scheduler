@@ -1,0 +1,17 @@
+input_data: /home/robin/Research/xcos-dash-v1/defense-scheduler/data/input/intermediate_2026
+output_dir: /home/robin/Research/xcos-dash-v1/defense-scheduler/data/output/intermediate_2026
+number_of_defenses_in_problem: all
+number_of_unavailabilities_in_problem: all
+solver: ortools
+allocation_model: false
+adjacency_objective: true
+must_plan_all_defenses: false
+allow_online_defenses: false
+availability_odds: 0.75
+online_odds: 0
+max_rooms: 10
+max_days: NA
+explain: false
+no_plots: true
+solver_time_limit_sec: 180.0
+solver_workers: 2

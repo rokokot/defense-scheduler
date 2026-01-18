@@ -1,0 +1,74 @@
+{
+  "assignments": [
+    {
+      "assignment_id": "assign-0",
+      "entity_id": "def-001",
+      "entity_name": "Adaptive Sensing for Mobile Robots",
+      "resource_id": "room-3",
+      "resource_name": "Room 3",
+      "timeslot_id": "ts-9",
+      "day_index": 0,
+      "date": "2025-06-10",
+      "day_name": "Tuesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "alex-example",
+        "prof--l--gomez",
+        "dr--u--chen",
+        "dr--e--marcel",
+        "dr--f--day",
+        "mentor-yuki",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-1",
+      "entity_id": "def-002",
+      "entity_name": "Secure Federated Analytics",
+      "resource_id": "room-3",
+      "resource_name": "Room 3",
+      "timeslot_id": "ts-8",
+      "day_index": 0,
+      "date": "2025-06-10",
+      "day_name": "Tuesday",
+      "start_time": "08:00",
+      "end_time": "09:00",
+      "participant_ids": [
+        "riley-rivera",
+        "prof--k--nouri",
+        "dr--p--jain",
+        "dr--m--ito",
+        "dr--g--singh",
+        "mentor-omar",
+        "mentor-nina",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 8
+    }
+  ],
+  "unscheduled": [],
+  "summary": {
+    "total": 2,
+    "scheduled": 2,
+    "unscheduled": 0,
+    "adjacency_score": 0,
+    "adjacency_possible": 0
+  },
+  "objectives": {
+    "adjacency": {
+      "score": 0,
+      "possible": 0
+    }
+  }
+}

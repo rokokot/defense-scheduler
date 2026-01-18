@@ -1,0 +1,5535 @@
+{
+  "assignments": [
+    {
+      "assignment_id": "assign-0",
+      "entity_id": "def-15",
+      "entity_name": "DDOS protection in industrial control systems",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-35",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "neyens-toon",
+        "danny-hughes",
+        "sam-michiels",
+        "nan",
+        "nan",
+        "tom-van-eyck",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 35
+    },
+    {
+      "assignment_id": "assign-1",
+      "entity_id": "def-145",
+      "entity_name": "I got 99 secure design problems, but I'm not sure which ones",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-12",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "koninckx-tom",
+        "wouter-joosen",
+        "laurens-sion",
+        "nan",
+        "nan",
+        "stef-verreydt",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 12
+    },
+    {
+      "assignment_id": "assign-2",
+      "entity_id": "def-132",
+      "entity_name": "Safe digital money transfer on the Internet Computer",
+      "resource_id": "room-5",
+      "resource_name": "200B 01.14",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "marti-gimeno-josep",
+        "tom-van-cutsem",
+        "nan",
+        "nan",
+        "nan",
+        "dominique-devriese",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-3",
+      "entity_id": "def-89",
+      "entity_name": "Leveraging Chunked Transfer-Encoding to Improve Remote Timing Attacks",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-60",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "truijen-thomas",
+        "mathy-vanhoef",
+        "nan",
+        "nan",
+        "nan",
+        "tom-van-goethem",
+        "vik-vanderlinden",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 60
+    },
+    {
+      "assignment_id": "assign-4",
+      "entity_id": "def-78",
+      "entity_name": "Neurosymbolic OCR for Biological Specimen Labels",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-83",
+      "day_index": 10,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "luyckx-guust",
+        "luc-de-raedt",
+        "wannes-meert",
+        "nan",
+        "nan",
+        "quinten-dewulf",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 83
+    },
+    {
+      "assignment_id": "assign-5",
+      "entity_id": "def-70",
+      "entity_name": "Detecting fingerprinting scripts of third-party trackers accross websites",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "jacobs-sibren",
+        "lieven-desmet",
+        "wouter-joosen",
+        "nan",
+        "nan",
+        "yana-dimova",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    },
+    {
+      "assignment_id": "assign-6",
+      "entity_id": "def-56",
+      "entity_name": "Explain to Restrain: Designing Human-Centered Explanations for a Smart App Blocker",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "baeyens-luna-mei",
+        "katrien-verbert",
+        "nan",
+        "nan",
+        "nan",
+        "anna-verheyden",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    },
+    {
+      "assignment_id": "assign-7",
+      "entity_id": "def-79",
+      "entity_name": "Checking correctness of proofs for general inductive definitions",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "schurmans-melvin",
+        "marc-denecker",
+        "bart-bogaerts",
+        "nan",
+        "nan",
+        "robbe-van-den-eede",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-8",
+      "entity_id": "def-57",
+      "entity_name": "AI Tutors: Enhancing Student Learning Through LLM-Powered Support Systems",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-13",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "participant_ids": [
+        "carrera-monterde-pilar",
+        "katrien-verbert",
+        "nan",
+        "nan",
+        "nan",
+        "grzegorz-meller",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 13
+    },
+    {
+      "assignment_id": "assign-9",
+      "entity_id": "def-99",
+      "entity_name": "Rust Optimizations for Efficient Reasoning over Internet of Things Data",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "mandelings-rob",
+        "pieter-bonte",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-10",
+      "entity_id": "def-34",
+      "entity_name": "Decomposing KAN networks: A tensor decomposition analysis of Kolmogorov-Arnold neural networks",
+      "resource_id": "room-9",
+      "resource_name": "Python",
+      "timeslot_id": "ts-35",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "geybels-maarten",
+        "hendrik-blockeel",
+        "mariya-ishteva",
+        "nan",
+        "nan",
+        "joppe-de-jonghe",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 35
+    },
+    {
+      "assignment_id": "assign-11",
+      "entity_id": "def-33",
+      "entity_name": "Tricking AI: comparison of adversarial examples",
+      "resource_id": "room-9",
+      "resource_name": "Python",
+      "timeslot_id": "ts-33",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "tan-filip",
+        "hendrik-blockeel",
+        "nan",
+        "nan",
+        "nan",
+        "marie-sch\u00f6nfeld",
+        "luca-stradiotti",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 33
+    },
+    {
+      "assignment_id": "assign-12",
+      "entity_id": "def-133",
+      "entity_name": "Optimizing Time Series Anomaly Detection: Automatic Algorithm and Hyperparameter Selection",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-84",
+      "day_index": 10,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "deliever-thibaut",
+        "mathias-verbeke",
+        "wannes-meert",
+        "nan",
+        "nan",
+        "ilyas-lemmens",
+        "louis-carpentier",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 84
+    },
+    {
+      "assignment_id": "assign-13",
+      "entity_id": "def-2",
+      "entity_name": "Generative Locomotion in VR",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "li-haoyang",
+        "adalberto-simeone",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    },
+    {
+      "assignment_id": "assign-14",
+      "entity_id": "def-126",
+      "entity_name": "Het genereren van studie-gerelateerd programmeeroefeningen op basis van interesses van leerlingen",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "van-cleemput-gino",
+        "tom-schrijvers",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-15",
+      "entity_id": "def-90",
+      "entity_name": "Automated Vulnerability Discovery in Wi-Fi Authentication Protocols",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-64",
+      "day_index": 8,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "16:00",
+      "end_time": "17:00",
+      "participant_ids": [
+        "wuyts-anouk",
+        "mathy-vanhoef",
+        "nan",
+        "nan",
+        "nan",
+        "jeroen-robben",
+        "h\u00e9lo\u00efse-gollier",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 64
+    },
+    {
+      "assignment_id": "assign-16",
+      "entity_id": "def-146",
+      "entity_name": "Detecting Backdoors in Federated Learning",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-14",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "lobera-vilar-enrique",
+        "wouter-joosen",
+        "davy-preuveneers",
+        "nan",
+        "nan",
+        "qianying-liao",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 14
+    },
+    {
+      "assignment_id": "assign-17",
+      "entity_id": "def-93",
+      "entity_name": "Enhancing Healthcare Interpretation through Conversational AI: Exploring Large Language Model (LLM)",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "tahsin-mustafa-turan",
+        "miryam-de-lhoneux",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-18",
+      "entity_id": "def-88",
+      "entity_name": "Security Testing of Multiplayer Video Game Protocols",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-61",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "participant_ids": [
+        "segers-jorn",
+        "mathy-vanhoef",
+        "nan",
+        "nan",
+        "nan",
+        "jeroen-robben",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 61
+    },
+    {
+      "assignment_id": "assign-19",
+      "entity_id": "def-149",
+      "entity_name": "Enhancing Kubernetes Deployments: Harnessing the Power of Blue-Green Strategies with In-Place Pod Updates",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-15",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "wu-hanlin",
+        "wouter-joosen",
+        "nan",
+        "nan",
+        "nan",
+        "eddy-truyen",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 15
+    },
+    {
+      "assignment_id": "assign-20",
+      "entity_id": "def-139",
+      "entity_name": "Operationalizing Security Threat Models",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-13",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "participant_ids": [
+        "croon-maxim",
+        "wouter-joosen",
+        "laurens-sion",
+        "nan",
+        "nan",
+        "wout-ceulemans",
+        "stef-verreydt",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 13
+    },
+    {
+      "assignment_id": "assign-21",
+      "entity_id": "def-45",
+      "entity_name": "Developing a Global Model for Predictive Maintenance in Industrial Compressors",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-87",
+      "day_index": 10,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "devlamminck-thomas",
+        "jesse-davis",
+        "michel-hillen",
+        "nan",
+        "nan",
+        "timo-martens",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 87
+    },
+    {
+      "assignment_id": "assign-22",
+      "entity_id": "def-95",
+      "entity_name": "Analyse van BVH strategie\u00ebn voor ray tracing",
+      "resource_id": "room-7",
+      "resource_name": "200B 01.18",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "bekaert-eline",
+        "philip-dutr\u00e9",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-23",
+      "entity_id": "def-86",
+      "entity_name": "Behind Enemy LANS: Protecting Local Networks from Malicious Mobile Apps",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-63",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "schepers-daan",
+        "mathy-vanhoef",
+        "nan",
+        "nan",
+        "nan",
+        "jeroen-robben",
+        "angelos-beitis",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 63
+    },
+    {
+      "assignment_id": "assign-24",
+      "entity_id": "def-10",
+      "entity_name": "Video-Based Remote Control for Battery-Free Robot",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-36",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "de-vos-milan",
+        "danny-hughes",
+        "sam-michiels",
+        "nan",
+        "nan",
+        "yinze-li",
+        "mengyao-liu",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 36
+    },
+    {
+      "assignment_id": "assign-25",
+      "entity_id": "def-109",
+      "entity_name": "Preference learning for multi-objective optimization",
+      "resource_id": "room-5",
+      "resource_name": "200B 01.14",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "de-maeseneer-dries",
+        "tias-guns",
+        "nan",
+        "nan",
+        "nan",
+        "marco-foschini",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-26",
+      "entity_id": "def-123",
+      "entity_name": "PISA-Booster: A software tool to accelerate math learning through self-assessment training",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "kindekens-naten",
+        "tom-schrijvers",
+        "nan",
+        "nan",
+        "nan",
+        "elien-bellon",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    },
+    {
+      "assignment_id": "assign-27",
+      "entity_id": "def-49",
+      "entity_name": "Whole-Fly 3D foundational model: a predictive and explainable model of spatial gene regulation",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-86",
+      "day_index": 10,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "vermeire-lukas",
+        "jesse-davis",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 86
+    },
+    {
+      "assignment_id": "assign-28",
+      "entity_id": "def-51",
+      "entity_name": "Estimating rider power in smart indoor cycling trainers with machine learning",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-85",
+      "day_index": 10,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "participant_ids": [
+        "isotupa-ca\u00f1izal-marko",
+        "jesse-davis",
+        "wannes-meert",
+        "nan",
+        "nan",
+        "kilian-hendrickx",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 85
+    },
+    {
+      "assignment_id": "assign-29",
+      "entity_id": "def-122",
+      "entity_name": "Testing the Tests: A Tool-Driven Approach to Understanding Test Suite Quality",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-15",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "vandenbulcke-zeno",
+        "tom-holvoet",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 15
+    },
+    {
+      "assignment_id": "assign-30",
+      "entity_id": "def-16",
+      "entity_name": "Low-Latency Ultra-Wideband Network Support for Multi-Robot Flocking",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-38",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "rolly-simon",
+        "danny-hughes",
+        "sam-michiels",
+        "nan",
+        "nan",
+        "jonathan-oostvogels",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 38
+    },
+    {
+      "assignment_id": "assign-31",
+      "entity_id": "def-119",
+      "entity_name": "Safe Reinforcement Learning in Robotics",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-16",
+      "day_index": 2,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "16:00",
+      "end_time": "17:00",
+      "participant_ids": [
+        "mystriotis-dimitrios",
+        "tom-holvoet",
+        "nan",
+        "nan",
+        "nan",
+        "yi-yang",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 16
+    },
+    {
+      "assignment_id": "assign-32",
+      "entity_id": "def-48",
+      "entity_name": "Matching KBO entries with be domain name registrations",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-88",
+      "day_index": 11,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "16:00",
+      "end_time": "17:00",
+      "participant_ids": [
+        "maris-arno",
+        "jesse-davis",
+        "maarten-bosteels",
+        "nan",
+        "nan",
+        "thomas-daniels",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 88
+    },
+    {
+      "assignment_id": "assign-33",
+      "entity_id": "def-23",
+      "entity_name": "Attack prototyping on a research RISC-V processor",
+      "resource_id": "room-9",
+      "resource_name": "Python",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "huybrechts-nik",
+        "frank-piessens",
+        "nan",
+        "nan",
+        "nan",
+        "m\u00e1rton-bogn\u00e1r",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-34",
+      "entity_id": "def-105",
+      "entity_name": "Detecting Misconceptions in Programming Exercises",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "pauwels-michiel",
+        "siegfried-nijssen",
+        "tom-schrijvers",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-35",
+      "entity_id": "def-71",
+      "entity_name": "Leveraging URL parameters in phishing links to track campaigns",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "segers-michiel",
+        "lieven-desmet",
+        "nan",
+        "nan",
+        "nan",
+        "daan-vansteenhuyse",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-36",
+      "entity_id": "def-124",
+      "entity_name": "Efficient bidirectional parser combinators",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-12",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "pauwels-wouter",
+        "tom-schrijvers",
+        "nan",
+        "nan",
+        "nan",
+        "ruifeng-xie",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 12
+    },
+    {
+      "assignment_id": "assign-37",
+      "entity_id": "def-82",
+      "entity_name": "Behind Enemy LANS: Protecting Local Networks from Malicious Mobile Apps",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-62",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "olson-nicholas",
+        "mathy-vanhoef",
+        "nan",
+        "nan",
+        "nan",
+        "jeroen-robben",
+        "angelos-beitis",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 62
+    },
+    {
+      "assignment_id": "assign-38",
+      "entity_id": "def-53",
+      "entity_name": "ARM Your Code: Practical Symbolic Validation of TrustZone Programs on Cortex-M Microcontrollers",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "bellefroid-tijs",
+        "jo-van-bulck",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-39",
+      "entity_id": "def-58",
+      "entity_name": "Intelligent Tutors: Predicting Learning Struggles and Guiding Students with AI-Powered Support.",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-12",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "cools-michiel",
+        "katrien-verbert",
+        "nan",
+        "nan",
+        "nan",
+        "grzegorz-meller",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 12
+    },
+    {
+      "assignment_id": "assign-40",
+      "entity_id": "def-98",
+      "entity_name": "Advanced Monte Carlo Ray Tracing Methods",
+      "resource_id": "room-7",
+      "resource_name": "200B 01.18",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "debois-lowie",
+        "philip-dutr\u00e9",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-41",
+      "entity_id": "def-66",
+      "entity_name": "Privacy analysis of subdomains",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "frank-raoul",
+        "lieven-desmet",
+        "nan",
+        "nan",
+        "nan",
+        "yana-dimova",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-42",
+      "entity_id": "def-100",
+      "entity_name": "Hybrid AI for advanced Internet of Things analytics",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "sanyal-srinjoy",
+        "pieter-bonte",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-43",
+      "entity_id": "def-13",
+      "entity_name": "Energy-Aware Task Scheduling for Battery Free Wildlife Tracking",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-33",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "jacobs-lars",
+        "danny-hughes",
+        "sam-michiels",
+        "nan",
+        "nan",
+        "shuaibu-musa-adam",
+        "van-vu-bui",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 33
+    },
+    {
+      "assignment_id": "assign-44",
+      "entity_id": "def-101",
+      "entity_name": "mapping real world combinational optimization problems to an Ising formulation",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-12",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "feng-shannon",
+        "roel-wuyts",
+        "marian-verhelst",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 12
+    },
+    {
+      "assignment_id": "assign-45",
+      "entity_id": "def-31",
+      "entity_name": "Tricking AI: comparison of adversarial examples",
+      "resource_id": "room-9",
+      "resource_name": "Python",
+      "timeslot_id": "ts-34",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "senica-dailen",
+        "hendrik-blockeel",
+        "nan",
+        "nan",
+        "nan",
+        "marie-sch\u00f6nfeld",
+        "luca-stradiotti",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 34
+    },
+    {
+      "assignment_id": "assign-46",
+      "entity_id": "def-18",
+      "entity_name": "Providing availability guarantees to OTA updates for IoT systems",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-34",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "vanhentenrijk-liam",
+        "danny-hughes",
+        "sam-michiels",
+        "nan",
+        "nan",
+        "tom-van-eyck",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 34
+    },
+    {
+      "assignment_id": "assign-47",
+      "entity_id": "def-12",
+      "entity_name": "Robot Tracking for Ultra-Dense Swarms Using mmWave Radar",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-37",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "participant_ids": [
+        "herbert-joshua",
+        "danny-hughes",
+        "sam-michiels",
+        "nan",
+        "nan",
+        "jonathan-oostvogels",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 37
+    },
+    {
+      "assignment_id": "assign-48",
+      "entity_id": "def-55",
+      "entity_name": "General-Relativistic Hydronamics with AMREX",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-13",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "participant_ids": [
+        "andriessen-simon",
+        "karl-meerbergen",
+        "tjonnie-guang-feng-li",
+        "nan",
+        "nan",
+        "frederik-de-ceuster",
+        "arthur-offermans",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 13
+    },
+    {
+      "assignment_id": "assign-49",
+      "entity_id": "def-8",
+      "entity_name": "Monitoring of super users in a PON network and guaranteeing fairness versus other users",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "embrechts-jonas",
+        "bart-jacobs",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    }
+  ],
+  "unscheduled": [],
+  "summary": {
+    "total": 50,
+    "scheduled": 50,
+    "unscheduled": 0,
+    "adjacency_score": 47,
+    "adjacency_possible": 47
+  },
+  "objectives": {
+    "adjacency": {
+      "score": 47,
+      "possible": 47
+    }
+  },
+  "conflicts": [
+    {
+      "id": "conflict-1",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-132",
+        "def-132"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-2",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-132",
+        "def-132"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-3",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-132",
+        "def-132"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-4",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-132",
+        "def-132"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-5",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-132",
+        "def-132"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-6",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-132",
+        "def-99"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-7",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-99",
+        "def-99"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-8",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-99",
+        "def-99"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-9",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-99",
+        "def-99"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-10",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-99",
+        "def-99"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-11",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-99",
+        "def-99"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-12",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-99",
+        "def-99"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-13",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-99",
+        "def-93"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-14",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-93",
+        "def-93"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-15",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-93",
+        "def-93"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-16",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-93",
+        "def-93"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-17",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-93",
+        "def-93"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-18",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-93",
+        "def-93"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-19",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-93",
+        "def-93"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-20",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-93",
+        "def-95"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-21",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-95",
+        "def-95"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-22",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-95",
+        "def-95"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-23",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-95",
+        "def-95"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-24",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-95",
+        "def-95"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-25",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-95",
+        "def-95"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-26",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-95",
+        "def-95"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-27",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-95",
+        "def-105"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-28",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-105",
+        "def-105"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-29",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-105",
+        "def-105"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-30",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-105",
+        "def-105"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-31",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-105",
+        "def-105"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-32",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-105",
+        "def-105"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-33",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-105",
+        "def-71"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-34",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-71",
+        "def-71"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-35",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-71",
+        "def-71"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-36",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-71",
+        "def-71"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-37",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-71",
+        "def-71"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-38",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-71",
+        "def-71"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-39",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-71",
+        "def-53"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-40",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-53",
+        "def-53"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-41",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-53",
+        "def-53"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-42",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-53",
+        "def-53"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-43",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-53",
+        "def-53"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-44",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-53",
+        "def-53"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-45",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-53",
+        "def-53"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-46",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-79",
+        "def-79"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-47",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-79",
+        "def-79"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-48",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-79",
+        "def-79"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-49",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-79",
+        "def-79"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-50",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-79",
+        "def-126"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-51",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-126",
+        "def-126"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-52",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-126",
+        "def-126"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-53",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-126",
+        "def-126"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-54",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-126",
+        "def-126"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-55",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-126",
+        "def-126"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-56",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-126",
+        "def-126"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-57",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-126",
+        "def-109"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-58",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-109",
+        "def-109"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-59",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-109",
+        "def-109"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-60",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-109",
+        "def-109"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-61",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-109",
+        "def-109"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-62",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-109",
+        "def-109"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-63",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-109",
+        "def-23"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-64",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-23",
+        "def-23"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-65",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-23",
+        "def-23"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-66",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-23",
+        "def-23"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-67",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-23",
+        "def-23"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-68",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-23",
+        "def-23"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-69",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-23",
+        "def-98"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-70",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-98",
+        "def-98"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-71",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-98",
+        "def-98"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-72",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-98",
+        "def-98"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-73",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-98",
+        "def-98"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-74",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-98",
+        "def-98"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-75",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-98",
+        "def-98"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-76",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-98",
+        "def-66"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-77",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-66",
+        "def-66"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-78",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-66",
+        "def-66"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-79",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-66",
+        "def-66"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-80",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-66",
+        "def-66"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-81",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-66",
+        "def-66"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-82",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-66",
+        "def-100"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-83",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-100",
+        "def-100"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-84",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-100",
+        "def-100"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-85",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-100",
+        "def-100"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-86",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-100",
+        "def-100"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-87",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-100",
+        "def-100"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-88",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-100",
+        "def-100"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-89",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-70",
+        "def-70"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-90",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-70",
+        "def-70"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-91",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-70",
+        "def-70"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-92",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-70",
+        "def-70"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-93",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-70",
+        "def-56"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-94",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-56",
+        "def-56"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-95",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-56",
+        "def-56"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-96",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-56",
+        "def-56"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-97",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-56",
+        "def-56"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-98",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-56",
+        "def-56"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-99",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-56",
+        "def-2"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-100",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-2",
+        "def-2"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-101",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-2",
+        "def-2"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-102",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-2",
+        "def-2"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-103",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-2",
+        "def-2"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-104",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-2",
+        "def-2"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-105",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-2",
+        "def-2"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-106",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-2",
+        "def-123"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-107",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-123",
+        "def-123"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-108",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-123",
+        "def-123"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-109",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-123",
+        "def-123"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-110",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-123",
+        "def-123"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-111",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-123",
+        "def-123"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-112",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-123",
+        "def-8"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-113",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-8",
+        "def-8"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-114",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-8",
+        "def-8"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-115",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-8",
+        "def-8"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-116",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-8",
+        "def-8"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-117",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-8",
+        "def-8"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-118",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-8",
+        "def-8"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-119",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-145",
+        "def-145"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-120",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-145",
+        "def-145"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-121",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-145",
+        "def-145"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-122",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-145",
+        "def-145"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-123",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-145",
+        "def-124"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-124",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-124",
+        "def-124"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-125",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-124",
+        "def-124"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-126",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-124",
+        "def-124"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-127",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-124",
+        "def-124"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-128",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-124",
+        "def-124"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-129",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-124",
+        "def-58"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-130",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-58",
+        "def-58"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-131",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-58",
+        "def-58"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-132",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-58",
+        "def-58"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-133",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-58",
+        "def-58"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-134",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-58",
+        "def-58"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-135",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-58",
+        "def-101"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-136",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-101",
+        "def-101"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-137",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-101",
+        "def-101"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-138",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-101",
+        "def-101"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-139",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-101",
+        "def-101"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-140",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-101",
+        "def-101"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-141",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-57",
+        "def-57"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-142",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-57",
+        "def-57"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-143",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-57",
+        "def-57"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-144",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-57",
+        "def-57"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-145",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-57",
+        "def-57"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-146",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-57",
+        "def-139"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-147",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-139",
+        "def-139"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-148",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-139",
+        "def-139"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-149",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-139",
+        "def-139"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-150",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-139",
+        "def-55"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-151",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-55",
+        "def-55"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-152",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-55",
+        "def-55"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-153",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-55",
+        "def-55"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-154",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-146",
+        "def-146"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-155",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-146",
+        "def-146"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-156",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-146",
+        "def-146"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-157",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-146",
+        "def-146"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-158",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-149",
+        "def-149"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-159",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-149",
+        "def-149"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-160",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-149",
+        "def-149"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-161",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-149",
+        "def-149"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-162",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-149",
+        "def-149"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-163",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-149",
+        "def-122"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-164",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-122",
+        "def-122"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-165",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-122",
+        "def-122"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-166",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-122",
+        "def-122"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-167",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-122",
+        "def-122"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-168",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-122",
+        "def-122"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-169",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-122",
+        "def-122"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-170",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-119",
+        "def-119"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "16:00"
+    },
+    {
+      "id": "conflict-171",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-119",
+        "def-119"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "16:00"
+    },
+    {
+      "id": "conflict-172",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-119",
+        "def-119"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "16:00"
+    },
+    {
+      "id": "conflict-173",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-119",
+        "def-119"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "16:00"
+    },
+    {
+      "id": "conflict-174",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-119",
+        "def-119"
+      ],
+      "day": "2025-02-24",
+      "time_slot": "16:00"
+    },
+    {
+      "id": "conflict-175",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-33",
+        "def-33"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-176",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-33",
+        "def-33"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-177",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-33",
+        "def-33"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-178",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-33",
+        "def-33"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-179",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-33",
+        "def-13"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-180",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-13",
+        "def-13"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-181",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-13",
+        "def-13"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-182",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-13",
+        "def-13"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "09:00"
+    },
+    {
+      "id": "conflict-183",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-31",
+        "def-31"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-184",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-31",
+        "def-31"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-185",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-31",
+        "def-31"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-186",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-31",
+        "def-31"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-187",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-31",
+        "def-18"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-188",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-18",
+        "def-18"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-189",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-18",
+        "def-18"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-190",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-18",
+        "def-18"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-191",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-18",
+        "def-18"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "10:00"
+    },
+    {
+      "id": "conflict-192",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-15",
+        "def-15"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-193",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-15",
+        "def-15"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-194",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-15",
+        "def-15"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-195",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-15",
+        "def-15"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-196",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-15",
+        "def-34"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-197",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-34",
+        "def-34"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-198",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-34",
+        "def-34"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-199",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-34",
+        "def-34"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-200",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-34",
+        "def-34"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-201",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-10",
+        "def-10"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-202",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-10",
+        "def-10"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-203",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-10",
+        "def-10"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-204",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-12",
+        "def-12"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-205",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-12",
+        "def-12"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-206",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-12",
+        "def-12"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-207",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-12",
+        "def-12"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-208",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-16",
+        "def-16"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-209",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-16",
+        "def-16"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-210",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-16",
+        "def-16"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-211",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-16",
+        "def-16"
+      ],
+      "day": "2025-02-25",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-212",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-89",
+        "def-89"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-213",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-89",
+        "def-89"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-214",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-89",
+        "def-89"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-215",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-89",
+        "def-89"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-216",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-88",
+        "def-88"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-217",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-88",
+        "def-88"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-218",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-88",
+        "def-88"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-219",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-88",
+        "def-88"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-220",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-88",
+        "def-88"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-221",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-82",
+        "def-82"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-222",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-82",
+        "def-82"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-223",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-82",
+        "def-82"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-224",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-82",
+        "def-82"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-225",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-86",
+        "def-86"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-226",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-86",
+        "def-86"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-227",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-86",
+        "def-86"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-228",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-86",
+        "def-86"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-229",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-90",
+        "def-90"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "16:00"
+    },
+    {
+      "id": "conflict-230",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-90",
+        "def-90"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "16:00"
+    },
+    {
+      "id": "conflict-231",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-90",
+        "def-90"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "16:00"
+    },
+    {
+      "id": "conflict-232",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-90",
+        "def-90"
+      ],
+      "day": "2025-02-26",
+      "time_slot": "16:00"
+    },
+    {
+      "id": "conflict-233",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-78",
+        "def-78"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-234",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-78",
+        "def-78"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-235",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-78",
+        "def-78"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-236",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-78",
+        "def-78"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "11:00"
+    },
+    {
+      "id": "conflict-237",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-133",
+        "def-133"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-238",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-133",
+        "def-133"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-239",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-133",
+        "def-133"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "12:00"
+    },
+    {
+      "id": "conflict-240",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-51",
+        "def-51"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-241",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-51",
+        "def-51"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-242",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-51",
+        "def-51"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-243",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-51",
+        "def-51"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "13:00"
+    },
+    {
+      "id": "conflict-244",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-49",
+        "def-49"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-245",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-49",
+        "def-49"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-246",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-49",
+        "def-49"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-247",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-49",
+        "def-49"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-248",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-49",
+        "def-49"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-249",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-49",
+        "def-49"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "14:00"
+    },
+    {
+      "id": "conflict-250",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-45",
+        "def-45"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-251",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-45",
+        "def-45"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-252",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-45",
+        "def-45"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-253",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-45",
+        "def-45"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "15:00"
+    },
+    {
+      "id": "conflict-254",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-48",
+        "def-48"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "16:00"
+    },
+    {
+      "id": "conflict-255",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-48",
+        "def-48"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "16:00"
+    },
+    {
+      "id": "conflict-256",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-48",
+        "def-48"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "16:00"
+    },
+    {
+      "id": "conflict-257",
+      "type": "double-booking",
+      "severity": "error",
+      "message": "Participant nan has overlapping assignments",
+      "description": "Participant nan has overlapping assignments",
+      "participants": [
+        "nan"
+      ],
+      "affected_defence_ids": [
+        "def-48",
+        "def-48"
+      ],
+      "day": "2025-02-27",
+      "time_slot": "16:00"
+    }
+  ],
+  "num_conflicts": 257,
+  "planned_count": 50,
+  "status": "invalid"
+}

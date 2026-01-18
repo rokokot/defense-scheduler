@@ -1,0 +1,38 @@
+{
+  "status": "satisfiable",
+  "run_id": "20260118_163908",
+  "dataset": "intermediate_2026_100",
+  "solve_time_sec": 0.5159039497375488,
+  "planned_count": 1,
+  "total_defenses": 100,
+  "solution_index": 1,
+  "assignments": [
+    {
+      "assignment_id": "assign-0",
+      "entity_id": "def-15",
+      "entity_name": "DDOS protection in industrial control systems",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-60",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [],
+      "num_participants": 0,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 60
+    }
+  ],
+  "unscheduled": [],
+  "summary": {
+    "total": 100,
+    "scheduled": 1,
+    "unscheduled": 99
+  },
+  "objectives": {},
+  "conflicts": [],
+  "num_conflicts": 0
+}

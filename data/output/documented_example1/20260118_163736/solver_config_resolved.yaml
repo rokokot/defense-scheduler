@@ -1,0 +1,15 @@
+input_data: /app/data/input/documented_example1
+output_dir: /app/data/output/documented_example1
+number_of_defenses_in_problem: all
+number_of_unavailabilities_in_problem: all
+solver: ortools
+allocation_model: false
+adjacency_objective: false
+must_plan_all_defenses: false
+allow_online_defenses: false
+availability_odds: 0.75
+online_odds: 0
+max_rooms: 2
+max_days: NA
+explain: false
+no_plots: true

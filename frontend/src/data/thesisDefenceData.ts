@@ -11,7 +11,10 @@ export interface AvailabilityRecord {
 }
 
 interface DefenceRow {
-  event_id: string;
+  event_id?: string;
+  defense_id?: string;
+  defence_id?: string;
+  id?: string;
   student: string;
   supervisor: string;
   co_supervisor: string;
@@ -48,8 +51,8 @@ export function parseDefencesCsv(csvText: string): DefenceEvent[] {
     console.error('CSV parsing errors:', result.errors);
   }
 
-  return result.data.map(row => ({
-    id: row.event_id,
+  return result.data.map((row, index) => ({
+    id: row.event_id || row.defense_id || row.defence_id || row.id || `def-${index + 1}`,
     title: `${row.student} Thesis Defence`,
     student: row.student,
     supervisor: row.supervisor,

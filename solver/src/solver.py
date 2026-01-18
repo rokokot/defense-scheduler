@@ -47,7 +47,7 @@ DEFAULT_SETTINGS = {
 
     # Regarding the use case
     "adjacency_objective": False,
-    "must_plan_all_defenses" : True,
+    "must_plan_all_defenses" : False,
     "allow_online_defenses": False,
     "availability_odds": 0.75,
     "online_odds": 0,
@@ -188,6 +188,41 @@ class DefenseRosteringModel(cp.Model):
         else:
             self.df_def = pd.read_csv(f'{input_path}/defences.csv')
 
+        def _merge_unavailabilities(df):
+            if df.empty:
+                return df
+            df = df.copy()
+            if "status" in df.columns:
+                group_cols = ["name", "type", "day", "status"]
+            else:
+                group_cols = ["name", "type", "day"]
+            df["start_dt"] = pd.to_datetime(df["day"].astype(str) + " " + df["start_time"].astype(str))
+            df["end_dt"] = pd.to_datetime(df["day"].astype(str) + " " + df["end_time"].astype(str))
+            df = df.sort_values(group_cols + ["start_dt"])
+
+            merged_rows = []
+            for _, group in df.groupby(group_cols, sort=False):
+                current = None
+                for _, row in group.iterrows():
+                    if current is None:
+                        current = row.copy()
+                        continue
+                    if row["start_dt"] == current["end_dt"]:
+                        current["end_dt"] = row["end_dt"]
+                        current["end_time"] = row["end_time"]
+                    else:
+                        merged_rows.append(current)
+                        current = row.copy()
+                if current is not None:
+                    merged_rows.append(current)
+            merged = pd.DataFrame(merged_rows)
+            merged["day"] = pd.to_datetime(merged["day"]).dt.strftime("%Y-%m-%d")
+            merged["start_time"] = pd.to_datetime(merged["start_dt"]).dt.strftime("%H:%M")
+            merged["end_time"] = pd.to_datetime(merged["end_dt"]).dt.strftime("%H:%M")
+            return merged.drop(columns=["start_dt", "end_dt"])
+
+        self.df_av = _merge_unavailabilities(self.df_av)
+
         with open(f'{input_path}/timeslot_info.json') as f:
             self.timeslot_info = json.load(f)
 
@@ -207,6 +242,11 @@ class DefenseRosteringModel(cp.Model):
                 name = str(room)
             normalized_rooms.append(name)
         self.rooms = normalized_rooms[: self.max_rooms]
+
+        def _normalize_room_name(value):
+            return " ".join(str(value).strip().split()).lower()
+
+        room_index = {_normalize_room_name(name): idx for idx, name in enumerate(self.rooms)}
 
         # Determining the first and last day that defenses take place
 
@@ -252,16 +292,18 @@ class DefenseRosteringModel(cp.Model):
             for ev in self.evaluator_list
         }
 
-        self.df_def['defense_id'] = pd.factorize(self.df_def['student'])[0]
+        self.df_def = self.df_def.reset_index(drop=True)
+        # Use a stable per-row defense id to avoid collisions on duplicate student names.
+        self.df_def['defense_id'] = range(len(self.df_def))
 
         #self.df_rav['rid'] = pd.factorize(self.df_rav['room_id'])[0]
 
         mask = self.df_av['type'] == 'room'
-
-
         self.df_av['room_id'] = pd.NA
-
-        self.df_av.loc[mask, 'room_id'] = pd.factorize(self.df_av.loc[mask, 'name'])[0]
+        if mask.any():
+            self.df_av.loc[mask, 'room_id'] = self.df_av.loc[mask, 'name'].map(
+                lambda name: room_index.get(_normalize_room_name(name))
+            )
 
         if cfg['max_days'] == 'NA':
             self.no_days = self.timeslot_info['number_of_days']
@@ -269,7 +311,40 @@ class DefenseRosteringModel(cp.Model):
             self.no_days = cfg['max_days']
 
         self.no_timeslots = 24*self.no_days
-        self.no_defenses = self.df_def['defense_id'].max()+1
+        self.no_defenses = len(self.df_def)
+
+        self._person_unavail = {}
+        self._room_unavail = {}
+        for row in self.df_av.itertuples(index=False):
+            row_type = getattr(row, "type", None)
+            start_id = getattr(row, "start_id", None)
+            end_id = getattr(row, "end_id", None)
+            if start_id is None or end_id is None or pd.isna(start_id) or pd.isna(end_id):
+                continue
+            if row_type == "person":
+                name = getattr(row, "name", None)
+                if not name or pd.isna(name):
+                    continue
+                self._person_unavail.setdefault(name, []).append((int(start_id), int(end_id)))
+            elif row_type == "room":
+                room_id = getattr(row, "room_id", None)
+                if room_id is None or pd.isna(room_id):
+                    continue
+                rid = int(room_id)
+                if rid < 0:
+                    continue
+                self._room_unavail.setdefault(rid, []).append((int(start_id), int(end_id)))
+
+        self._illegal_blocks = []
+        dur = 0
+        for t in range(self.no_timeslots):
+            if timeslot_illegal(t, self.timeslot_info['start_hour'], self.timeslot_info['end_hour']):
+                dur += 1
+            elif dur > 0:
+                self._illegal_blocks.append((t - dur, dur, t))
+                dur = 0
+        if dur > 0:
+            self._illegal_blocks.append((self.no_timeslots - dur, dur, self.no_timeslots))
 
 
         shape = (self.no_defenses,)
@@ -283,6 +358,7 @@ class DefenseRosteringModel(cp.Model):
         self.assumption_constraints = []
         self.assumption_literals = []
         self.assumption_labels = {}
+        self._track_labels = bool(cfg.get("explain", False))
 
         if cfg['allocation_model']:
             self.add_labeled("evaluator_availability", self.evaluator_availability_constraints_allocation())
@@ -316,8 +392,11 @@ class DefenseRosteringModel(cp.Model):
                 self.defenses_obj = cp.sum(self.is_planned)
                 self.adj_obj, self.no_pairs, self.adj_obj_ub = self.adjacency_objectives()
                 self.add_labeled("adjacency_bound", [self.adj_obj <= self.adj_obj_ub])
-
-                self.maximize((self.adj_obj_ub+1)*self.defenses_obj + self.adj_obj)
+                # Weight must be large enough that scheduling ANY additional defense
+                # is always better than ANY adjacency improvement. Use a large constant
+                # to ensure numerical stability with OR-Tools.
+                defense_weight = max(self.adj_obj_ub + 1, 10000)
+                self.maximize(defense_weight * self.defenses_obj + self.adj_obj)
         else:
             if cfg['must_plan_all_defenses']:
                 self.add_labeled("must_plan_all", [cp.all(self.is_planned)])
@@ -335,7 +414,8 @@ class DefenseRosteringModel(cp.Model):
     def add_labeled(self, label, constraints):
         """Add constraints to the model and keep a label for explainability grouping."""
         super().add(constraints)
-        self.constraint_labels.extend((c, label) for c in constraints)
+        if self._track_labels:
+            self.constraint_labels.extend((c, label) for c in constraints)
 
     def add_assumption_constraints(self):
         """Add per-interval assumption constraints for more granular cores when explaining UNSAT."""
@@ -343,10 +423,16 @@ class DefenseRosteringModel(cp.Model):
 
         # Room unavailability per timeslot
         for _, av in self.df_av.iterrows():
+            start_id = av.get('start_id')
+            end_id = av.get('end_id')
+            if start_id is None or end_id is None or pd.isna(start_id) or pd.isna(end_id):
+                continue
             if av['type'] == 'room' and av['room_id'] == av['room_id'] and av['room_id'] < self.max_rooms:
+                if av['room_id'] is None or pd.isna(av['room_id']):
+                    continue
                 r = int(av['room_id'])
                 label_base = f"room:{av['name']}@{av['day']} {av['start_time']}-{av['end_time']}"
-                for t in range(int(av['start_id']), int(av['end_id'])):
+                for t in range(int(start_id), int(end_id)):
                     a = cp.boolvar(name=f"assume_room_{r}_t{t}")
                     cons = [
                         a.implies(self.is_planned[d].implies((self.in_room[d] != r) | (self.start_times[d] != t)))
@@ -359,13 +445,17 @@ class DefenseRosteringModel(cp.Model):
 
         # Evaluator unavailability per timeslot
         for _, av in self.df_av.iterrows():
+            start_id = av.get('start_id')
+            end_id = av.get('end_id')
+            if start_id is None or end_id is None or pd.isna(start_id) or pd.isna(end_id):
+                continue
             if av['type'] == 'person':
                 name = av['name']
                 defenses = self.evaluator_to_defenses.get(name, [])
                 if not defenses:
                     continue
                 label_base = f"person:{name}@{av['day']} {av['start_time']}-{av['end_time']}"
-                for t in range(int(av['start_id']), int(av['end_id'])):
+                for t in range(int(start_id), int(end_id)):
                     a = cp.boolvar(name=f"assume_person_{abs(hash(name)) % 10000}_t{t}")
                     cons = [
                         a.implies(self.is_planned[d].implies(self.start_times[d] != t))
@@ -415,7 +505,11 @@ class DefenseRosteringModel(cp.Model):
             defenses = self.df_evaluators.index[self.df_evaluators['evaluators'] == evaluator].unique().tolist()
             for idx, av in self.df_av.iterrows():
                 if av['name'] == evaluator and av['type'] == 'person':
-                    for t in range(av['start_id'], av['end_id']):
+                    start_id = av.get('start_id')
+                    end_id = av.get('end_id')
+                    if start_id is None or end_id is None or pd.isna(start_id) or pd.isna(end_id):
+                        continue
+                    for t in range(int(start_id), int(end_id)):
                         constraints += [self.is_planned[defenses].implies(self.start_times[defenses] != t)]
         return constraints
 
@@ -433,17 +527,22 @@ class DefenseRosteringModel(cp.Model):
 
     def room_availability_constraints_allocation(self):
         constraints = []
-        for r in range(self.max_rooms):
+        for r in range(len(self.rooms)):
             for idx, av in self.df_av.iterrows():
                 if av['type'] == 'room' and av['room_id'] == r:
-                    for t in range(av['start_id'], av['end_id']):
+                    start_id = av.get('start_id')
+                    end_id = av.get('end_id')
+                    if start_id is None or end_id is None or pd.isna(start_id) or pd.isna(end_id):
+                        continue
+                    for t in range(int(start_id), int(end_id)):
                         constraints += [self.is_planned.implies((self.in_room != r) | (self.start_times != t))]
         return constraints
 
     def room_overlap_constraints_allocation(self):
         constraints = []
-
-        constraints += [cp.AllDifferentExcept0((self.max_rooms + 2)*self.is_planned*self.start_times + self.is_planned*(self.in_room+1))]
+        # Use len(self.rooms) to match actual room count
+        num_rooms = len(self.rooms)
+        constraints += [cp.AllDifferentExcept0((num_rooms + 2)*self.is_planned*self.start_times + self.is_planned*(self.in_room+1))]
 
         return constraints
 
@@ -457,43 +556,19 @@ class DefenseRosteringModel(cp.Model):
     def evaluator_availability_and_overlap_constraints(self):
         constraints = []
 
-        def _slice_vars(var_array, indices):
-            if hasattr(var_array, "__getitem__"):
-                return [var_array[idx] for idx in indices]
-            if len(indices) == 1 and indices[0] == 0:
-                return [var_array]
-            raise TypeError("Unexpected variable shape for slicing")
+        for evaluator, defenses in self.evaluator_to_defenses.items():
+            if not defenses:
+                continue
 
-        df_evaluators = (
-            self.df_def['evaluators']
-            .str.split('|')
-            .explode()
-            .str.strip()
-            .replace('nan', pd.NA)
-            .dropna()
-            .to_frame(name='evaluators')
-        )
-        evaluator_list = df_evaluators['evaluators'].unique()
-
-        for evaluator in evaluator_list:
-            defenses = df_evaluators.index[df_evaluators['evaluators'] == evaluator].unique().tolist()
-
-            start = _slice_vars(self.start_times, defenses)
+            start = [self.start_times[idx] for idx in defenses]
             duration = [1 for _ in defenses]
             end = [start[i] + duration[i] for i in range(len(start))]
-            heights = _slice_vars(self.is_planned, defenses)
-            for idx, av in self.df_av.iterrows():
-                if av['name'] == evaluator and av['type'] == 'person':
-                    start += [av['start_id']]
-                    duration += [av['end_id'] - av['start_id']]
-                    end += [av['end_id']]
-                    heights += [1]
-                    # if av['status'] == 'online':
-                    #   start += [av['timeslot_id']]
-                    #    duration += [1]
-                    #    end += [av['timeslot_id'] + 1]
-                    #    heights += [1]
-                    # heights += [cp.any(cp.any(self.in_room[d,:-1]) for d in defenses)] (?)
+            heights = [self.is_planned[idx] for idx in defenses]
+            for start_id, end_id in self._person_unavail.get(evaluator, []):
+                start.append(start_id)
+                duration.append(end_id - start_id)
+                end.append(end_id)
+                heights.append(1)
 
             constraints += [cp.Cumulative(start=start, duration=duration, end=end, demand=heights, capacity=1)]
 
@@ -504,36 +579,27 @@ class DefenseRosteringModel(cp.Model):
         # for d in range(self.no_defenses):
         #    constraints += [cp.sum(self.in_room[d,:]) <= 1]
 
-        for r in range(self.max_rooms):
+        # Iterate over actual rooms loaded (in_room domain is 0..len(self.rooms)-1)
+        for r in range(len(self.rooms)):
+            start = list(self.start_times)
+            duration = [1 for _ in range(self.no_defenses)]
+            end = [start[i] + duration[i] for i in range(len(start))]
 
-            start = self.start_times.tolist()
-            duration = [1 for _ in range(len(self.start_times))]
-            end = [start[i] + duration[i] for i in range(len(self.start_times))]
+            heights = [self.is_planned[idx] * (self.in_room[idx] == r) for idx in range(self.no_defenses)]
 
-            heights = (self.is_planned & (self.in_room == r)).tolist()
+            for start_id, end_id in self._room_unavail.get(r, []):
+                start.append(start_id)
+                duration.append(end_id - start_id)
+                end.append(end_id)
+                heights.append(1)
 
-            for idx, av in self.df_av.iterrows():
-                if av['type'] == 'room' and av['room_id'] == r:
-                    start += [av['start_id']]
-                    duration += [av['end_id'] - av['start_id']]
-                    end += [av['end_id']]
-                    heights += [1]
-
-            dur = 0
-            for t in range(self.no_timeslots):
-                if (t % 24) < self.timeslot_info['start_hour'] or (t % 24) >= self.timeslot_info['end_hour']:
-                    dur += 1
-                elif dur > 0:
-                    start += [t - dur]
-                    duration += [dur]
-                    end += [t]
-                    heights += [1]
-                    dur = 0
-
-            start += [self.no_timeslots - dur]
-            duration += [dur]
-            end += [self.no_timeslots]
-            heights += [1]
+            for start_id, dur, end_id in self._illegal_blocks:
+                if dur <= 0:
+                    continue
+                start.append(start_id)
+                duration.append(dur)
+                end.append(end_id)
+                heights.append(1)
 
             constraints += [cp.Cumulative(start=start, duration=duration, end=end, demand=heights, capacity=1)]
 
@@ -544,10 +610,17 @@ class DefenseRosteringModel(cp.Model):
 
         return constraints
 
-    def adjacency_objectives(self):
+    def adjacency_objectives(self, scheduled_only=None):
+        """
+        Build adjacency objective for evaluator pairs.
 
+        Args:
+            scheduled_only: Optional set of defense indices. When provided,
+                only considers defenses in this set and omits is_planned products
+                (assumes all are planned). This dramatically improves performance
+                for two-phase solving.
+        """
         adjacency_objective = 0
-        #room_objective = 0
         time_objective_ub = 0
         pairs_count = 0
 
@@ -564,40 +637,39 @@ class DefenseRosteringModel(cp.Model):
 
         for evaluator in evaluator_list:
             defenses = df_evaluators.index[df_evaluators['evaluators'] == evaluator].unique().tolist()
+
+            # Filter to scheduled defenses only if provided
+            if scheduled_only is not None:
+                defenses = [d for d in defenses if d in scheduled_only]
+
             d = len(defenses)
+            if d < 2:
+                continue
+
             if d < self.timeslot_info['end_hour'] - self.timeslot_info['start_hour']:
-                time_objective_ub -= (1/2)*(d**2) - (3/2)*d + 1 # amount of defense pairs that cannot be planned consecutively
+                time_objective_ub -= (1/2)*(d**2) - (3/2)*d + 1
             else:
                 time_objective_ub -= (1/2)*(d**2) - (1/2)*d - self.timeslot_info['end_hour'] + self.timeslot_info['start_hour'] + 1
 
-            # Motivation:
-
-            # d*(d-1)/2 is the amount of ordered pairs (without 2x same element) that can be taken from d defenses
-            # max(d-1, last_hour-first_hour-1) is the maximal amount of consecutive pairs that can be planned (at most),
-            # since there can never be defenses planned at the same time (due to evaluator overlap)
-            # so d*(d-1)/2 - (d-1) = (1/2)(d^2) - (3/2)*d + 1 if d < last_hour - first_hour
-            # else (1/2)*(d^2) - (1/2)d - (last_hour - first_hour - 1)
-
-            '''group_constraint = 0
-            for d1, d2 in itertools.combinations(defenses, 2):
-                adjacency_objective += ((cp.abs(self.start_times[d1] - self.start_times[d2]) == 1) & (cp.all(self.in_room[d1,:] == self.in_room[d2,:])))
-                #adjacency_objective += ((((self.start_times[d1] - self.start_times[d2]) == 1) | ((self.start_times[d2] - self.start_times[d1]) == 1))
-                #                        & (cp.all(self.in_room[d1,:] == self.in_room[d2,:]))) # Geen absolute value + algemene duration
-                group_constraint += cp.abs(self.start_times[d1] - self.start_times[d2]) == 1 # Toevoegen aan time objective
-                #room_objective += cp.all(self.in_room[d1,:] == self.in_room[d2,:]) # Proberen één constraint van te maken
-                pairs_count += 1
-            self.add([group_constraint <= d-1])'''
-
-            group_constraint = 0
             for d1 in defenses:
                 for d2 in defenses:
                     if d1 != d2:
-                        adjacency_objective += ((self.is_planned[d1] & self.is_planned[d2]) &
-                                                 ((self.start_times[d1] - self.start_times[d2]) == 1) & (self.in_room[d1] == self.in_room[d2]))
+                        if scheduled_only is not None:
+                            # Phase 2: all defenses are planned, skip is_planned products
+                            adjacency_objective += (
+                                ((self.start_times[d1] - self.start_times[d2]) == 1) *
+                                (self.in_room[d1] == self.in_room[d2])
+                            )
+                        else:
+                            # Original: include is_planned products
+                            adjacency_objective += (
+                                self.is_planned[d1] * self.is_planned[d2] *
+                                ((self.start_times[d1] - self.start_times[d2]) == 1) *
+                                (self.in_room[d1] == self.in_room[d2])
+                            )
                         pairs_count += 1
-            #self.add([group_constraint <= d - 1])
-        pairs_count //= 2
 
+        pairs_count //= 2
         time_objective_ub += pairs_count
         time_objective_ub = int(time_objective_ub)
 
@@ -1317,13 +1389,22 @@ def _blocked_sets(model):
     blocked_people = {}
 
     for _, av in model.df_av.iterrows():
+        start_id = av.get('start_id')
+        end_id = av.get('end_id')
+        if start_id is None or end_id is None or pd.isna(start_id) or pd.isna(end_id):
+            continue
         if av['type'] == 'room' and av['room_id'] == av['room_id'] and av['room_id'] < model.max_rooms:
-            for t in range(int(av['start_id']), int(av['end_id'])):
-                blocked_rooms[int(av['room_id'])].add(int(t))
+            room_id = av['room_id']
+            if room_id is None or pd.isna(room_id):
+                continue
+            for t in range(int(start_id), int(end_id)):
+                blocked_rooms[int(room_id)].add(int(t))
         elif av['type'] == 'person':
             name = av['name']
+            if name is None or pd.isna(name):
+                continue
             blocked_people.setdefault(name, set())
-            for t in range(int(av['start_id']), int(av['end_id'])):
+            for t in range(int(start_id), int(end_id)):
                 blocked_people[name].add(int(t))
 
     global_blocked = set()
@@ -1360,8 +1441,12 @@ def compute_utilization(model):
     for d in range(model.no_defenses):
         if not model.is_planned[d].value():
             continue
-        t = int(model.start_times[d].value())
-        r = int(model.in_room[d].value())
+        start_val = model.start_times[d].value()
+        room_val = model.in_room[d].value()
+        if start_val is None or room_val is None:
+            continue
+        t = int(start_val)
+        r = int(room_val)
         room_busy[r] = room_busy.get(r, 0) + 1
 
         row = df_def.loc[d]
@@ -1456,8 +1541,12 @@ def compute_slack(model):
     for d in range(model.no_defenses):
         if not model.is_planned[d].value():
             continue
-        t = int(model.start_times[d].value())
-        r = int(model.in_room[d].value())
+        start_val = model.start_times[d].value()
+        room_val = model.in_room[d].value()
+        if start_val is None or room_val is None:
+            continue
+        t = int(start_val)
+        r = int(room_val)
         row = df_def.loc[d]
 
         resources = []

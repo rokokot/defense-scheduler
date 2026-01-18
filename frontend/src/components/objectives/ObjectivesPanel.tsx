@@ -95,7 +95,7 @@ export function ObjectivesPanel({
   axisLabelFormatter,
   registerResizeHandle,
   hideInternalHandle = false,
-  solverPreferences,
+  solverPreferences: _solverPreferences, // eslint-disable-line @typescript-eslint/no-unused-vars
   objectiveHighlights,
   comparisonSchedules,
   activeScheduleId,
@@ -461,25 +461,6 @@ export function ObjectivesPanel({
                 style={{ minHeight: `${Math.max(graphMinHeight, 320)}px` }}
               >
                 <div className="space-y-3" style={{ maxWidth: `${objectiveColumnMaxWidth}px`, flex: '0 0 auto' }}>
-                  {solverPreferences && (
-                    <div className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
-                      <label className="flex items-start gap-3 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={solverPreferences.mustPlanAllDefenses}
-                          onChange={e => solverPreferences.onMustPlanAllDefensesChange?.(e.target.checked)}
-                          className="mt-1 h-4 w-4"
-                        />
-                        <div>
-                          <div className="font-semibold text-gray-900">Require scheduling every defense</div>
-                          <div className="text-sm text-gray-600 mt-0.5">
-                            When disabled, the solver maximizes the number of scheduled defenses and may leave conflicted ones
-                            unscheduled.
-                          </div>
-                        </div>
-                      </label>
-                    </div>
-                  )}
                   {globalObjectives.map(objective => {
                     const highlight = objectiveHighlights?.[objective.id];
                     return (

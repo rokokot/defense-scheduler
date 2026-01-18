@@ -1,10 +1,8 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import clsx from 'clsx';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { AlertCircle, GripHorizontal } from 'lucide-react';
 import {
   RoomAvailabilityDrawer,
   RoomAvailabilityRoom,
-  ROOM_STATUS_CLASS,
   ROOM_STATUS_LABELS,
 } from './RoomAvailabilityDrawer';
 
@@ -18,9 +16,13 @@ interface RoomAvailabilityPanelProps {
   registerResizeHandle?: (handler: ((event: React.MouseEvent) => void) | null) => void;
   hideInternalHandle?: boolean;
   onRoomToggle?: (roomId: string, enabled: boolean) => void;
+  onRoomAdd?: (roomName: string) => void;
+  onRoomDelete?: (roomId: string) => void;
   onSlotStatusChange?: (roomId: string, day: string, timeSlot: string, status: 'available' | 'unavailable') => void;
   onSlotSelect?: (roomId: string, day: string, timeSlot: string) => void;
   programmeColors?: Record<string, string>;
+  highlightedRoomId?: string | null;
+  highlightedSlot?: { day: string; timeSlot: string } | null;
 }
 
 export function RoomAvailabilityPanel({
@@ -33,12 +35,15 @@ export function RoomAvailabilityPanel({
   registerResizeHandle,
   hideInternalHandle = false,
   onRoomToggle,
+  onRoomAdd,
+  onRoomDelete,
   onSlotStatusChange,
   onSlotSelect,
   programmeColors,
+  highlightedRoomId,
+  highlightedSlot,
 }: RoomAvailabilityPanelProps) {
   const [panelHeight, setPanelHeight] = useState(sharedHeight ?? 520);
-  const [drawerOpen, setDrawerOpen] = useState(true);
   const panelRef = useRef<HTMLDivElement>(null);
   const dragStartY = useRef(0);
   const dragStartHeight = useRef(panelHeight);
@@ -98,16 +103,6 @@ export function RoomAvailabilityPanel({
     registerResizeHandle(null);
   }, [registerResizeHandle, handleDragStart, isExpanded]);
 
-  const selectableRooms = useMemo(
-    () => rooms.filter(room => room.selectable !== false),
-    [rooms]
-  );
-  const totalTrackedRooms = selectableRooms.length || rooms.length;
-  const activeTrackedRooms = useMemo(() => {
-    const target = selectableRooms.length > 0 ? selectableRooms : rooms;
-    return target.filter(room => room.enabled !== false).length;
-  }, [rooms, selectableRooms]);
-
   return (
     <div
       ref={panelRef}
@@ -127,7 +122,7 @@ export function RoomAvailabilityPanel({
       )}
 
       <div
-        className="h-full pt-3 flex flex-col"
+        className="h-full pt-0 flex flex-col"
         style={{
           opacity: isExpanded ? 1 : 0,
           visibility: isExpanded ? 'visible' : 'hidden',
@@ -135,25 +130,15 @@ export function RoomAvailabilityPanel({
         }}
       >
         <div className="flex flex-col h-full">
-          {onRoomToggle && rooms.length > 0 && (
-            <div className="px-4 pb-3 border-b border-gray-100 flex flex-col gap-1 text-sm text-gray-600">
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-gray-900">
-                  {activeTrackedRooms} / {totalTrackedRooms} rooms enabled
-                </span>
-                <span className="text-xs text-gray-500">
-                  Disabled rooms are ignored by the solver
-                </span>
-              </div>
-            </div>
-          )}
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 min-h-0 overflow-hidden">
             <RoomAvailabilityDrawer
               rooms={rooms}
               days={days}
               timeSlots={timeSlots}
-              isOpen={drawerOpen}
-              onToggle={() => setDrawerOpen(open => !open)}
+              highlightedRoomId={highlightedRoomId}
+              highlightedSlot={highlightedSlot}
+              onRoomAdd={onRoomAdd}
+              onRoomDelete={onRoomDelete}
               onRoomToggle={onRoomToggle}
               showRoomToggles={Boolean(onRoomToggle)}
               onSlotToggle={onSlotStatusChange}
@@ -165,12 +150,27 @@ export function RoomAvailabilityPanel({
             <span className="font-semibold hidden sm:inline">Legend:</span>
             {(Object.keys(ROOM_STATUS_LABELS) as Array<keyof typeof ROOM_STATUS_LABELS>).map(status => (
               <div key={status} className="flex items-center gap-2">
-                <span className={clsx('w-4 h-4 rounded border shadow-sm', ROOM_STATUS_CLASS[status])} />
+                <span
+                  className="w-6 h-6 rounded shadow-sm border border-gray-700"
+                  style={{
+                    ...(status === 'available' && {
+                      backgroundColor: 'white'
+                    }),
+                    ...(status === 'unavailable' && {
+                      backgroundColor: '#9ca3af',
+                      opacity: 0.6,
+                      backgroundImage: 'repeating-linear-gradient(135deg, transparent 0, transparent 3px, rgba(255,255,255,0.3) 3px, rgba(255,255,255,0.3) 6px)'
+                    }),
+                    ...(status === 'booked' && {
+                      backgroundImage: 'linear-gradient(135deg, #3b82f6 0%, #3b82f6 25%, #8b5cf6 25%, #8b5cf6 50%, #ec4899 50%, #ec4899 75%, #f59e0b 75%, #f59e0b 100%)'
+                    })
+                  }}
+                />
                 <span className="capitalize">{ROOM_STATUS_LABELS[status]}</span>
               </div>
             ))}
             <div className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-red-500" />
+              <AlertCircle className="h-6 w-6 text-red-500" />
               <span>Conflict</span>
             </div>
           </div>

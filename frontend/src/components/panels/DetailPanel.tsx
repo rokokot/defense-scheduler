@@ -41,6 +41,8 @@ export interface ParticipantDetail {
   role: 'student' | 'supervisor' | 'assessor' | 'mentor';
   email?: string;
   programme?: string;
+  scheduledDefences?: ParticipantDefenceSummary[];
+  unscheduledDefences?: ParticipantDefenceSummary[];
   assignedDefences?: {
     id: string;
     studentName: string;
@@ -50,6 +52,16 @@ export interface ParticipantDetail {
     available: number;
     total: number;
   };
+}
+
+export interface ParticipantDefenceSummary {
+  id: string;
+  studentName: string;
+  programme?: string;
+  day?: string;
+  startTime?: string;
+  endTime?: string;
+  room?: string;
 }
 
 export interface TimeslotDetail {
@@ -86,6 +98,8 @@ export interface DetailPanelProps {
   colorScheme?: Record<string, string>;
   highlightedEventId?: string;
   selectedEventId?: string;
+  priorityEventIds?: Set<string>;
+  selectedPersonName?: string;
 }
 
 export function DetailPanel({
@@ -98,7 +112,7 @@ export function DetailPanel({
   onSave,
   onEdit,
   onDelete,
-  currentTimeslotPriority = 'normal',
+  currentTimeslotPriority: _currentTimeslotPriority = 'normal', // eslint-disable-line @typescript-eslint/no-unused-vars
   mode = 'detail',
   unscheduledEvents = [],
   searchQuery = '',
@@ -108,6 +122,8 @@ export function DetailPanel({
   colorScheme = {},
   highlightedEventId,
   selectedEventId,
+  priorityEventIds,
+  selectedPersonName,
 }: DetailPanelProps) {
   const [studentExpanded, setStudentExpanded] = useState(true);
   const [committeeExpanded, setCommitteeExpanded] = useState(true);
@@ -161,9 +177,12 @@ export function DetailPanel({
           onCardClick={onCardClick || (() => {})}
           onAddNew={onAddNew || (() => {})}
           onClose={onClose}
+          onDelete={onDelete ? (event) => onDelete(event.id) : undefined}
           colorScheme={colorScheme}
           highlightedEventId={highlightedEventId}
           selectedEventId={selectedEventId}
+          priorityEventIds={priorityEventIds}
+          selectedPersonName={selectedPersonName}
         />
       </div>
     );
@@ -198,57 +217,18 @@ export function DetailPanel({
 
     return (
       <>
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900">
             {defence.id.includes('defence-') && defence.student.name === 'New Student' ? 'Add New Defense' : 'Edit Defense'}
           </h2>
-
-          {/* Timeslot Priority Controls */}
-          {edited.scheduledTime && (
-            <div className="mb-3">
-              <label className="text-xs text-gray-500 uppercase tracking-wide mb-2 block">Timeslot Priority</label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    const newPriority = currentTimeslotPriority === 'unavailable' ? 'normal' : 'unavailable';
-                    onAction?.('setTimeslotPriority', { day: edited.scheduledTime?.day, timeSlot: edited.scheduledTime?.startTime, priority: newPriority });
-                  }}
-                  className={`px-3 py-1.5 text-xs font-medium rounded border transition-colors ${
-                    currentTimeslotPriority === 'unavailable'
-                      ? 'border-gray-400 bg-gray-100 text-gray-800'
-                      : 'border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  Unavailable
-                </button>
-                <button
-                  onClick={() => {
-                    const newPriority = currentTimeslotPriority === 'prioritized' ? 'normal' : 'prioritized';
-                    onAction?.('setTimeslotPriority', { day: edited.scheduledTime?.day, timeSlot: edited.scheduledTime?.startTime, priority: newPriority });
-                  }}
-                  className={`px-3 py-1.5 text-xs font-medium rounded border transition-colors ${
-                    currentTimeslotPriority === 'prioritized'
-                      ? 'border-blue-400 bg-blue-100 text-blue-800'
-                      : 'border-blue-300 text-blue-700 hover:bg-blue-50'
-                  }`}
-                >
-                  Prioritized
-                </button>
-                <button
-                  onClick={() => {
-                    const newPriority = currentTimeslotPriority === 'deprioritized' ? 'normal' : 'deprioritized';
-                    onAction?.('setTimeslotPriority', { day: edited.scheduledTime?.day, timeSlot: edited.scheduledTime?.startTime, priority: newPriority });
-                  }}
-                  className={`px-3 py-1.5 text-xs font-medium rounded border transition-colors ${
-                    currentTimeslotPriority === 'deprioritized'
-                      ? 'border-orange-400 bg-orange-100 text-orange-800'
-                      : 'border-orange-300 text-orange-700 hover:bg-orange-50'
-                  }`}
-                >
-                  Deprioritized
-                </button>
-              </div>
-            </div>
+          {onDelete && (
+            <button
+              onClick={() => onDelete(defence.id)}
+              className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+              title="Delete defense"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
           )}
         </div>
 
@@ -682,69 +662,126 @@ export function DetailPanel({
     </>
   );
 
-  const renderParticipantView = (participant: ParticipantDetail) => (
-    <>
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">{participant.name}</h2>
-        <div className="inline-block mt-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded capitalize">
-          {participant.role}
+  const renderParticipantView = (participant: ParticipantDetail) => {
+    const scheduledDefences = participant.scheduledDefences || [];
+    const unscheduledDefences = participant.unscheduledDefences || [];
+
+    return (
+      <>
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">{participant.name}</h2>
+          <div className="inline-block mt-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded capitalize">
+            {participant.role}
+          </div>
         </div>
-      </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-4">
-        {participant.email && (
-          <div className="mb-6">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Email</p>
-            <p className="text-sm text-gray-900">{participant.email}</p>
-          </div>
-        )}
-
-        {participant.programme && (
-          <div className="mb-6">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Programme</p>
-            <p className="text-sm text-gray-900">{participant.programme}</p>
-          </div>
-        )}
-
-        {participant.availabilityCount && (
-          <div className="mb-6">
-            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Availability</p>
-            <p className="text-sm text-gray-900">
-              {participant.availabilityCount.available} of {participant.availabilityCount.total} slots available
-            </p>
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-              <div
-                className="bg-green-500 h-2 rounded-full"
-                style={{
-                  width: `${(participant.availabilityCount.available / participant.availabilityCount.total) * 100}%`,
-                }}
-              />
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          {participant.email && (
+            <div className="mb-6">
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Email</p>
+              <p className="text-sm text-gray-900">{participant.email}</p>
             </div>
-          </div>
-        )}
+          )}
 
-        {participant.assignedDefences && participant.assignedDefences.length > 0 && (
+          {participant.programme && (
+            <div className="mb-6">
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Programme</p>
+              <p className="text-sm text-gray-900">{participant.programme}</p>
+            </div>
+          )}
+
+          {participant.availabilityCount && (
+            <div className="mb-6">
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Availability</p>
+              <p className="text-sm text-gray-900">
+                {participant.availabilityCount.available} of {participant.availabilityCount.total} slots available
+              </p>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div
+                  className="bg-green-500 h-2 rounded-full"
+                  style={{
+                    width: `${(participant.availabilityCount.available / participant.availabilityCount.total) * 100}%`,
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
           <div className="mb-6">
             <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">
-              Assigned Defenses ({participant.assignedDefences.length})
+              Scheduled Defenses ({scheduledDefences.length})
             </p>
-            <div className="space-y-2">
-              {participant.assignedDefences.map(defence => (
-                <div
-                  key={defence.id}
-                  className="p-2 bg-gray-50 rounded text-sm hover:bg-gray-100 cursor-pointer transition-colors"
-                  onClick={() => onAction?.('view-defence', defence.id)}
-              >
-                  <p className="font-medium text-gray-900">{defence.studentName}</p>
-                  <p className="text-xs text-gray-600 mt-1">{defence.time}</p>
-                </div>
-              ))}
-            </div>
+            {scheduledDefences.length === 0 ? (
+              <p className="text-sm text-gray-500">No scheduled defenses.</p>
+            ) : (
+              <div className="space-y-2">
+                {scheduledDefences.map(defence => (
+                  <div
+                    key={defence.id}
+                    className="p-2 bg-gray-50 rounded text-sm hover:bg-gray-100 cursor-pointer transition-colors"
+                    onClick={() => onAction?.('view-defence', defence.id)}
+                  >
+                    <p className="font-medium text-gray-900">{defence.studentName}</p>
+                    {defence.programme && (
+                      <p className="text-xs text-gray-600 mt-1">{defence.programme}</p>
+                    )}
+                    <p className="text-xs text-gray-600 mt-1">
+                      {defence.day} {defence.startTime}{defence.endTime ? `-${defence.endTime}` : ''}{defence.room ? ` • ${defence.room}` : ''}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </div>
-    </>
-  );
+
+          <div className="mb-6">
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">
+              Unscheduled Defenses ({unscheduledDefences.length})
+            </p>
+            {unscheduledDefences.length === 0 ? (
+              <p className="text-sm text-gray-500">No unscheduled defenses.</p>
+            ) : (
+              <div className="space-y-2">
+                {unscheduledDefences.map(defence => (
+                  <div
+                    key={defence.id}
+                    className="p-2 bg-gray-50 rounded text-sm hover:bg-gray-100 cursor-pointer transition-colors"
+                    onClick={() => onAction?.('view-defence', defence.id)}
+                  >
+                    <p className="font-medium text-gray-900">{defence.studentName}</p>
+                    {defence.programme && (
+                      <p className="text-xs text-gray-600 mt-1">{defence.programme}</p>
+                    )}
+                    <p className="text-xs text-gray-500 mt-1">Unscheduled</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {participant.assignedDefences && participant.assignedDefences.length > 0 && (
+            <div className="mb-6">
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">
+                Assigned Defenses ({participant.assignedDefences.length})
+              </p>
+              <div className="space-y-2">
+                {participant.assignedDefences.map(defence => (
+                  <div
+                    key={defence.id}
+                    className="p-2 bg-gray-50 rounded text-sm hover:bg-gray-100 cursor-pointer transition-colors"
+                    onClick={() => onAction?.('view-defence', defence.id)}
+                >
+                    <p className="font-medium text-gray-900">{defence.studentName}</p>
+                    <p className="text-xs text-gray-600 mt-1">{defence.time}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  };
 
   return (
     <div className={`${positionClasses} w-96 bg-white border-l border-gray-200 shadow-xl flex flex-col z-40`}>

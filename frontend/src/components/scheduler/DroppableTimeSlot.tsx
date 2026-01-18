@@ -101,7 +101,7 @@ function DroppableTimeSlotComponent({
       }}
     >
       {isEmpty ? (
-        <div className="h-full min-h-[100px] group-hover:bg-blue-50 transition-colors" />
+        <div className="h-full min-h-[100px] group-hover:bg-blue-100 transition-colors" />
       ) : children}
     </td>
   );

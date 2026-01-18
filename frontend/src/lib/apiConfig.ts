@@ -4,16 +4,22 @@
  * reading `import.meta.env` directly in multiple places.
  */
 const resolveApiBaseUrl = () => {
-  if (import.meta?.env?.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
+  const envUrl = import.meta?.env?.VITE_API_URL;
+  if (envUrl && envUrl.trim()) {
+    return envUrl.trim().replace(/\/+$/, '');
+  }
+
+  // In DEV mode, use relative URLs so Vite proxy can intercept /api requests.
+  // The proxy in vite.config.ts forwards /api to http://localhost:8000.
+  if (import.meta?.env?.DEV) {
+    return '';
   }
 
   if (typeof window !== 'undefined') {
-    const { protocol, hostname } = window.location;
-    return `${protocol}//${hostname}:8000`;
+    return window.location.origin;
   }
 
-  return 'http://localhost:8000';
+  return '';
 };
 
 export const API_BASE_URL = resolveApiBaseUrl();

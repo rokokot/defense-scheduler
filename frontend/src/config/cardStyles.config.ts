@@ -119,7 +119,7 @@ export const defaultDefenceCardTheme: DefenceCardTheme = {
   states: {
     selected: {
       border: {
-        width: '2.3px',
+        width: '1px',
         color: '#4a5568',
         style: 'solid',
       },

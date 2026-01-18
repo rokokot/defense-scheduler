@@ -6,7 +6,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef, useMemo, useCallback, startTransition } from 'react';
 import type { ReactNode } from 'react';
-import { GripHorizontal, Loader2, CheckCircle2, AlertTriangle, CircleSlash2 } from 'lucide-react';
+import { GripHorizontal, X, Terminal } from 'lucide-react';
 import clsx from 'clsx';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
@@ -43,6 +43,8 @@ import { detectEventConflicts } from '../../lib/availabilityLoader';
 import { defaultDefenceCardTheme } from '../../config/cardStyles.config';
 import { GridSetupModal } from '../modals/GridSetupModal';
 import { splitParticipantNames } from '../../utils/participantNames';
+import { resolveRoomName } from '../../utils/roomNames';
+import { eventsToAssignments, checkRoomTimeslotCollision } from '../../utils/conflictValidation';
 import { ConflictsPanelV2 } from '../conflicts/ConflictsPanelV2';
 import { ConflictSuggestion } from '../../types/schedule';
 import { buildRoomAvailabilityRooms } from '../panels/RoomAvailabilityDrawer';
@@ -57,6 +59,7 @@ import { schedulingAPI } from '../../api/scheduling';
 import { API_BASE_URL } from '../../lib/apiConfig';
 import { exportRosterSnapshot } from '../../services/snapshotService';
 
+
 const normalizeName = (name?: string | null) => (name || '').trim().toLowerCase();
 const expandParticipantNames = (value?: string | null) => splitParticipantNames(value);
 const slugifyRoomId = (value: string) =>
@@ -66,7 +69,6 @@ const slugifyRoomId = (value: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
-const DEFAULT_SOLVER_TIMEOUT_SECONDS = 180;
 type SolverExecutionSummary = {
   total: number;
   scheduled: number;
@@ -375,7 +377,7 @@ export function RosterDashboard({
   }, [datasetId, datasetVersion]);
 
   const { currentState, canUndo, canRedo, push, undo, redo, reset: resetHistory } = useScheduleHistory(initialState);
-  const events = useMemo(() => currentState?.events ?? [], [currentState]);
+  const baseEvents = useMemo(() => currentState?.events ?? [], [currentState]);
 
   // Roster management with global counter for proper naming
   const rosterCounterRef = useRef(persistedSnapshot ? persistedSnapshot.rosters.length : 1);
@@ -444,12 +446,16 @@ export function RosterDashboard({
   const [highlightedSlot, setHighlightedSlot] = useState<{ day: string; timeSlot: string } | null>(null);
   const [roomsExpanded, setRoomsExpanded] = useState(false);
   const [highlightedPersons, setHighlightedPersons] = useState<string[]>([]);
+  const [highlightedRoomId, setHighlightedRoomId] = useState<string | null>(null);
   const [toolbarPosition, setToolbarPosition] = useState<'top' | 'right'>(
     persistedSnapshot?.uiPreferences?.toolbarPosition ?? 'top'
   );
   const [detailPanelMode, setDetailPanelMode] = useState<'list' | 'detail'>('detail');
   const [searchQuery, setSearchQuery] = useState('');
+  const [priorityEventIds, setPriorityEventIds] = useState<Set<string>>(new Set());
+  const [selectedPersonName, setSelectedPersonName] = useState<string | undefined>(undefined);
   const [highlightedEventId, setHighlightedEventId] = useState<string | undefined>(undefined);
+  const [eventActionPrompt, setEventActionPrompt] = useState<{ eventId: string } | null>(null);
   const [clickCount, setClickCount] = useState<Map<string, number>>(new Map());
   const clickTimeoutRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
   const [showGridSetupModal, setShowGridSetupModal] = useState(false);
@@ -465,34 +471,223 @@ export function RosterDashboard({
   const [solverRunning, setSolverRunning] = useState(false);
   const [activeSolverRunId, setActiveSolverRunId] = useState<string | null>(null);
   const [cancellingSolverRun, setCancellingSolverRun] = useState(false);
-  const [solverStatusModal, setSolverStatusModal] = useState<{
-    open: boolean;
-    status: 'running' | 'success' | 'error' | 'cancelled';
-    title: string;
-    message: string;
-    adjacencyLabel: string | null;
-    startedAt: number | null;
-    timeoutSeconds: number | null;
-    elapsedSeconds: number;
-    runId: string | null;
-  }>({
-    open: false,
-    status: 'running',
-    title: '',
-    message: '',
-    adjacencyLabel: null,
-    startedAt: null,
-    timeoutSeconds: null,
-    elapsedSeconds: 0,
-    runId: null,
-  });
+  const [solverStreamStatus, setSolverStreamStatus] = useState<'open' | 'error' | 'closed' | null>(null);
+  const [solverRunStartedAt, setSolverRunStartedAt] = useState<number | null>(null);
+  const [solverElapsedSeconds, setSolverElapsedSeconds] = useState(0);
+  const [solverLogOpen, setSolverLogOpen] = useState(false);
+  const [solverLogLines, setSolverLogLines] = useState<string[]>([]);
+  const [solverLogStatus, setSolverLogStatus] = useState<'open' | 'error' | 'closed' | null>(null);
+  const [solverLogRunId, setSolverLogRunId] = useState<string | null>(null);
+  const solverLogSourceRef = useRef<EventSource | null>(null);
+
+  const mapAssignmentsToEvents = useCallback(
+    (sourceEvents: DefenceEvent[], assignments: SolveResult['assignments'] = []) => {
+      const assignmentMap = new Map<string, typeof assignments[number]>();
+      const normalizedIdMap = new Map<string, typeof assignments[number]>();
+      const nameMap = new Map<string, typeof assignments[number]>();
+      const nameCollisions = new Set<string>();
+      const normalizeId = (value: unknown) =>
+        String(value ?? '')
+          .trim()
+          .replace(/^def[-_]/i, '')
+          .replace(/^defence[-_]/i, '')
+          .toLowerCase();
+      const normalizeText = (value: unknown) => String(value ?? '').trim().toLowerCase();
+      assignments.forEach(assignment => {
+        const rawId = String(assignment.entity_id ?? '').trim();
+        if (rawId) {
+          assignmentMap.set(rawId, assignment);
+          const normalized = normalizeId(rawId);
+          if (normalized && !normalizedIdMap.has(normalized)) {
+            normalizedIdMap.set(normalized, assignment);
+          }
+        }
+        const rawName = normalizeText(assignment.entity_name);
+        if (rawName) {
+          if (nameMap.has(rawName)) {
+            nameCollisions.add(rawName);
+          } else {
+            nameMap.set(rawName, assignment);
+          }
+        }
+      });
+      nameCollisions.forEach(name => nameMap.delete(name));
+
+      const consumedAssignments = new Set<string>();
+      return sourceEvents.map(event => {
+        const eventId = String(event.id ?? '').trim();
+        let assignment: typeof assignments[number] | undefined;
+        const exactMatch = assignmentMap.get(eventId);
+        if (exactMatch && !consumedAssignments.has(exactMatch.assignment_id)) {
+          assignment = exactMatch;
+        }
+        if (!assignment) {
+          const normalizedMatch = normalizedIdMap.get(normalizeId(eventId));
+          if (normalizedMatch && !consumedAssignments.has(normalizedMatch.assignment_id)) {
+            assignment = normalizedMatch;
+          }
+        }
+        if (!assignment) {
+          const titleKey = normalizeText(event.title);
+          const studentKey = normalizeText(event.student);
+          const titleCandidate = nameMap.get(titleKey);
+          const studentCandidate = nameMap.get(studentKey);
+          if (titleCandidate && !consumedAssignments.has(titleCandidate.assignment_id)) {
+            assignment = titleCandidate;
+          } else if (studentCandidate && !consumedAssignments.has(studentCandidate.assignment_id)) {
+            assignment = studentCandidate;
+          }
+        }
+        if (!assignment) {
+          return {
+            ...event,
+            day: '',
+            startTime: '',
+            endTime: '',
+            room: undefined,
+          };
+        }
+        consumedAssignments.add(assignment.assignment_id);
+        return {
+          ...event,
+          day: assignment.date,
+          startTime: assignment.start_time,
+          endTime: assignment.end_time,
+          room: assignment.resource_name ?? event.room,
+        };
+      });
+    },
+    []
+  );
+
+  const streamSolutionIdsRef = useRef<Set<string>>(new Set());
+  type StreamedAlternative = {
+    id: string;
+    result: SolveResult;
+    receivedAt: number;
+  };
+  const [streamedSolveAlternatives, setStreamedSolveAlternatives] = useState<StreamedAlternative[]>([]);
+  const [selectedStreamSolutionId, setSelectedStreamSolutionId] = useState<string | null>(null);
+  const [manualStreamPreview, setManualStreamPreview] = useState(false);
+  const [solverPanelOpen, setSolverPanelOpen] = useState(false);
+  const [streamGateOpen, setStreamGateOpen] = useState(false);
+  const [pendingStreamAlternatives, setPendingStreamAlternatives] = useState<StreamedAlternative[]>([]);
+  const [streamSnapshotCount, setStreamSnapshotCount] = useState(0);
+  const [streamGateHintVisible, setStreamGateHintVisible] = useState(false);
+  const selectedStreamSolutionIdRef = useRef<string | null>(null);
+  const streamGateOpenRef = useRef(false);
+  const pendingSolutionsRef = useRef<StreamedAlternative[]>([]);
+  const plannedAdjacencyRef = useRef<Map<number, Set<number>>>(new Map());
+  const selectedStreamedResult = useMemo(() => {
+    if (!selectedStreamSolutionId) return null;
+    return streamedSolveAlternatives.find(entry => entry.id === selectedStreamSolutionId)?.result ?? null;
+  }, [selectedStreamSolutionId, streamedSolveAlternatives]);
+
+  const previewEvents = useMemo(() => {
+    if (!selectedStreamedResult?.assignments) {
+      return null;
+    }
+    if (!solverRunning && !manualStreamPreview) {
+      return null;
+    }
+    return mapAssignmentsToEvents(baseEvents, selectedStreamedResult.assignments);
+  }, [baseEvents, mapAssignmentsToEvents, manualStreamPreview, selectedStreamedResult, solverRunning]);
+
+  const events = useMemo(() => previewEvents ?? baseEvents, [previewEvents, baseEvents]);
   const solverProgressInterval = useRef<NodeJS.Timeout | null>(null);
-  const closeSolverStatusModal = useCallback(() => {
-    setSolverStatusModal(prev => {
-      if (prev.status === 'running') return prev;
-      return { ...prev, open: false };
+
+  const openSolverLogStreamFor = useCallback((runId: string | null) => {
+    if (!runId) {
+      setSolverLogStatus('error');
+      return;
+    }
+    if (solverLogSourceRef.current) {
+      solverLogSourceRef.current.close();
+      solverLogSourceRef.current = null;
+    }
+    setSolverLogStatus(null);
+
+    const streamUrl = `${API_BASE_URL}/api/solver/runs/${runId}/debug`;
+    let source: EventSource | null = null;
+    try {
+      source = new EventSource(streamUrl);
+      solverLogSourceRef.current = source;
+    } catch (err) {
+      logger.error('Failed to open solver log stream', err);
+      setSolverLogStatus('error');
+      return;
+    }
+
+    const handleLogEvent = (event: MessageEvent) => {
+      if (!event.data) return;
+      try {
+        const payload = JSON.parse(event.data) as { line?: string };
+        const line = payload.line;
+        if (line !== undefined && line !== null) {
+          setSolverLogLines(prev => [...prev, line]);
+        }
+      } catch (err) {
+        logger.error('Failed to parse log event', err);
+      }
+    };
+
+    const handleCloseEvent = (event: MessageEvent) => {
+      if (!event.data) return;
+      try {
+        const payload = JSON.parse(event.data) as { status?: string };
+        logger.info('Solver log stream closed', payload);
+      } catch (err) {
+        // ignore
+      }
+      setSolverLogStatus('closed');
+      if (solverLogSourceRef.current) {
+        solverLogSourceRef.current.close();
+        solverLogSourceRef.current = null;
+      }
+    };
+
+    source.addEventListener('log', handleLogEvent);
+    source.addEventListener('close', handleCloseEvent);
+    source.addEventListener('heartbeat', () => {
+      // noop
     });
+    source.addEventListener('meta', () => {
+      // noop
+    });
+    source.onopen = () => {
+      setSolverLogStatus('open');
+    };
+    source.onerror = (err) => {
+      logger.error('Solver log stream error', err);
+      setSolverLogStatus('error');
+    };
   }, []);
+
+  useEffect(() => {
+    if (!solverLogRunId) return;
+    setSolverLogLines([]);
+    setSolverLogStatus(null);
+    if (solverLogSourceRef.current) {
+      solverLogSourceRef.current.close();
+      solverLogSourceRef.current = null;
+    }
+    if (solverLogOpen) {
+      openSolverLogStreamFor(solverLogRunId);
+    }
+  }, [openSolverLogStreamFor, solverLogOpen, solverLogRunId]);
+
+  useEffect(() => {
+    if (!solverLogOpen) {
+      if (solverLogSourceRef.current) {
+        solverLogSourceRef.current.close();
+        solverLogSourceRef.current = null;
+      }
+      return;
+    }
+    if (solverLogRunId) {
+      openSolverLogStreamFor(solverLogRunId);
+    }
+  }, [openSolverLogStreamFor, solverLogOpen, solverLogRunId]);
   // Bottom panel state
   type BottomPanelTab = 'availability' | 'objectives' | 'rooms' | 'conflicts';
   const [bottomPanelTab, setBottomPanelTab] = useState<BottomPanelTab>('availability');
@@ -577,7 +772,7 @@ export function RosterDashboard({
       type: 'adjacency-alignment',
       label: 'Adjacency objective',
       description: '',
-      enabled: false,
+      enabled: true,
       weight: 8,
     },
     {
@@ -617,28 +812,8 @@ export function RosterDashboard({
   const [objectiveHighlights, setObjectiveHighlights] = useState<
     Record<string, { value: number | null; max?: number | null } | undefined>
   >({});
-  const [mustPlanAllDefenses, setMustPlanAllDefenses] = useState(true);
+  const [mustPlanAllDefenses, setMustPlanAllDefenses] = useState(false);
   const [partialScheduleNotice, setPartialScheduleNotice] = useState<{ total: number; unscheduled: number } | null>(null);
-  const [pendingSolverResult, setPendingSolverResult] = useState<{
-    result: SolveResult;
-    mode: 'solve' | 'reoptimize';
-    summary: SolverExecutionSummary;
-  } | null>(null);
-  const adjacencyObjectiveEnabled = useMemo(
-    () => globalObjectives.some(obj => obj.id === 'adjacency-objective' && obj.enabled),
-    [globalObjectives]
-  );
-  const solverStatusPrimaryText =
-    solverStatusModal.message ||
-    (solverStatusModal.status === 'running' ? '' : '');
-  const pendingAdjacencyInfo = pendingSolverResult?.result.objectives?.adjacency;
-  const pendingAdjacencyLabel =
-    pendingAdjacencyInfo && (pendingAdjacencyInfo.score ?? pendingAdjacencyInfo.possible) !== undefined
-      ? `Adjacency ${pendingAdjacencyInfo.score ?? 0}${
-          pendingAdjacencyInfo.possible !== undefined ? ` / ${pendingAdjacencyInfo.possible}` : ''
-        }`
-      : null;
-
   // Ref for schedule grid rows to enable scrolling to specific slots
   const timeSlotRefs = useRef<Map<string, HTMLTableRowElement>>(new Map());
   const scheduleGridRef = useRef<HTMLDivElement | null>(null);
@@ -690,6 +865,8 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     propDays.length > 0 && propTimeSlots.length > 0 ? 'props' : 'timehorizon'
   );
   const [horizonMergeEnabled, setHorizonMergeEnabled] = useState(false);
+
+  // New dashboard state for 3-column layout
 
   const [filters, setFilters] = useState<FilterState>(
     persistedSnapshot?.filters || buildDefaultFilterState()
@@ -795,51 +972,163 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     }
   }, [resolvedRoomOptions, schedulingContext.roomOptions, setSchedulingContext]);
 
-  const columnHighlights = useMemo(() => {
-    if (!selectedEvent || highlightedPersons.length === 0) return {};
+  type ScheduleColumnHighlight = 'primary' | 'match';
+  type AvailabilityColumnHighlight = ScheduleColumnHighlight | 'near-match';
 
-    const targetEvent = events.find(e => e.id === selectedEvent);
-    const persons = availabilities.filter(p => highlightedPersons.includes(p.id));
-    if (persons.length === 0) {
-      if (targetEvent?.day && targetEvent?.startTime) {
-        return { [targetEvent.day]: { [targetEvent.startTime]: 'primary' as const } };
-      }
-      return {};
+  const resolveHighlightedRoomId = useCallback((room: unknown) => {
+    const label = resolveRoomName(room).trim();
+    if (!label) return null;
+    const normalizedLabel = label.toLowerCase();
+    const normalizedSlug = slugifyRoomId(label);
+    const matchedRoom = roomAvailabilityRooms.find(entry => {
+      const entryId = entry.id.toLowerCase();
+      const entryLabel = entry.label.toLowerCase();
+      return (
+        entryId === normalizedLabel ||
+        entryLabel === normalizedLabel ||
+        slugifyRoomId(entryId) === normalizedSlug ||
+        slugifyRoomId(entryLabel) === normalizedSlug
+      );
+    });
+    return matchedRoom?.id ?? null;
+  }, [roomAvailabilityRooms]);
+
+  const highlightInfo = useMemo(() => {
+    const scheduleHighlights: Record<string, Record<string, ScheduleColumnHighlight>> = {};
+    const availabilityHighlights: Record<string, Record<string, AvailabilityColumnHighlight>> = {};
+    const nearMatchMissing: Record<string, Record<string, string[]>> = {};
+
+    if (highlightedPersons.length === 0) {
+      return { scheduleHighlights, availabilityHighlights, nearMatchMissing };
     }
 
-    const highlightMap: Record<string, Record<string, 'primary' | 'match'>> = {};
+    const targetEvent = selectedEvent ? events.find(e => e.id === selectedEvent) : undefined;
+    const persons = availabilities.filter(p => highlightedPersons.includes(p.id));
+    const allowScheduleHighlights = Boolean(selectedEvent);
 
     if (targetEvent?.day && targetEvent?.startTime) {
-      highlightMap[targetEvent.day] = { [targetEvent.startTime]: 'primary' };
+      if (allowScheduleHighlights) {
+        scheduleHighlights[targetEvent.day] = { [targetEvent.startTime]: 'primary' };
+      }
+      availabilityHighlights[targetEvent.day] = { [targetEvent.startTime]: 'primary' };
     }
+
+    if (persons.length === 0) {
+      return { scheduleHighlights, availabilityHighlights, nearMatchMissing };
+    }
+
+    const highlightedNameSet = new Set(
+      persons.map(person => normalizeName(person.name)).filter(Boolean)
+    );
+    const bookedSlots = new Map<string, Set<string>>();
+
+    events.forEach(event => {
+      if (!event.day || !event.startTime) return;
+      const slotKey = `${event.day}_${event.startTime}`;
+      const participants: string[] = [];
+      expandParticipantNames(event.student).forEach(name => participants.push(name));
+      expandParticipantNames(event.supervisor).forEach(name => participants.push(name));
+      expandParticipantNames(event.coSupervisor).forEach(name => participants.push(name));
+      if (event.assessors) participants.push(...event.assessors.filter(Boolean));
+      if (event.mentors) participants.push(...event.mentors.filter(Boolean));
+
+      participants.forEach(name => {
+        const normalized = normalizeName(name);
+        if (!normalized || !highlightedNameSet.has(normalized)) return;
+        if (!bookedSlots.has(normalized)) {
+          bookedSlots.set(normalized, new Set());
+        }
+        bookedSlots.get(normalized)!.add(slotKey);
+      });
+    });
 
     const getStatus = (person: PersonAvailability, day: string, slot: string): AvailabilityStatus => {
       const slotValue = person.availability?.[day]?.[slot];
-      if (!slotValue) return 'available';
-      const rawStatus = typeof slotValue === 'string' ? slotValue : slotValue.status;
-      return rawStatus === 'empty' ? 'available' : rawStatus;
+      const rawStatus = typeof slotValue === 'string' ? slotValue : slotValue?.status;
+      const normalizedStatus = rawStatus === 'empty' ? 'unavailable' : rawStatus || 'unavailable';
+      if (normalizedStatus !== 'available') return 'unavailable';
+      const personKey = normalizeName(person.name);
+      return bookedSlots.get(personKey)?.has(`${day}_${slot}`) ? 'unavailable' : 'available';
     };
+
+    const matchSlots: Array<{ day: string; slot: string }> = [];
 
     days.forEach(day => {
       timeSlots.forEach(slot => {
         const allAvailable = persons.every(person => getStatus(person, day, slot) === 'available');
         if (allAvailable) {
-          if (!highlightMap[day]) {
-            highlightMap[day] = {};
-          }
-          if (highlightMap[day][slot] !== 'primary') {
-            highlightMap[day][slot] = 'match';
-          }
+          matchSlots.push({ day, slot });
         }
       });
     });
 
-    return highlightMap;
+    if (matchSlots.length > 0) {
+      matchSlots.forEach(({ day, slot }) => {
+        if (allowScheduleHighlights) {
+          if (!scheduleHighlights[day]) {
+            scheduleHighlights[day] = {};
+          }
+          if (scheduleHighlights[day][slot] !== 'primary') {
+            scheduleHighlights[day][slot] = 'match';
+          }
+        }
+        if (!availabilityHighlights[day]) {
+          availabilityHighlights[day] = {};
+        }
+        if (availabilityHighlights[day][slot] !== 'primary') {
+          availabilityHighlights[day][slot] = 'match';
+        }
+      });
+      return { scheduleHighlights, availabilityHighlights, nearMatchMissing };
+    }
+
+    const candidates: Array<{
+      day: string;
+      slot: string;
+      missingIds: string[];
+      missingCount: number;
+      dayIndex: number;
+      slotIndex: number;
+    }> = [];
+
+    days.forEach((day, dayIndex) => {
+      timeSlots.forEach((slot, slotIndex) => {
+        const missingIds = persons
+          .filter(person => getStatus(person, day, slot) !== 'available')
+          .map(person => person.id);
+        const missingCount = missingIds.length;
+        if (missingCount >= 1 && missingCount <= 2) {
+          candidates.push({ day, slot, missingIds, missingCount, dayIndex, slotIndex });
+        }
+      });
+    });
+
+    candidates
+      .sort((a, b) => a.missingCount - b.missingCount || a.dayIndex - b.dayIndex || a.slotIndex - b.slotIndex)
+      .slice(0, 3)
+      .forEach(({ day, slot, missingIds }) => {
+        if (!availabilityHighlights[day]) {
+          availabilityHighlights[day] = {};
+        }
+        if (!availabilityHighlights[day][slot]) {
+          availabilityHighlights[day][slot] = 'near-match';
+        }
+        if (!nearMatchMissing[day]) {
+          nearMatchMissing[day] = {};
+        }
+        nearMatchMissing[day][slot] = missingIds;
+      });
+
+    return { scheduleHighlights, availabilityHighlights, nearMatchMissing };
   }, [selectedEvent, highlightedPersons, events, availabilities, days, timeSlots]);
+
+  const scheduleColumnHighlights = highlightInfo.scheduleHighlights;
+  const availabilityColumnHighlights = highlightInfo.availabilityHighlights;
+  const availabilityNearMatchMissing = highlightInfo.nearMatchMissing;
   const hasColumnHighlighting = useMemo(
     () =>
-      Object.values(columnHighlights).some(dayMap => dayMap && Object.keys(dayMap).length > 0),
-    [columnHighlights]
+      Object.values(scheduleColumnHighlights).some(dayMap => dayMap && Object.keys(dayMap).length > 0),
+    [scheduleColumnHighlights]
   );
   const availabilityContextActive = bottomPanelTab === 'availability' && availabilityExpanded;
   const availabilityPanelHighlights = useMemo(
@@ -847,7 +1136,7 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     [availabilityContextActive, highlightedPersons]
   );
   const overlayActive =
-    datasetModalOpen || snapshotModalOpen || solverStatusModal.open;
+    datasetModalOpen || snapshotModalOpen;
   const scheduledEventsCount = useMemo(
     () => events.filter(event => Boolean(event.day && event.startTime)).length,
     [events]
@@ -1189,32 +1478,13 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
         });
         return;
       }
+      if (result.status?.toLowerCase() === 'invalid') {
+        const numConflicts = result.num_conflicts || 0;
+        logger.warn('Solution has constraint violations', { numConflicts, conflicts: result.conflicts });
+      }
 
       const assignments = result.assignments || [];
-      const assignmentMap = new Map<string, typeof assignments[number]>();
-      assignments.forEach(assignment => {
-        assignmentMap.set(String(assignment.entity_id), assignment);
-      });
-
-      const updatedEvents = baseState.events.map(event => {
-        const assignment = assignmentMap.get(event.id);
-        if (!assignment) {
-          return {
-            ...event,
-            day: '',
-            startTime: '',
-            endTime: '',
-            room: undefined,
-          };
-        }
-        return {
-          ...event,
-          day: assignment.date,
-          startTime: assignment.start_time,
-          endTime: assignment.end_time,
-          room: assignment.resource_name ?? event.room,
-        };
-      });
+      const updatedEvents = mapAssignmentsToEvents(baseState.events, assignments);
 
       const adjacencyInfo = result.objectives?.adjacency;
       const solverMetadata: SolverRunInfo = {
@@ -1249,7 +1519,7 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
       push(action, nextState);
       persistNow();
     },
-    [persistNow, push, setUnsatNotice]
+    [mapAssignmentsToEvents, persistNow, push, setUnsatNotice]
   );
 
   const summarizeSolveResult = useCallback(
@@ -1275,6 +1545,116 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     },
     []
   );
+
+  const liveSolveSummary = useMemo(() => {
+    if (!selectedStreamedResult) return null;
+    return summarizeSolveResult(selectedStreamedResult);
+  }, [selectedStreamedResult, summarizeSolveResult]);
+
+  const liveScheduleProgress = useMemo(() => {
+    if (!liveSolveSummary || liveSolveSummary.total === 0) return null;
+    return Math.min(liveSolveSummary.scheduled / liveSolveSummary.total, 1);
+  }, [liveSolveSummary]);
+  const handleSelectStreamedAlternative = useCallback((entry: StreamedAlternative) => {
+    selectedStreamSolutionIdRef.current = entry.id;
+    setSelectedStreamSolutionId(entry.id);
+    setManualStreamPreview(true);
+  }, []);
+  const clampStreamedAlternatives = useCallback((items: StreamedAlternative[]) => {
+    const maxItems = 12;
+    if (items.length <= maxItems) return items;
+    const selectedId = selectedStreamSolutionIdRef.current;
+    if (!selectedId) return items.slice(-maxItems);
+    const selected = items.find(item => item.id === selectedId);
+    const trimmed = items.filter(item => item.id !== selectedId).slice(-maxItems + 1);
+    return selected ? [selected, ...trimmed] : items.slice(-maxItems);
+  }, []);
+  const openStreamGateWithPending = useCallback(() => {
+    const pending = pendingSolutionsRef.current;
+    if (pending.length === 0) {
+      return;
+    }
+    streamGateOpenRef.current = true;
+    setStreamGateOpen(true);
+    setStreamedSolveAlternatives(pending);
+    setSolverPanelOpen(true);
+    if (!selectedStreamSolutionIdRef.current) {
+      selectedStreamSolutionIdRef.current = pending[0].id;
+      setSelectedStreamSolutionId(pending[0].id);
+    }
+  }, []);
+  const getPlannedCount = useCallback((result: SolveResult) => {
+    const summary = (result.summary || {}) as Record<string, unknown>;
+    if (typeof summary.scheduled === 'number') return summary.scheduled;
+    if (typeof result.planned_count === 'number') return result.planned_count;
+    if (result.assignments) return result.assignments.length;
+    return 0;
+  }, []);
+  const getAdjacencyScore = useCallback((result: SolveResult) => {
+    const adjacency = result.objectives?.adjacency;
+    return typeof adjacency?.score === 'number' ? adjacency.score : null;
+  }, []);
+  const streamedSolutionsSummary = useMemo(() => {
+    if (streamedSolveAlternatives.length === 0) return null;
+    const latest = streamedSolveAlternatives[streamedSolveAlternatives.length - 1];
+    const latestSummary = summarizeSolveResult(latest.result);
+    const latestAdjacency = latest.result.objectives?.adjacency;
+    let bestSummary = latestSummary;
+    let bestAdjacency = latestAdjacency;
+    for (const entry of streamedSolveAlternatives) {
+      const summary = summarizeSolveResult(entry.result);
+      const adjacency = entry.result.objectives?.adjacency;
+      const bestScheduled = bestSummary.scheduled;
+      const currentScheduled = summary.scheduled;
+      const bestAdjScore = bestAdjacency?.score ?? -1;
+      const currentAdjScore = adjacency?.score ?? -1;
+      if (
+        currentScheduled > bestScheduled ||
+        (currentScheduled === bestScheduled && currentAdjScore > bestAdjScore)
+      ) {
+        bestSummary = summary;
+        bestAdjacency = adjacency;
+      }
+    }
+    return {
+      count: streamedSolveAlternatives.length,
+      latestSummary,
+      latestAdjacency,
+      latestTimeMs: latest.result.solve_time_ms,
+      bestSummary,
+      bestAdjacency,
+    };
+  }, [streamedSolveAlternatives, summarizeSolveResult]);
+
+  const bestStreamedSolutionId = useMemo(() => {
+    if (streamedSolveAlternatives.length === 0) return null;
+    let best = streamedSolveAlternatives[0];
+    for (const entry of streamedSolveAlternatives) {
+      const entryAdj = getAdjacencyScore(entry.result);
+      const bestAdj = getAdjacencyScore(best.result);
+      if ((entryAdj ?? -1) > (bestAdj ?? -1)) {
+        best = entry;
+        continue;
+      }
+      if ((entryAdj ?? -1) < (bestAdj ?? -1)) {
+        continue;
+      }
+      const entrySummary = summarizeSolveResult(entry.result);
+      const bestSummary = summarizeSolveResult(best.result);
+      if (entrySummary.scheduled > bestSummary.scheduled) {
+        best = entry;
+      }
+    }
+    return best.id;
+  }, [getAdjacencyScore, streamedSolveAlternatives, summarizeSolveResult]);
+
+  useEffect(() => {
+    if (!bestStreamedSolutionId) return;
+    if (selectedStreamSolutionIdRef.current !== bestStreamedSolutionId) {
+      selectedStreamSolutionIdRef.current = bestStreamedSolutionId;
+      setSelectedStreamSolutionId(bestStreamedSolutionId);
+    }
+  }, [bestStreamedSolutionId]);
 
   const handleSolverMetrics = useCallback(
     (result: SolveResult, summary: SolverExecutionSummary) => {
@@ -1302,81 +1682,164 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
   );
 
   const runSolver = useCallback(
-    async (options?: { mode?: 'solve' | 'reoptimize'; timeout?: number; label?: string }) => {
+    async (options?: { mode?: 'solve' | 'reoptimize'; timeout?: number; label?: string; mustScheduleAll?: boolean }) => {
       if (!currentDatasetId) {
         showToast.error('No dataset selected');
         return;
       }
       if (solverRunning) return;
-      setPendingSolverResult(null);
+      setStreamedSolveAlternatives([]);
+      setSolverStreamStatus(null);
       setActiveSolverRunId(null);
       setCancellingSolverRun(false);
-      const mode = options?.mode || 'solve';
-      const baseTitle =
-        mode === 'reoptimize' ? 'Re-optimizing schedule' : 'Searching for a feasible timetable…';
-      const description =
-        options?.label ||
-        (mode === 'reoptimize'
-          ? ''
-          : '');
+      streamSolutionIdsRef.current = new Set();
+      selectedStreamSolutionIdRef.current = null;
+      streamGateOpenRef.current = false;
+      pendingSolutionsRef.current = [];
+      plannedAdjacencyRef.current = new Map();
+      setSelectedStreamSolutionId(null);
+      setManualStreamPreview(false);
+      setSolverPanelOpen(true);
+      setStreamGateOpen(false);
+      setPendingStreamAlternatives([]);
+      setStreamSnapshotCount(0);
+      setStreamGateHintVisible(false);
       const runStartedAt = Date.now();
-      const timeoutSeconds = options?.timeout ?? DEFAULT_SOLVER_TIMEOUT_SECONDS;
-      setSolverStatusModal({
-        open: true,
-        status: 'running',
-        title: baseTitle,
-        message: description,
-        adjacencyLabel: null,
-        startedAt: runStartedAt,
-        timeoutSeconds,
-        elapsedSeconds: 0,
-        runId: null,
-      });
+      const mode = options?.mode || 'solve';
+      const mustPlanAll = options?.mustScheduleAll ?? mustPlanAllDefenses;
+      setSolverRunStartedAt(runStartedAt);
       setSolverRunning(true);
       try {
-        await persistNow();
-        const schedule = await schedulingAPI.loadData(currentDatasetId);
+        void persistNow();
+        const schedule = {
+          dataset_id: currentDatasetId,
+          entities: [],
+          resources: [],
+          timeslots: [],
+          participants: [],
+        };
+        const adjacencyEnabled =
+          globalObjectives.find(objective => objective.id === 'adjacency-objective')?.enabled ?? false;
         const result = await schedulingAPI.solve(schedule, {
           timeout: options?.timeout,
           solver: 'ortools',
-          adjacencyObjective: adjacencyObjectiveEnabled,
-          mustPlanAllDefenses,
+          adjacencyObjective: adjacencyEnabled,
+          mustPlanAllDefenses: mustPlanAll,
+          stream: true,
         }, {
           onRunId: runId => {
             setActiveSolverRunId(runId);
-            setSolverStatusModal(prev => ({ ...prev, runId }));
+            setSolverLogRunId(runId);
+            if (solverLogOpen) {
+              openSolverLogStreamFor(runId);
+            }
+          },
+          onSnapshot: snapshot => {
+            if (!snapshot.assignments || snapshot.assignments.length === 0) {
+              return;
+            }
+            // Skip invalid solutions (constraint violations)
+            if (snapshot.status?.toLowerCase() === 'invalid') {
+              logger.warn('Skipping invalid streaming solution', {
+                solution_index: snapshot.solution_index,
+                num_conflicts: snapshot.num_conflicts,
+              });
+              return;
+            }
+            const now = Date.now();
+            const solutionIndex =
+              typeof snapshot.solution_index === 'number' ? snapshot.solution_index : null;
+            const solutionId =
+              solutionIndex !== null
+                ? `sol-${solutionIndex}`
+                : `sol-${snapshot.solve_time_ms}-${snapshot.assignments.length}`;
+            if (streamSolutionIdsRef.current.has(solutionId)) {
+              return;
+            }
+            streamSolutionIdsRef.current.add(solutionId);
+            setStreamSnapshotCount(prev => prev + 1);
+            const entry = { id: solutionId, result: snapshot, receivedAt: now };
+            const plannedCount = getPlannedCount(snapshot);
+            const adjacencyScore = getAdjacencyScore(snapshot);
+            let gateTriggered = false;
+            if (adjacencyScore !== null) {
+              const scoreSet = plannedAdjacencyRef.current.get(plannedCount) ?? new Set<number>();
+              if (scoreSet.size > 0 && !scoreSet.has(adjacencyScore)) {
+                gateTriggered = true;
+              }
+              scoreSet.add(adjacencyScore);
+              plannedAdjacencyRef.current.set(plannedCount, scoreSet);
+            }
+            if (!streamGateOpenRef.current) {
+              const nextPending = clampStreamedAlternatives([...pendingSolutionsRef.current, entry]);
+              pendingSolutionsRef.current = nextPending;
+              setPendingStreamAlternatives(nextPending);
+              if (nextPending.length >= 4 && !streamGateHintVisible) {
+                setStreamGateHintVisible(true);
+              }
+              if (gateTriggered) {
+                openStreamGateWithPending();
+              }
+              if (!streamGateOpenRef.current && nextPending.length >= 2) {
+                openStreamGateWithPending();
+              }
+              return;
+            }
+            setStreamedSolveAlternatives(prev => clampStreamedAlternatives([...prev, entry]));
+            setSolverPanelOpen(true);
+          },
+          onStreamStatus: status => {
+            setSolverStreamStatus(status);
           },
         });
         const summaryStats = summarizeSolveResult(result);
-        const durationSeconds =
-          typeof result.solve_time_ms === 'number'
-            ? result.solve_time_ms / 1000
-            : (Date.now() - runStartedAt) / 1000;
-        const summaryLabel = `${summaryStats.scheduled}/${summaryStats.total} defenses scheduled`;
-        const adjacencyInfo = result.objectives?.adjacency;
-        const adjacencyLabel =
-          adjacencyInfo && (adjacencyInfo.score ?? adjacencyInfo.possible) !== undefined
-            ? `Adjacency ${adjacencyInfo.score ?? 0}${
-                adjacencyInfo.possible !== undefined ? `/${adjacencyInfo.possible}` : ''
-              }`
-            : null;
-        const statusLine = [result.status, summaryLabel, `${durationSeconds.toFixed(1)}s`]
-          .filter(Boolean)
-          .join(' · ');
-        setSolverStatusModal({
-          open: true,
-          status: 'success',
-          title: 'Schedule complete',
-          message: statusLine,
-          adjacencyLabel,
-          startedAt: null,
-          timeoutSeconds: null,
-          elapsedSeconds: durationSeconds,
-          runId: null,
-        });
+        const finalSolutionIndex =
+          typeof result.solution_index === 'number' ? result.solution_index : null;
+        const finalSolutionId =
+          finalSolutionIndex !== null
+            ? `sol-${finalSolutionIndex}`
+            : `sol-final-${result.solve_time_ms}-${result.assignments?.length ?? 0}`;
+        if (!streamSolutionIdsRef.current.has(finalSolutionId)) {
+          streamSolutionIdsRef.current.add(finalSolutionId);
+          const entry = { id: finalSolutionId, result, receivedAt: Date.now() };
+          setStreamSnapshotCount(prev => prev + 1);
+          const plannedCount = getPlannedCount(result);
+          const adjacencyScore = getAdjacencyScore(result);
+          let gateTriggered = false;
+          if (adjacencyScore !== null) {
+            const scoreSet = plannedAdjacencyRef.current.get(plannedCount) ?? new Set<number>();
+            if (scoreSet.size > 0 && !scoreSet.has(adjacencyScore)) {
+              gateTriggered = true;
+            }
+            scoreSet.add(adjacencyScore);
+            plannedAdjacencyRef.current.set(plannedCount, scoreSet);
+          }
+          if (!streamGateOpenRef.current) {
+            const nextPending = clampStreamedAlternatives([...pendingSolutionsRef.current, entry]);
+            pendingSolutionsRef.current = nextPending;
+            setPendingStreamAlternatives(nextPending);
+            if (nextPending.length >= 4 && !streamGateHintVisible) {
+              setStreamGateHintVisible(true);
+            }
+            if (gateTriggered) {
+              openStreamGateWithPending();
+            }
+            if (!streamGateOpenRef.current && nextPending.length >= 2) {
+              openStreamGateWithPending();
+            }
+          } else {
+            setStreamedSolveAlternatives(prev => clampStreamedAlternatives([...prev, entry]));
+            setSolverPanelOpen(true);
+          }
+        }
+        if (streamGateOpenRef.current && !selectedStreamSolutionIdRef.current) {
+          selectedStreamSolutionIdRef.current = finalSolutionId;
+          setSelectedStreamSolutionId(finalSolutionId);
+        }
         if (summaryStats.unscheduled > 0) {
           if (summaryStats.scheduled > 0) {
-            setPendingSolverResult({ result, mode, summary: summaryStats });
+            applySolveResult(result, mode);
+            handleSolverMetrics(result, summaryStats);
           } else {
             setUnsatNotice({
               open: true,
@@ -1398,65 +1861,56 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
         } else {
           logger.info('Solver run cancelled by user');
         }
-        setSolverStatusModal({
-          open: true,
-          status: cancelled ? 'cancelled' : 'error',
-          title: cancelled ? 'Solver cancelled' : 'Solver failed',
-          message: cancelled ? 'The solver was stopped before completion.' : message,
-          adjacencyLabel: null,
-          startedAt: null,
-          timeoutSeconds: null,
-          elapsedSeconds: (Date.now() - runStartedAt) / 1000,
-          runId: null,
-        });
         if (cancelled) {
           showToast.info('Solver run cancelled');
         } else {
           showToast.error('Failed to run solver. Check backend logs.');
         }
       } finally {
+        if (!streamGateOpenRef.current && pendingSolutionsRef.current.length > 0) {
+          openStreamGateWithPending();
+        }
         setSolverRunning(false);
         setActiveSolverRunId(null);
         setCancellingSolverRun(false);
+        setSolverRunStartedAt(null);
       }
     },
     [
-      adjacencyObjectiveEnabled,
       applySolveResult,
+      clampStreamedAlternatives,
       currentDatasetId,
+      getAdjacencyScore,
+      getPlannedCount,
       handleSolverMetrics,
       mustPlanAllDefenses,
+      openStreamGateWithPending,
       persistNow,
       solverRunning,
       summarizeSolveResult,
+      globalObjectives,
     ]
   );
 
-  const handleApplyPartialResult = useCallback(() => {
-    if (!pendingSolverResult) return;
-    applySolveResult(pendingSolverResult.result, pendingSolverResult.mode);
-    handleSolverMetrics(pendingSolverResult.result, pendingSolverResult.summary);
-    setPendingSolverResult(null);
-  }, [applySolveResult, handleSolverMetrics, pendingSolverResult]);
-
-  const handleDiscardPartialResult = useCallback(() => {
-    setPendingSolverResult(null);
-    showToast.info('Kept previous schedule');
-  }, []);
 
   const handleCancelSolverRun = useCallback(async () => {
-    if (!activeSolverRunId || cancellingSolverRun) {
+    if (cancellingSolverRun) {
+      return;
+    }
+    const runId = activeSolverRunId || solverLogRunId;
+    if (!runId) {
+      showToast.error('No active solver run to cancel.');
       return;
     }
     try {
       setCancellingSolverRun(true);
-      await schedulingAPI.cancelSolverRun(activeSolverRunId);
+      await schedulingAPI.cancelSolverRun(runId);
     } catch (err) {
       logger.error('Failed to cancel solver run', err);
       setCancellingSolverRun(false);
       showToast.error('Unable to cancel solver run. Please try again.');
     }
-  }, [activeSolverRunId, cancellingSolverRun]);
+  }, [activeSolverRunId, cancellingSolverRun, solverLogRunId]);
 
   // Solver preset configurations (reserved for future quick-solve feature)
   // const quickSolvePresets: Record<'fast' | 'optimal' | 'enumerate', { timeout: number; label: string }> = {
@@ -1507,6 +1961,20 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     });
     return cache;
   }, [events, collectEventParticipants]);
+
+  // Helper function to extract participants with caching
+  const getEventParticipants = useCallback(
+    (event: DefenceEvent): string[] => {
+      return eventParticipantCache.get(event.id)?.names || collectEventParticipants(event);
+    },
+    [eventParticipantCache, collectEventParticipants]
+  );
+
+  const eventIncludesParticipant = (event: DefenceEvent, participantName: string): boolean => {
+    const normalized = normalizeName(participantName);
+    if (!normalized) return false;
+    return getEventParticipants(event).some(name => normalizeName(name) === normalized);
+  };
 
   // Derive scheduled slots per participant for availability visualization
   const scheduledBookings = useMemo(() => {
@@ -1864,6 +2332,7 @@ const prevRosterSyncRef = useRef<{
   ];
 
   const handleEventClick = useCallback((eventId: string, multiSelect?: boolean) => {
+    const clickedEvent = events.find(e => e.id === eventId);
     if (multiSelect) {
       setSelectedEvents(prev => {
         const newSet = new Set(prev);
@@ -1874,6 +2343,21 @@ const prevRosterSyncRef = useRef<{
         }
         return newSet;
       });
+      if (clickedEvent) {
+        setHighlightedEventId(eventId);
+        const participantNames = new Set(getEventParticipants(clickedEvent).map(name => normalizeName(name)));
+        const participantIds = availabilities
+          .filter(p => participantNames.has(normalizeName(p.name)))
+          .map(p => p.id);
+        setHighlightedPersons(participantIds);
+        setTimeout(() => setHighlightedEventId(undefined), 3000);
+      }
+      if (clickedEvent?.day && clickedEvent.startTime) {
+        setHighlightedSlot({ day: clickedEvent.day, timeSlot: clickedEvent.startTime });
+      } else {
+        setHighlightedSlot(null);
+      }
+      setHighlightedRoomId(resolveHighlightedRoomId(clickedEvent?.room));
     } else {
       // Select the event and highlight in sidebar
       setSelectedEvent(prev => {
@@ -1881,19 +2365,26 @@ const prevRosterSyncRef = useRef<{
         if (prev === eventId) {
           setHighlightedEventId(undefined);
           setHighlightedPersons([]);
+          setHighlightedSlot(null);
+          setHighlightedRoomId(null);
           return null;
         } else {
-          const event = events.find(e => e.id === eventId);
-          if (event) {
+          if (clickedEvent) {
             // Highlight in sidebar
             setHighlightedEventId(eventId);
 
             // Highlight all participants in availability
-            const participantNames = getEventParticipants(event);
+            const participantNames = new Set(getEventParticipants(clickedEvent).map(name => normalizeName(name)));
             const participantIds = availabilities
-              .filter(p => participantNames.includes(p.name))
+              .filter(p => participantNames.has(normalizeName(p.name)))
               .map(p => p.id);
             setHighlightedPersons(participantIds);
+            if (clickedEvent.day && clickedEvent.startTime) {
+              setHighlightedSlot({ day: clickedEvent.day, timeSlot: clickedEvent.startTime });
+            } else {
+              setHighlightedSlot(null);
+            }
+            setHighlightedRoomId(resolveHighlightedRoomId(clickedEvent.room));
 
             // Clear highlight after 3 seconds
             setTimeout(() => setHighlightedEventId(undefined), 3000);
@@ -1903,7 +2394,7 @@ const prevRosterSyncRef = useRef<{
       });
     }
     onEventClick?.(eventId);
-  }, [events, onEventClick]);
+  }, [events, onEventClick, resolveHighlightedRoomId, availabilities, getEventParticipants]);
 
   const handleEventDoubleClick = useCallback((eventId: string) => {
     const event = events.find(e => e.id === eventId);
@@ -1931,6 +2422,11 @@ const prevRosterSyncRef = useRef<{
       setDetailPanelMode('detail');
       setDetailEditable(true);
       setDetailPanelOpen(true);
+      setBottomPanelTab('availability');
+      setAvailabilityExpanded(true);
+      setObjectivesExpanded(false);
+      setRoomsExpanded(false);
+      setConflictsExpanded(false);
 
       // Set highlighted persons and slot for availability panel scrolling
       const participantNames = new Set(getEventParticipants(event).map(name => normalizeName(name)));
@@ -1945,44 +2441,52 @@ const prevRosterSyncRef = useRef<{
       } else {
         setHighlightedSlot(null);
       }
+      setHighlightedRoomId(resolveHighlightedRoomId(event.room));
     }
-  }, [events, availabilities]);
+  }, [events, availabilities, resolveHighlightedRoomId]);
 
   const handleParticipantClick = (personId: string) => {
     const person = availabilities.find(p => p.id === personId);
     if (person) {
+      const relatedEvents = events.filter(e => eventIncludesParticipant(e, person.name));
+
       // Highlight all defenses that include this participant
-      const relatedEventIds = events
-        .filter(e => eventIncludesParticipant(e, person.name))
-        .map(e => e.id);
+      const relatedEventIds = relatedEvents.map(e => e.id);
 
       setSelectedEvents(new Set(relatedEventIds));
       setSelectedEvent(relatedEventIds[0] || null);
       setHighlightedEventId(relatedEventIds[0]);
+      setPriorityEventIds(new Set(relatedEventIds));
+      setSelectedPersonName(person.name);
+      setSearchQuery('');
 
-      setDetailContent({
-        type: 'participant',
-        id: person.id,
-        name: person.name,
-        role: person.role,
-      });
+      setDetailContent(null);
+      setDetailPanelMode('list');
+      setDetailEditable(false);
       setDetailPanelOpen(true);
     }
   };
 
-  // Helper function to extract participants with caching
-  const getEventParticipants = useCallback(
-    (event: DefenceEvent): string[] => {
-      return eventParticipantCache.get(event.id)?.names || collectEventParticipants(event);
-    },
-    [eventParticipantCache, collectEventParticipants]
-  );
-
-  const eventIncludesParticipant = (event: DefenceEvent, participantName: string): boolean => {
+  const handleParticipantNameClick = useCallback((participantName: string) => {
     const normalized = normalizeName(participantName);
-    if (!normalized) return false;
-    return getEventParticipants(event).some(name => normalizeName(name) === normalized);
-  };
+    if (!normalized) return;
+    const person = availabilities.find(p => normalizeName(p.name) === normalized);
+    const relatedEvents = events.filter(event =>
+      getEventParticipants(event).some(name => normalizeName(name) === normalized)
+    );
+    if (person && relatedEvents.length === 0) return;
+    const relatedEventIds = relatedEvents.map(e => e.id);
+    setSelectedEvents(new Set(relatedEventIds));
+    setSelectedEvent(relatedEventIds[0] || null);
+    setHighlightedEventId(relatedEventIds[0]);
+    setPriorityEventIds(new Set(relatedEventIds));
+    setSelectedPersonName(person?.name || participantName);
+    setSearchQuery('');
+    setDetailContent(null);
+    setDetailPanelMode('list');
+    setDetailEditable(false);
+    setDetailPanelOpen(true);
+  }, [availabilities, events, getEventParticipants]);
 
   interface BackendConflict {
     type: string;
@@ -2251,6 +2755,18 @@ const prevRosterSyncRef = useRef<{
       ? Array.from(selectedEventsRef.current)
       : [eventId];
 
+    // Pre-validation: check for room-timeslot collision before optimistic update
+    const collision = checkRoomTimeslotCollision(
+      currentStateRef.current.events,
+      day,
+      timeSlot,
+      eventsToMove
+    );
+    if (collision.hasCollision) {
+      showToast.error(`Room ${collision.collidingRoom} already occupied at ${day} ${timeSlot}`);
+      return;
+    }
+
     const updatedEvents = currentStateRef.current.events.map(e => {
       if (eventsToMove.includes(e.id)) {
         return {
@@ -2288,10 +2804,11 @@ const prevRosterSyncRef = useRef<{
 
     // Validate with backend in background
     try {
-      const response = await fetch(`${API_BASE_URL}/api/schedule/validate`, {
+      const assignments = eventsToAssignments(updatedEvents);
+      const response = await fetch(`${API_BASE_URL}/api/schedule/conflicts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ events: updatedEvents }),
+        body: JSON.stringify({ solution: { assignments } }),
         signal: controller.signal,
       });
 
@@ -2373,6 +2890,23 @@ const prevRosterSyncRef = useRef<{
     // If there are multiple events in this slot, bring the one with this person to the front
     const cellKey = getCellKey(day, timeSlot);
     const cellEvents = getEventsForCell(day, timeSlot);
+
+    // Find and select the event with this person
+    const targetEvent = cellEvents.find(event => {
+      const person = availabilities.find(p => p.id === personId);
+      if (!person) return false;
+      return eventIncludesParticipant(event, person.name);
+    });
+
+    if (targetEvent) {
+      setSelectedEvent(targetEvent.id);
+      // Highlight all participants in availability
+      const participantNames = new Set(getEventParticipants(targetEvent).map(name => normalizeName(name)));
+      const participantIds = availabilities
+        .filter(p => participantNames.has(normalizeName(p.name)))
+        .map(p => p.id);
+      setHighlightedPersons(participantIds);
+    }
 
     if (cellEvents.length > 1) {
       // Find event with this person
@@ -2513,6 +3047,70 @@ const prevRosterSyncRef = useRef<{
     [setSchedulingContext, datasetRoomOptions]
   );
 
+  const handleRoomAdd = useCallback(
+    (roomName: string) => {
+      const trimmed = roomName.trim();
+      if (!trimmed) return;
+      if (resolvedRoomOptions.some(option => option.name.toLowerCase() === trimmed.toLowerCase())) {
+        showToast.info(`Room "${trimmed}" already exists.`);
+        return;
+      }
+
+      const baseId = slugifyRoomId(trimmed) || `room-${resolvedRoomOptions.length + 1}`;
+      const existingIds = new Set(resolvedRoomOptions.map(option => option.id));
+      let nextId = baseId;
+      let suffix = 2;
+      while (existingIds.has(nextId)) {
+        nextId = `${baseId}-${suffix}`;
+        suffix += 1;
+      }
+
+      const nextOptions = [
+        ...resolvedRoomOptions,
+        {
+          id: nextId,
+          name: trimmed,
+          enabled: true,
+        },
+      ];
+
+      setSchedulingContext(prev => ({
+        ...prev,
+        roomOptions: nextOptions,
+        rooms: getEnabledRoomNames(nextOptions),
+      }));
+      setRoomAvailabilityState(prev =>
+        stabilizeRoomAvailabilityState(prev, nextOptions, days, timeSlots)
+      );
+      showToast.success(`Added room "${trimmed}".`);
+    },
+    [resolvedRoomOptions, setSchedulingContext, days, timeSlots]
+  );
+
+  const handleRoomDelete = useCallback(
+    (roomId: string) => {
+      const target = resolvedRoomOptions.find(option => option.id === roomId);
+      const label = target?.name || roomId;
+      setSchedulingContext(prev => {
+        const normalized = ensureRoomOptionsList(
+          prev.roomOptions,
+          prev.rooms && prev.rooms.length > 0
+            ? prev.rooms
+            : datasetRoomOptions.map(room => room.name)
+        );
+        const nextOptions = normalized.filter(option => option.id !== roomId);
+        return {
+          ...prev,
+          roomOptions: nextOptions,
+          rooms: getEnabledRoomNames(nextOptions),
+        };
+      });
+      setRoomAvailabilityState(prev => prev.filter(room => room.id !== roomId));
+      showToast.success(`Deleted room "${label}".`);
+    },
+    [resolvedRoomOptions, datasetRoomOptions, setSchedulingContext]
+  );
+
   const handleRoomSlotToggle = useCallback(
     (roomId: string, day: string, slot: string, desiredStatus?: 'available' | 'unavailable') => {
       setRoomAvailabilityState(prev => {
@@ -2638,9 +3236,10 @@ const prevRosterSyncRef = useRef<{
     setSelectedEvents(new Set());
   };
 
-  const handleDeleteDefence = (defenceId: string) => {
+  const commitDeleteDefence = (defenceId: string) => {
     if (!currentState) return;
-
+    const target = currentState.events.find(e => e.id === defenceId);
+    const label = target?.student || defenceId;
     const remainingEvents = currentState.events.filter(e => e.id !== defenceId);
 
     const action: ScheduleAction = {
@@ -2655,9 +3254,49 @@ const prevRosterSyncRef = useRef<{
       events: remainingEvents,
     });
 
-    // Close detail panel after deletion
-    setDetailPanelOpen(false);
-    setDetailContent(null);
+    setSelectedEvent(prev => (prev === defenceId ? null : prev));
+    setSelectedEvents(prev => {
+      const next = new Set(prev);
+      next.delete(defenceId);
+      return next;
+    });
+
+    if (detailEditable || detailPanelMode === 'detail') {
+      setDetailEditable(false);
+      setDetailPanelMode('list');
+      setDetailPanelOpen(true);
+      setDetailContent(null);
+      return;
+    }
+    showToast.success(`Deleted defense "${label}"`);
+  };
+
+  const commitUnscheduleDefence = (defenceId: string) => {
+    if (!currentState) return;
+    const target = currentState.events.find(e => e.id === defenceId);
+    const label = target?.student || defenceId;
+    const updatedEvents = currentState.events.map(event =>
+      event.id === defenceId ? clearSchedulingFields(event) : event
+    );
+
+    const action: ScheduleAction = {
+      type: 'manual-edit',
+      timestamp: Date.now(),
+      description: `Unscheduled defense ${defenceId}`,
+      data: { unscheduledIds: [defenceId] },
+    };
+
+    push(action, {
+      ...currentState,
+      events: updatedEvents,
+    });
+
+    showToast.success(`Unscheduled defense "${label}"`);
+  };
+
+  const handleDeleteDefence = (defenceId: string) => {
+    if (!currentState) return;
+    setEventActionPrompt({ eventId: defenceId });
   };
 
   const handleAddDefence = (prefilledDay?: string, prefilledTimeSlot?: string) => {
@@ -2706,6 +3345,8 @@ const prevRosterSyncRef = useRef<{
     setDetailPanelMode('list');
     setDetailPanelOpen(true);
     setSearchQuery('');
+    setPriorityEventIds(new Set());
+    setSelectedPersonName(undefined);
   };
 
   const handleUnscheduledCardClick = (event: DefenceEvent) => {
@@ -2782,6 +3423,11 @@ const prevRosterSyncRef = useRef<{
       });
       setDetailEditable(true);
       setDetailPanelOpen(true);
+      setBottomPanelTab('availability');
+      setAvailabilityExpanded(true);
+      setObjectivesExpanded(false);
+      setRoomsExpanded(false);
+      setConflictsExpanded(false);
 
       // Extract all participants from the event and highlight them in availability panel
       const participantNames = new Set(getEventParticipants(event).map(name => normalizeName(name)));
@@ -3187,36 +3833,14 @@ const prevRosterSyncRef = useRef<{
     filterPanelCollapsed,
   ]);
 
-  const solverStatusIcon = useMemo(() => {
-    if (solverStatusModal.status === 'running') {
-      return <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />;
-    }
-    if (solverStatusModal.status === 'success') {
-      return <CheckCircle2 className="h-10 w-10 text-emerald-500" />;
-    }
-    if (solverStatusModal.status === 'cancelled') {
-      return <CircleSlash2 className="h-10 w-10 text-gray-500" />;
-    }
-    return <AlertTriangle className="h-10 w-10 text-red-500" />;
-  }, [solverStatusModal.status]);
-  const solverElapsedSeconds = solverStatusModal.elapsedSeconds ?? 0;
-
   useEffect(() => {
-    if (solverStatusModal.status === 'running' && solverStatusModal.startedAt) {
+    if (solverRunning && solverRunStartedAt) {
       if (solverProgressInterval.current) {
         clearInterval(solverProgressInterval.current);
       }
       solverProgressInterval.current = setInterval(() => {
-        setSolverStatusModal(prev => {
-          if (prev.status !== 'running' || !prev.startedAt) {
-            return prev;
-          }
-          const elapsedSeconds = (Date.now() - prev.startedAt) / 1000;
-          if (Math.abs(elapsedSeconds - prev.elapsedSeconds) < 0.05) {
-            return prev;
-          }
-          return { ...prev, elapsedSeconds };
-        });
+        const elapsedSeconds = (Date.now() - solverRunStartedAt) / 1000;
+        setSolverElapsedSeconds(elapsedSeconds);
       }, 250);
       return () => {
         if (solverProgressInterval.current) {
@@ -3229,8 +3853,11 @@ const prevRosterSyncRef = useRef<{
       clearInterval(solverProgressInterval.current);
       solverProgressInterval.current = null;
     }
+    if (!solverRunning) {
+      setSolverElapsedSeconds(0);
+    }
     return undefined;
-  }, [solverStatusModal.status, solverStatusModal.startedAt]);
+  }, [solverRunStartedAt, solverRunning]);
 
   const getCellKey = useCallback((day: string, time: string) => `${day}-${time}`, []);
 
@@ -3283,6 +3910,16 @@ const prevRosterSyncRef = useRef<{
     },
     [getEventsForCell, scrollElementIntoScheduleView, getCellKey, handleEventClick]
   );
+
+  const handleRoomTagClick = useCallback((room: unknown) => {
+    const roomId = resolveHighlightedRoomId(room);
+    setHighlightedRoomId(roomId);
+    setBottomPanelTab('rooms');
+    setRoomsExpanded(true);
+    setAvailabilityExpanded(false);
+    setObjectivesExpanded(false);
+    setConflictsExpanded(false);
+  }, [resolveHighlightedRoomId]);
 
   // Color scheme state with handler for FilterPanel
   const [colorScheme, setColorScheme] = useState<Record<string, string>>({
@@ -3341,23 +3978,41 @@ const prevRosterSyncRef = useRef<{
               style={{ width: '100%', tableLayout: 'fixed' }}
             >
               <thead>
-                <tr className="bg-gray-50">
-                  <th className="border border-gray-200 border-r-2 border-r-gray-300 p-3 text-left font-semibold sticky left-0 z-30 bg-gray-100" style={{ width: '80px', minWidth: '80px', maxWidth: '80px' }}>
+                <tr className="bg-gray-100 sticky z-40" style={{ top: '-1px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                  <th className="border border-gray-200 border-r-3 border-r-gray-500 p-3 text-left font-semibold sticky left-0 z-50 bg-gray-100" style={{ width: '100px', minWidth: '100px', maxWidth: '100px' }}>
 
                   </th>
-                  {days.map((day, idx) => (
-                    <th
-                      key={day}
-                      className="border border-gray-200 p-3 text-center font-semibold"
-                      style={{
-                        width: `${SCHEDULE_COLUMN_WIDTH}px`,
-                        minWidth: `${SCHEDULE_COLUMN_WIDTH}px`,
-                        maxWidth: `${SCHEDULE_COLUMN_WIDTH}px`,
-                      }}
-                    >
-                      {dayLabels?.[idx] || day}
-                    </th>
-                  ))}
+                  {days.map((day, idx) => {
+                    const label = dayLabels?.[idx] || day;
+                    const formattedLabel = (() => {
+                      try {
+                        const date = new Date(day);
+                        if (!isNaN(date.getTime())) {
+                          return new Intl.DateTimeFormat('en-US', {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'short'
+                          }).format(date);
+                        }
+                        return label;
+                      } catch {
+                        return label;
+                      }
+                    })();
+                    return (
+                      <th
+                        key={day}
+                        className="border border-gray-300 py-6 px-6 text-center font-semibold text-[1.3rem] bg-gray-150"
+                        style={{
+                          width: `${SCHEDULE_COLUMN_WIDTH}px`,
+                          minWidth: `${SCHEDULE_COLUMN_WIDTH}px`,
+                          maxWidth: `${SCHEDULE_COLUMN_WIDTH}px`,
+                        }}
+                      >
+                        {formattedLabel}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
@@ -3381,7 +4036,7 @@ const prevRosterSyncRef = useRef<{
                         }
                       }}
                   >
-                    <td className="border border-gray-200 border-r-2 border-r-gray-300 p-3 font-medium sticky left-0 z-30 bg-gray-50" style={{ width: '140px', minWidth: '140px', maxWidth: '140px' }}>
+                    <td className="border border-gray-200 border-r-2 border-r-gray-300 py-3 pr-3 pl-6 font-semibold sticky left-0 z-30 bg-gray-100 text-xl" style={{ width: '100px', minWidth: '100px', maxWidth: '100px' }}>
                       {slotLabel}
                     </td>
                     {days.map((day) => {
@@ -3390,22 +4045,29 @@ const prevRosterSyncRef = useRef<{
                         const hasMultipleEvents = cellEvents.length > 1;
                         const cellId = getCellKey(day, time);
                         const isHighlighted = highlightedSlot?.day === day && highlightedSlot?.timeSlot === time;
-                        const columnHighlightType = columnHighlights?.[day]?.[time];
+                        const columnHighlightType = scheduleColumnHighlights?.[day]?.[time];
                         const shouldDimColumn = hasColumnHighlighting && !columnHighlightType;
+                        const cellBgColor = columnHighlightType === 'primary'
+                          ? 'rgba(30, 58, 138, 0.15)'
+                          : columnHighlightType === 'match'
+                          ? 'rgba(145, 230, 139, 0.22)'
+                          : isHighlighted && !columnHighlightType
+                          ? '#dbeafe'
+                          : '#f1f5f9b4';
+                        const hasHighlight = columnHighlightType || (isHighlighted && !columnHighlightType);
                         return (
                               <DroppableTimeSlot
                                 key={cellId}
                                 id={cellId}
                                 day={day}
                                 timeSlot={time}
-                                cellBg="white"
-                                cellHoverBg="#eff6ff"
-                                borderColor="#e5e7eb"
+                                cellBg={cellBgColor}
+                                cellHoverBg="#dbeafe"
+                                borderColor="#cbd5e1"
                                 cellPadding={defaultDefenceCardTheme.spacing.cell.padding}
                                 className={clsx(
-                                  isHighlighted && !columnHighlightType && 'bg-blue-50 outline outline-2 outline-blue-900 outline-offset-[-10px]',
-                                  columnHighlightType === 'primary' && 'outline outline-2 outline-blue-900 outline-offset-[-10px] shadow-lg',
-                                  columnHighlightType === 'match' && 'outline outline-[1.5px] outline-emerald-600 outline-offset-[-12px] shadow-md',
+                                  'border-[1px]',
+                                  hasHighlight && 'shadow-[inset_0_0_0_14px_white]',
                                   shouldDimColumn && 'opacity-40'
                                 )}
                                 columnWidth={SCHEDULE_COLUMN_WIDTH}
@@ -3444,6 +4106,8 @@ const prevRosterSyncRef = useRef<{
                                         }}
                                         theme={defaultDefenceCardTheme}
                                         highlighted={highlightedEventId === event.id}
+                                        onParticipantClick={handleParticipantNameClick}
+                                        onRoomClick={handleRoomTagClick}
                                         onClick={(e) => {
                                           const multiSelect = e.ctrlKey || e.metaKey;
                                           if (!isActive && !multiSelect) {
@@ -3480,7 +4144,10 @@ const prevRosterSyncRef = useRef<{
                                       </svg>
                                     </button>
 
-                                    <div className="px-2 py-1 bg-white text-gray-700 text-xs font-semibold rounded shadow-md">
+                                    <div
+                                      className="px-2 py-1 bg-white text-gray-700 text-xs font-semibold rounded shadow-md"
+                                      style={{ border: '1.5px solid rgb(203, 213, 225)' }}
+                                    >
                                       {activeIndex + 1} / {cellEvents.length}
                                     </div>
 
@@ -3525,12 +4192,14 @@ const prevRosterSyncRef = useRef<{
                                       cardStyle={{
                                         width: '100%',
                                         minHeight: '42px',
-                                        padding: '12px 10px 10px 12px',
+                                        padding: '12px 10px 10px 8px',
                                         fontSize: 'text-xs',
                                         showFullDetails: false,
                                       }}
                                       theme={defaultDefenceCardTheme}
                                       highlighted={highlightedEventId === event.id}
+                                      onParticipantClick={handleParticipantNameClick}
+                                      onRoomClick={handleRoomTagClick}
                                       onClick={(e) => {
                                         const multiSelect = e.ctrlKey || e.metaKey;
                                         handleEventClick(event.id, multiSelect);
@@ -3604,139 +4273,363 @@ const prevRosterSyncRef = useRef<{
       case 'schedule':
         return (
           <div className="flex-1 flex overflow-hidden">
-            {toolbarPosition === 'right' && (
-              <AdaptiveToolbar
-                position={toolbarPosition}
-                onPositionChange={setToolbarPosition}
-                cardViewMode={cardViewMode}
-                onCardViewModeChange={setCardViewMode}
-                onToggleFilterSidebar={() => setFilterPanelCollapsed(!filterPanelCollapsed)}
-                onShowUnscheduled={handleShowUnscheduled}
-                unscheduledCount={sidebarEvents.length}
-                onAddDefence={handleAddDefence}
-                onGenerateSchedule={() => runSolver({ mode: 'solve' })}
-                onReoptimize={() => runSolver({ mode: 'reoptimize' })}
-                onQuickSolve={preset => {
-                  if (preset === 'fast') {
-                    runSolver({ mode: 'reoptimize', timeout: 45 });
-                  } else if (preset === 'optimal') {
-                    runSolver({ mode: 'solve', timeout: 180 });
-                  } else {
-                    runSolver({ mode: 'solve', timeout: 300 });
-                  }
-                }}
-                onSolverSettings={() => logger.debug('Solver settings')}
-                onImportData={() => setDatasetModalOpen(true)}
-                onExportResults={handleExportRoster}
-                onSaveSnapshot={() => {
-                  setSnapshotModalMode('save');
-                  setSnapshotModalOpen(true);
-                }}
-                onLoadSnapshot={() => {
-                  setSnapshotModalMode('list');
-                  setSnapshotModalOpen(true);
-                }}
-                onShowConflicts={() => setShowConflictsPanel(true)}
-                onValidateSchedule={() => logger.debug('Validate schedule')}
-                onViewStatistics={() => logger.debug('View statistics')}
-                onExplainInfeasibility={() => logger.debug('Explain infeasibility')}
-                onDeleteSelection={handleDeleteSelection}
-                onDeleteAll={handleDeleteAll}
-                onUnscheduleSelection={handleUnscheduleSelection}
-                onUnscheduleAll={handleUnscheduleAll}
-                selectedCount={selectedEvents.size}
-                canUndo={canUndo}
-                canRedo={canRedo}
-                onUndo={undo}
-                onRedo={redo}
-                rosters={rosters.map(r => ({ id: r.id, label: r.label }))}
-                activeRosterId={activeRosterId}
-                onRosterSelect={handleRosterSelect}
-                onRosterDelete={handleRosterDelete}
-                onRosterRename={handleRosterRename}
-                onNewRoster={handleNewRoster}
-                isSolving={solverRunning}
-              />
-            )}
-
-            <div className="flex-1 flex flex-col overflow-hidden">
-              {toolbarPosition === 'top' && (
-              <AdaptiveToolbar
-                position={toolbarPosition}
-                onPositionChange={setToolbarPosition}
-                cardViewMode={cardViewMode}
-                onCardViewModeChange={setCardViewMode}
-                onToggleFilterSidebar={() => setFilterPanelCollapsed(!filterPanelCollapsed)}
-                onShowUnscheduled={handleShowUnscheduled}
-                unscheduledCount={sidebarEvents.length}
-                onAddDefence={handleAddDefence}
-                onGenerateSchedule={() => runSolver({ mode: 'solve' })}
-                onReoptimize={() => runSolver({ mode: 'reoptimize' })}
-                onQuickSolve={preset => {
-                  if (preset === 'fast') {
-                    runSolver({ mode: 'reoptimize', timeout: 45 });
-                  } else if (preset === 'optimal') {
-                    runSolver({ mode: 'solve', timeout: 180 });
-                  } else {
-                    runSolver({ mode: 'solve', timeout: 300 });
-                  }
-                }}
-                onSolverSettings={() => logger.debug('Solver settings')}
-                onImportData={() => setDatasetModalOpen(true)}
-                onExportResults={handleExportRoster}
-                onSaveSnapshot={() => {
-                  setSnapshotModalMode('save');
-                  setSnapshotModalOpen(true);
-                }}
-                onLoadSnapshot={() => {
-                  setSnapshotModalMode('list');
-                  setSnapshotModalOpen(true);
-                }}
-                onShowConflicts={() => setShowConflictsPanel(true)}
-                onValidateSchedule={() => logger.debug('Validate schedule')}
-                  onViewStatistics={() => logger.debug('View statistics')}
-                  onExplainInfeasibility={() => logger.debug('Explain infeasibility')}
-                  onDeleteSelection={handleDeleteSelection}
-                  onDeleteAll={handleDeleteAll}
-                  onUnscheduleSelection={handleUnscheduleSelection}
-                  onUnscheduleAll={handleUnscheduleAll}
-                  selectedCount={selectedEvents.size}
-                  canUndo={canUndo}
-                  canRedo={canRedo}
-                  onUndo={undo}
-                  onRedo={redo}
-                  rosters={toolbarRosters}
-                  activeRosterId={activeRosterId}
-                  onRosterSelect={handleRosterSelect}
-                  onRosterDelete={handleRosterDelete}
-                  onRosterRename={handleRosterRename}
-                  onNewRoster={handleNewRoster}
-                isSolving={solverRunning}
-              />
-            )}
-              {partialScheduleNotice && (
-                <div className="mx-6 mt-3 mb-2 p-4 rounded-xl border border-amber-200 bg-amber-50 shadow-sm">
-                  <div className="flex items-center gap-2 text-amber-900">
-                    <AlertTriangle className="w-5 h-5" />
-                    <span className="font-semibold">Partial schedule active</span>
+              {solverLogOpen && (
+                <div className="w-[360px] flex-shrink-0 border-r border-slate-200 bg-white">
+                  <div className="flex h-full flex-col">
+                  <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+                    <div>
+                      <div className="text-sm font-semibold text-slate-900">Solver log</div>
+                      <div className="text-xs text-slate-500">
+                        {solverLogRunId ? `Run ${solverLogRunId.slice(0, 8)}` : 'No run selected'}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {solverLogStatus === 'error' && (
+                        <button
+                          type="button"
+                          onClick={() => openSolverLogStreamFor(solverLogRunId)}
+                          className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 transition hover:bg-slate-200"
+                        >
+                          Reconnect
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSolverLogOpen(false);
+                          setSolverLogLines([]);
+                          setSolverLogStatus(null);
+                        }}
+                        className="rounded-full p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                        aria-label="Close solver log"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-sm text-amber-900 mt-1">
-                    {partialScheduleNotice.unscheduled} of {partialScheduleNotice.total} defenses still require manual placement.
-                  </p>
-                  <div className="mt-2">
-                    <button
-                      type="button"
-                      onClick={handleShowUnscheduled}
-                      className="px-3 py-1.5 text-sm font-medium text-amber-900 border border-amber-300 rounded-lg bg-white/70 hover:bg-white transition-colors"
-                    >
-                      Review unscheduled defenses
-                    </button>
+                    <div className="flex items-center justify-between border-b border-slate-200 px-4 py-2 text-xs text-slate-500">
+                      <span>
+                        {solverLogStatus === 'open'
+                          ? 'Live'
+                          : solverLogStatus === 'error'
+                            ? 'Disconnected'
+                            : solverLogStatus === 'closed'
+                              ? 'Closed'
+                              : 'Idle'}
+                      </span>
+                      <span>{solverLogLines.length} lines</span>
+                    </div>
+                    <div className="flex-1 overflow-auto bg-slate-950">
+                      <pre className="whitespace-pre-wrap break-words px-4 py-3 text-[11px] leading-relaxed text-slate-100">
+                        {solverLogLines.length > 0 ? solverLogLines.join('\n') : 'Waiting for solver logs...'}
+                      </pre>
+                    </div>
                   </div>
                 </div>
               )}
 
-              {renderScheduleGrid()}
-            </div>
+              {/* Center Panel - Schedule Grid + Toolbar */}
+              <div className="flex-1 flex overflow-hidden">
+                {toolbarPosition === 'right' && (
+                  <AdaptiveToolbar
+                    position={toolbarPosition}
+                    onPositionChange={setToolbarPosition}
+                    cardViewMode={cardViewMode}
+                    onCardViewModeChange={setCardViewMode}
+                    onToggleFilterSidebar={() => setFilterPanelCollapsed(!filterPanelCollapsed)}
+                    onShowUnscheduled={handleShowUnscheduled}
+                    unscheduledCount={sidebarEvents.length}
+                    onAddDefence={handleAddDefence}
+                    onGenerateSchedule={(mustScheduleAll) => runSolver({ mode: 'solve', mustScheduleAll })}
+                    onReoptimize={() => runSolver({ mode: 'reoptimize' })}
+                    onQuickSolve={preset => {
+                      if (preset === 'fast') {
+                        runSolver({ mode: 'reoptimize', timeout: 45 });
+                      } else if (preset === 'optimal') {
+                        runSolver({ mode: 'solve', timeout: 180 });
+                      } else {
+                        runSolver({ mode: 'solve', timeout: 300 });
+                      }
+                    }}
+                    onSolverSettings={() => logger.debug('Solver settings')}
+                    onImportData={() => setDatasetModalOpen(true)}
+                    onExportResults={handleExportRoster}
+                    onSaveSnapshot={() => {
+                      setSnapshotModalMode('save');
+                      setSnapshotModalOpen(true);
+                    }}
+                    onLoadSnapshot={() => {
+                      setSnapshotModalMode('list');
+                      setSnapshotModalOpen(true);
+                    }}
+                    onShowConflicts={() => setShowConflictsPanel(true)}
+                    onValidateSchedule={() => logger.debug('Validate schedule')}
+                    onViewStatistics={() => logger.debug('View statistics')}
+                    onExplainInfeasibility={() => logger.debug('Explain infeasibility')}
+                    onDeleteSelection={handleDeleteSelection}
+                    onDeleteAll={handleDeleteAll}
+                    onUnscheduleSelection={handleUnscheduleSelection}
+                    onUnscheduleAll={handleUnscheduleAll}
+                    selectedCount={selectedEvents.size}
+                    canUndo={canUndo}
+                    canRedo={canRedo}
+                    onUndo={undo}
+                    onRedo={redo}
+                    rosters={rosters.map(r => ({ id: r.id, label: r.label }))}
+                    activeRosterId={activeRosterId}
+                    onRosterSelect={handleRosterSelect}
+                    onRosterDelete={handleRosterDelete}
+                    onRosterRename={handleRosterRename}
+                    onNewRoster={handleNewRoster}
+                    isSolving={solverRunning}
+                  />
+                )}
+
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  {toolbarPosition === 'top' && (
+                    <AdaptiveToolbar
+                      position={toolbarPosition}
+                      onPositionChange={setToolbarPosition}
+                      cardViewMode={cardViewMode}
+                      onCardViewModeChange={setCardViewMode}
+                      onToggleFilterSidebar={() => setFilterPanelCollapsed(!filterPanelCollapsed)}
+                      onShowUnscheduled={handleShowUnscheduled}
+                      unscheduledCount={sidebarEvents.length}
+                      onAddDefence={handleAddDefence}
+                      onGenerateSchedule={(mustScheduleAll) => runSolver({ mode: 'solve', mustScheduleAll })}
+                      onReoptimize={() => runSolver({ mode: 'reoptimize' })}
+                      onQuickSolve={preset => {
+                        if (preset === 'fast') {
+                          runSolver({ mode: 'reoptimize', timeout: 45 });
+                        } else if (preset === 'optimal') {
+                          runSolver({ mode: 'solve', timeout: 180 });
+                        } else {
+                          runSolver({ mode: 'solve', timeout: 300 });
+                        }
+                      }}
+                      onSolverSettings={() => logger.debug('Solver settings')}
+                      onImportData={() => setDatasetModalOpen(true)}
+                      onExportResults={handleExportRoster}
+                      onSaveSnapshot={() => {
+                        setSnapshotModalMode('save');
+                        setSnapshotModalOpen(true);
+                      }}
+                      onLoadSnapshot={() => {
+                        setSnapshotModalMode('list');
+                        setSnapshotModalOpen(true);
+                      }}
+                      onShowConflicts={() => setShowConflictsPanel(true)}
+                      onValidateSchedule={() => logger.debug('Validate schedule')}
+                      onViewStatistics={() => logger.debug('View statistics')}
+                      onExplainInfeasibility={() => logger.debug('Explain infeasibility')}
+                      onDeleteSelection={handleDeleteSelection}
+                      onDeleteAll={handleDeleteAll}
+                      onUnscheduleSelection={handleUnscheduleSelection}
+                      onUnscheduleAll={handleUnscheduleAll}
+                      selectedCount={selectedEvents.size}
+                      canUndo={canUndo}
+                      canRedo={canRedo}
+                      onUndo={undo}
+                      onRedo={redo}
+                      rosters={toolbarRosters}
+                      activeRosterId={activeRosterId}
+                      onRosterSelect={handleRosterSelect}
+                      onRosterDelete={handleRosterDelete}
+                      onRosterRename={handleRosterRename}
+                      onNewRoster={handleNewRoster}
+                      isSolving={solverRunning}
+                    />
+                  )}
+
+                  {(solverRunning || (solverPanelOpen && streamedSolveAlternatives.length > 0)) && (
+                    <div className="mx-6 mt-3 mb-2 rounded-xl border border-slate-200 bg-white px-6 py-4 shadow-sm">
+                      <div className="flex flex-wrap items-center justify-between gap-4">
+                        <span className="text-sm text-slate-500">
+                          {solverRunning
+                            ? `${solverElapsedSeconds.toFixed(1)}s elapsed`
+                            : 'Solver results'}
+                        </span>
+                        <div className="flex items-center gap-4">
+                          {solverStreamStatus === 'error' && (
+                            <span className="text-xs font-semibold uppercase tracking-wide text-amber-600">
+                              Stream fallback
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSolverLogOpen(true);
+                              openSolverLogStreamFor(solverLogRunId);
+                            }}
+                            disabled={!solverLogRunId}
+                            className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-100/60 disabled:text-slate-400"
+                          >
+                            <Terminal className="h-3.5 w-3.5" />
+                            Logs
+                          </button>
+                          {solverRunning ? (
+                            <button
+                              type="button"
+                              onClick={handleCancelSolverRun}
+                              disabled={!activeSolverRunId || cancellingSolverRun}
+                              className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:text-gray-500 transition-colors"
+                            >
+                              {cancellingSolverRun ? 'Cancelling…' : 'Cancel'}
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSolverPanelOpen(false);
+                                setStreamedSolveAlternatives([]);
+                                setSelectedStreamSolutionId(null);
+                                selectedStreamSolutionIdRef.current = null;
+                                setManualStreamPreview(false);
+                                setStreamGateOpen(false);
+                                setPendingStreamAlternatives([]);
+                                streamGateOpenRef.current = false;
+                                pendingSolutionsRef.current = [];
+                                plannedAdjacencyRef.current = new Map();
+                              }}
+                              className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                            >
+                              Dismiss
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      {liveScheduleProgress !== null && (
+                        <div className="mt-3 h-4 w-full overflow-hidden rounded-full bg-slate-100">
+                          <div
+                            className="h-full rounded-full bg-blue-500 transition-all duration-300"
+                            style={{ width: `${Math.round(liveScheduleProgress * 100)}%` }}
+                          />
+                        </div>
+                      )}
+                      {streamGateOpen && streamedSolveAlternatives.length > 0 && (
+                        <div className="mt-3">
+                          {streamedSolutionsSummary && (
+                            <div className="mb-2 text-xs text-slate-600 flex flex-wrap gap-2">
+                              <span className="font-semibold text-slate-700">
+                                Solutions: {streamedSolutionsSummary.count}
+                              </span>
+                              <span>
+                                Latest {streamedSolutionsSummary.latestSummary.scheduled}/
+                                {streamedSolutionsSummary.latestSummary.total}
+                              </span>
+                              {streamedSolutionsSummary.latestAdjacency && (
+                                <span>
+                                  Adj {streamedSolutionsSummary.latestAdjacency.score ?? '–'} /
+                                  {streamedSolutionsSummary.latestAdjacency.possible ?? '–'}
+                                </span>
+                              )}
+                              <span>
+                                Best {streamedSolutionsSummary.bestSummary.scheduled}/
+                                {streamedSolutionsSummary.bestSummary.total}
+                              </span>
+                              {streamedSolutionsSummary.bestAdjacency && (
+                                <span>
+                                  Adj {streamedSolutionsSummary.bestAdjacency.score ?? '–'} /
+                                  {streamedSolutionsSummary.bestAdjacency.possible ?? '–'}
+                                </span>
+                              )}
+                              {typeof streamedSolutionsSummary.latestTimeMs === 'number' && (
+                                <span>{(streamedSolutionsSummary.latestTimeMs / 1000).toFixed(1)}s</span>
+                              )}
+                            </div>
+                          )}
+                          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                            {[...streamedSolveAlternatives]
+                              .sort((a, b) => {
+                                const adjA = getAdjacencyScore(a.result) ?? -1;
+                                const adjB = getAdjacencyScore(b.result) ?? -1;
+                                if (adjA !== adjB) return adjB - adjA;
+                                const sumA = summarizeSolveResult(a.result);
+                                const sumB = summarizeSolveResult(b.result);
+                                if (sumA.scheduled !== sumB.scheduled) {
+                                  return sumB.scheduled - sumA.scheduled;
+                                }
+                                const idxA = a.result.solution_index ?? 0;
+                                const idxB = b.result.solution_index ?? 0;
+                                return idxB - idxA;
+                              })
+                              .map((entry, index) => {
+                              const summary = summarizeSolveResult(entry.result);
+                              const adjacency = entry.result.objectives?.adjacency;
+                              const isSelected = entry.id === selectedStreamSolutionId;
+                              return (
+                                <button
+                                  key={entry.id}
+                                  type="button"
+                                  onClick={() => handleSelectStreamedAlternative(entry)}
+                                  aria-pressed={isSelected}
+                                  className={`min-w-[140px] rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
+                                    isSelected
+                                      ? 'border-blue-300 bg-white shadow-sm'
+                                      : 'border-slate-200 bg-white/80 hover:border-slate-300 hover:bg-white'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between text-slate-800">
+                                    <span className="font-semibold">
+                                      Solution {entry.result.solution_index ?? index + 1}
+                                    </span>
+                                    {isSelected && (
+                                      <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
+                                        Preview
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="mt-1 text-[11px] text-slate-600">
+                                    Scheduled {summary.scheduled}/{summary.total}
+                                  </div>
+                                  {adjacency && (
+                                    <div className="text-[11px] text-slate-600">
+                                      Adjacency {adjacency.score ?? '–'} / {adjacency.possible ?? '–'}
+                                    </div>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                          <p className="mt-1 text-[11px] text-slate-500">
+                            Preview stays on the first solution unless you click another.
+                          </p>
+                        </div>
+                      )}
+                      {solverRunning && !streamGateOpen && pendingStreamAlternatives.length > 0 && (
+                        <div className="mt-2 text-xs text-slate-500 space-y-1">
+                          <p>
+                            Waiting for two solutions with the same scheduled count but different adjacency scores…
+                          </p>
+                          <p>
+                            Snapshots received: {streamSnapshotCount}
+                          </p>
+                          {streamGateHintVisible && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                streamGateOpenRef.current = true;
+                                setStreamGateOpen(true);
+                                setStreamedSolveAlternatives(pendingSolutionsRef.current);
+                                if (!selectedStreamSolutionIdRef.current && pendingSolutionsRef.current.length > 0) {
+                                  selectedStreamSolutionIdRef.current = pendingSolutionsRef.current[0].id;
+                                  setSelectedStreamSolutionId(pendingSolutionsRef.current[0].id);
+                                }
+                              }}
+                              className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+                            >
+                              Show solutions anyway
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+
+                  {renderScheduleGrid()}
+                </div>
+              </div>
           </div>
         );
 
@@ -3819,9 +4712,18 @@ const prevRosterSyncRef = useRef<{
           <DetailPanel
             isOpen={detailPanelOpen}
             onClose={() => {
+              if (detailEditable) {
+                setDetailEditable(false);
+                setDetailPanelMode('list');
+                setDetailPanelOpen(true);
+                setDetailContent(null);
+                return;
+              }
               setDetailPanelOpen(false);
               setDetailEditable(false);
               setDetailPanelMode('detail');
+              setSelectedPersonName(undefined);
+              setPriorityEventIds(new Set());
             }}
             content={detailContent}
             positioning="relative"
@@ -3846,6 +4748,11 @@ const prevRosterSyncRef = useRef<{
                     });
                   }
                 }
+              } else if (action === 'view-defence') {
+                const targetId = typeof data === 'string' ? data : undefined;
+                if (targetId) {
+                  handleEventDoubleClick(targetId);
+                }
               } else {
                 logger.debug('Action:', action, data);
               }
@@ -3859,14 +4766,66 @@ const prevRosterSyncRef = useRef<{
             colorScheme={colorScheme}
             highlightedEventId={highlightedEventId}
             selectedEventId={selectedEvent || undefined}
+            priorityEventIds={priorityEventIds}
+            selectedPersonName={selectedPersonName}
           />
         )}
+
+        {eventActionPrompt && (() => {
+          const pendingEvent = events.find(e => e.id === eventActionPrompt.eventId);
+          if (!pendingEvent) return null;
+          const isScheduled = Boolean(pendingEvent.day && pendingEvent.startTime);
+          const label = pendingEvent.student || pendingEvent.id;
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+              <div className="bg-white rounded-lg shadow-xl p-6 max-w-sm mx-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Manage defense</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {isScheduled
+                    ? `This defense is scheduled. What would you like to do with "${label}"?`
+                    : `Delete defense "${label}"? This cannot be undone.`}
+                </p>
+                <div className="flex gap-3 justify-end">
+                  <button
+                    onClick={() => setEventActionPrompt(null)}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  {isScheduled && (
+                    <button
+                      onClick={() => {
+                        commitUnscheduleDefence(pendingEvent.id);
+                        setEventActionPrompt(null);
+                      }}
+                      className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded hover:bg-blue-100 transition-colors"
+                    >
+                      Unschedule
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      commitDeleteDefence(pendingEvent.id);
+                      setEventActionPrompt(null);
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Bottom panel with tabs */}
       <div
-        className="relative border-t border-gray-200 bg-white"
-        style={{ pointerEvents: overlayActive ? 'none' : 'auto' }}
+        className="relative border-t border-gray-200 bg-white flex flex-col"
+        style={{
+          pointerEvents: overlayActive ? 'none' : 'auto',
+          maxHeight: '60vh'
+        }}
       >
         {panelResizeHandler && (
           <div className="absolute -top-3 left-0 right-0 z-40 px-4 pointer-events-none">
@@ -3880,7 +4839,7 @@ const prevRosterSyncRef = useRef<{
         )}
 
         {/* Tab bar */}
-        <div className="flex items-center justify-between text-lg font-semibold px-4 py-2 pt-5">
+        <div className="flex items-center justify-between text-[1.3rem] font-semibold px-4 py-2 pt-5 flex-shrink-0 bg-[#f1f5f9]">
           <div className="flex">
             <button
               onClick={() => handleBottomPanelTabClick('availability')}
@@ -3893,16 +4852,6 @@ const prevRosterSyncRef = useRef<{
               Availability
             </button>
             <button
-              onClick={() => handleBottomPanelTabClick('objectives')}
-              className={`px-4 py-2 transition-colors ${
-                bottomPanelTab === 'objectives' && objectivesExpanded
-                  ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-500'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-              }`}
-            >
-              Objectives
-            </button>
-            <button
               onClick={() => handleBottomPanelTabClick('rooms')}
               className={`px-4 py-2 transition-colors ${
                 bottomPanelTab === 'rooms'
@@ -3912,29 +4861,38 @@ const prevRosterSyncRef = useRef<{
             >
               Rooms
             </button>
+            <button
+              onClick={() => handleBottomPanelTabClick('objectives')}
+              className={`px-4 py-2 transition-colors ${
+                bottomPanelTab === 'objectives' && objectivesExpanded
+                  ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-500'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              Objectives
+            </button>
           </div>
-          <div className="flex items-center gap-6 text-sm text-gray-600">
-            <span className="font-semibold text-xl text-gray-800">Total defenses:</span>
-            <div className="flex flex-col gap-2 min-w-[720px]">
-              <div className="flex items-center justify-between text-xl font-semibold text-gray-500">
-                <span>{scheduledEventsCount}/{events.length} scheduled</span>
-              </div>
-              <div className="relative flex h-4 overflow-hidden rounded-full border border-gray-200 bg-gray-100 shadow-inner">
-                <div
-                  className="h-full bg-blue-400 transition-[width] duration-300 ease-out"
-                  style={{ width: `${Math.min(100, (scheduledEventsCount / Math.max(events.length, 1)) * 100)}%` }}
-                />
-                <div
-                  className="h-full bg-gray-300 transition-[width] duration-300 ease-out"
-                  style={{ width: `${Math.max(0, ((events.length - scheduledEventsCount) / Math.max(events.length, 1)) * 100)}%` }}
-                />
-              </div>
+          <div className="flex items-center gap-5 text-2xl">
+            <span className="font-semibold text-gray-900">Total defenses:</span>
+            <span className="font-semibold text-gray-600 leading-none">
+              {scheduledEventsCount}/{events.length} scheduled
+            </span>
+            <div className="h-5 w-[35rem] max-w-[55vw] overflow-hidden rounded-full bg-gray-200">
+              <div
+                className="h-full rounded-full bg-blue-500 transition-all duration-300"
+                style={{
+                  width: `${events.length > 0 ? Math.round((scheduledEventsCount / events.length) * 100) : 0}%`,
+                }}
+              />
             </div>
           </div>
         </div>
 
         {/* Availability Panel - keep mounted for instant switching */}
-        <div style={{ display: bottomPanelTab === 'availability' ? 'block' : 'none' }}>
+        <div
+          className="flex-1 min-h-0 overflow-hidden"
+          style={{ display: bottomPanelTab === 'availability' ? 'block' : 'none' }}
+        >
           <AvailabilityPanel
             availabilities={visibleAvailabilities}
             days={days}
@@ -3956,7 +4914,10 @@ const prevRosterSyncRef = useRef<{
             slotConflicts={personSlotConflictsMap}
             scheduledBookings={scheduledBookings}
             workloadStats={participantWorkload}
-            columnHighlights={columnHighlights}
+            columnHighlights={availabilityColumnHighlights}
+            nearMatchMissing={availabilityNearMatchMissing}
+            programmeColors={colorScheme}
+            events={events}
             sharedHeight={sharedPanelHeight}
             onHeightChange={handleSharedHeightChange}
             registerResizeHandle={
@@ -3969,8 +4930,12 @@ const prevRosterSyncRef = useRef<{
         </div>
 
         {/* Objectives Panel */}
-        {bottomPanelTab === 'objectives' && (
-          <ObjectivesPanel
+        <div
+          className="flex-1 min-h-0 overflow-hidden"
+          style={{ display: bottomPanelTab === 'objectives' ? 'block' : 'none' }}
+        >
+          {bottomPanelTab === 'objectives' && (
+            <ObjectivesPanel
 
             globalObjectives={globalObjectives}
             localObjectives={localObjectives}
@@ -4014,14 +4979,22 @@ const prevRosterSyncRef = useRef<{
             comparisonSchedules={scheduleComparisonEntries}
             activeScheduleId={activeRosterId}
           />
-        )}
+          )}
+        </div>
 
-        {bottomPanelTab === 'rooms' && (
-          <RoomAvailabilityPanel
+        {/* Rooms Panel */}
+        <div
+          className="flex-1 min-h-0 overflow-hidden"
+          style={{ display: bottomPanelTab === 'rooms' ? 'block' : 'none' }}
+        >
+          {bottomPanelTab === 'rooms' && (
+            <RoomAvailabilityPanel
             rooms={roomAvailabilityRooms}
             days={days}
             timeSlots={timeSlots}
             isExpanded={roomsExpanded}
+            highlightedRoomId={highlightedRoomId}
+            highlightedSlot={highlightedSlot}
             sharedHeight={sharedPanelHeight}
             onHeightChange={handleSharedHeightChange}
             registerResizeHandle={
@@ -4029,14 +5002,22 @@ const prevRosterSyncRef = useRef<{
             }
             hideInternalHandle={bottomPanelTab === 'rooms' && roomsExpanded}
             onRoomToggle={handleRoomToggle}
+            onRoomAdd={handleRoomAdd}
+            onRoomDelete={handleRoomDelete}
             onSlotStatusChange={handleRoomSlotToggle}
             onSlotSelect={handleRoomSlotSelect}
             programmeColors={{ ...colorScheme }}
           />
-        )}
+          )}
+        </div>
 
-        {bottomPanelTab === 'conflicts' && (
-          <ConflictsPanelV2
+        {/* Conflicts Panel */}
+        <div
+          className="flex-1 min-h-0 overflow-hidden"
+          style={{ display: bottomPanelTab === 'conflicts' ? 'block' : 'none' }}
+        >
+          {bottomPanelTab === 'conflicts' && (
+            <ConflictsPanelV2
             isExpanded={conflictsExpanded}
             onToggleExpanded={() => setConflictsExpanded(prev => !prev)}
             sharedHeight={sharedPanelHeight}
@@ -4048,7 +5029,9 @@ const prevRosterSyncRef = useRef<{
             }
             hideInternalHandle={bottomPanelTab === 'conflicts' && conflictsExpanded}
           />
-        )}
+          )}
+        </div>
+
       </div>
 
       {showConflictsPanel && (
@@ -4155,108 +5138,6 @@ const prevRosterSyncRef = useRef<{
         currentState={currentSnapshotState}
         onRestore={handleRestoreSnapshot}
       />
-      {solverStatusModal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
-            aria-hidden="true"
-          />
-          <div className="relative z-10 w-full max-w-md px-4">
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl p-8 text-center space-y-5">
-              <div className="flex justify-center">{solverStatusIcon}</div>
-              <div className="space-y-2">
-                <h3 className="text-xl font-semibold text-gray-900">
-                  {solverStatusModal.title || 'Running solver'}
-                </h3>
-                {solverStatusPrimaryText && (
-                  <p className="text-lg text-gray-700">{solverStatusPrimaryText}</p>
-                )}
-                {solverStatusModal.adjacencyLabel && solverStatusModal.status !== 'running' && (
-                  <p className="text-lg text-gray-700">{solverStatusModal.adjacencyLabel}</p>
-                )}
-              </div>
-              {solverStatusModal.status === 'running' ? (
-                <div className="space-y-4">
-                  <div className="solver-progress solver-progress--indeterminate" aria-hidden="true">
-                    <div className="solver-progress__indicator" />
-                  </div>
-                  <p className="text-base text-gray-700 font-semibold">
-                    Elapsed time: {solverElapsedSeconds.toFixed(1)}s
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleCancelSolverRun}
-                    disabled={!activeSolverRunId || cancellingSolverRun}
-                    className="px-4 py-2 rounded-full text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:text-gray-500 transition-colors"
-                  >
-                    {cancellingSolverRun ? 'Cancelling…' : 'Cancel solve'}
-                  </button>
-                </div>
-              ) : (
-                <div className="flex justify-center">
-                  <button
-                    type="button"
-                    onClick={closeSolverStatusModal}
-                    className="px-4 py-2 rounded-full text-sm font-medium text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors"
-                  >
-                    Close
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-      {pendingSolverResult && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" aria-hidden="true" />
-          <div className="relative z-10 w-full max-w-lg px-4">
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-2xl p-8 space-y-4">
-              <div className="text-center space-y-1">
-                <h3 className="text-2xl font-semibold text-gray-900">Apply partial schedule?</h3>
-                <p className="text-lg text-gray-700">
-                  The solver scheduled {pendingSolverResult.summary.scheduled} of {pendingSolverResult.summary.total} defenses.{` `}
-                  {pendingSolverResult.summary.unscheduled} still require manual placement.
-                </p>
-                {pendingAdjacencyLabel && (
-                  <p className="text-lg text-gray-700">{pendingAdjacencyLabel}</p>
-                )}
-              </div>
-              {pendingSolverResult.result.unscheduled && pendingSolverResult.result.unscheduled.length > 0 && (
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 max-h-48 overflow-auto">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Unscheduled defenses</p>
-                  <ul className="space-y-1 text-sm text-gray-800">
-                    {pendingSolverResult.result.unscheduled.slice(0, 6).map(item => (
-                      <li key={item.entity_id || item.entity_name}>{item.entity_name || item.entity_id}</li>
-                    ))}
-                    {pendingSolverResult.result.unscheduled.length > 6 && (
-                      <li className="text-xs text-gray-500">
-                        +{pendingSolverResult.result.unscheduled.length - 6} more…
-                      </li>
-                    )}
-                  </ul>
-                </div>
-              )}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  type="button"
-                  onClick={handleDiscardPartialResult}
-                  className="w-full sm:w-1/2 px-4 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Keep previous schedule
-                </button>
-                <button
-                  type="button"
-                  onClick={handleApplyPartialResult}
-                  className="w-full sm:w-1/2 px-4 py-2.5 rounded-full text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-                >
-                  Apply partial schedule
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
       {unsatNotice.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" />
@@ -4281,8 +5162,12 @@ const prevRosterSyncRef = useRef<{
   );
 }
 
+
+
+
+
 /*
-Legacy ConflictsPanel implementation kept for reference.
+Legacy ConflictsPanel implementation for reference.
 
 type ConflictsConstraintStatus = 'ok' | 'neutral' | 'conflict';
 type ConflictsConstraintType =

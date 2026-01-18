@@ -22,10 +22,18 @@ interface SolveOptions {
   adjacencyObjective?: boolean;
   mustPlanAllDefenses?: boolean;
   allowOnlineDefenses?: boolean;
+  stream?: boolean;
+  streamStallSeconds?: number;
+  streamMinSolutions?: number;
+  solverWorkers?: number;
+  solverConfigYaml?: string;
 }
 
 interface SolveCallbacks {
   onRunId?: (runId: string) => void;
+  onSnapshot?: (snapshot: SolveResult) => void;
+  onFinal?: (result: SolveResult) => void;
+  onStreamStatus?: (status: 'open' | 'error' | 'closed') => void;
 }
 
 export class SchedulingAPI {
@@ -76,6 +84,13 @@ export class SchedulingAPI {
     if (options?.allowOnlineDefenses !== undefined) {
       payload.allow_online_defenses = options.allowOnlineDefenses;
     }
+    if (options?.stream !== undefined) {
+      payload.stream = options.stream;
+    }
+    const solverConfigYaml = buildSolverConfigYaml(options);
+    if (solverConfigYaml) {
+      payload.solver_config_yaml = solverConfigYaml;
+    }
     const response = await fetch(`${this.baseUrl}/api/solver/runs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -114,24 +129,152 @@ export class SchedulingAPI {
       callbacks.onRunId(run.run_id);
     }
     const runId = run.run_id;
-    let delay = 500;
+    let finalResult: SolveResult | null = null;
+    const streamCallbacks: SolveCallbacks | undefined = callbacks
+      ? {
+          ...callbacks,
+          onFinal: (result: SolveResult) => {
+            finalResult = result;
+            callbacks.onFinal?.(result);
+          },
+          onStreamStatus: (status: 'open' | 'closed' | 'error') => {
+            callbacks.onStreamStatus?.(status);
+          },
+        }
+      : {
+          onFinal: (result: SolveResult) => {
+            finalResult = result;
+          },
+        };
+    console.log('[solve] opening SSE stream for run:', runId);
+    const closeStream = this.openSolverStream(runId, streamCallbacks);
+    let delay = 250;
     const maxWait = (options?.timeout || 180) * 1000 + 60000;
     const startTime = Date.now();
-    while (Date.now() - startTime <= maxWait) {
-      const status = await this.getSolverRun(runId);
-      if (status.status === 'succeeded' && status.result) {
-        return status.result;
+    let succeededWithoutResult = 0;
+    let pollCount = 0;
+    try {
+      while (Date.now() - startTime <= maxWait) {
+        if (finalResult) {
+          console.log('[solve] returning finalResult from SSE');
+          return finalResult;
+        }
+        let status: SolverRunStatus;
+        try {
+          pollCount++;
+          console.log(`[solve] poll #${pollCount}, delay was ${delay}ms`);
+          status = await this.getSolverRun(runId);
+          console.log(`[solve] poll #${pollCount} result: status=${status.status}, hasResult=${!!status.result}`);
+        } catch (fetchError) {
+          // Network error during polling - retry after delay unless SSE delivered result
+          console.warn('[solve] polling error, retrying...', fetchError);
+          await this.sleep(delay);
+          if (finalResult) return finalResult;
+          delay = Math.min(delay * 1.5, 1500);
+          continue;
+        }
+        if (status.status === 'succeeded') {
+          if (status.result) {
+            console.log('[solve] returning result from poll, assignments:', status.result.assignments?.length);
+            return status.result;
+          }
+          // Status is succeeded but result not yet available - retry a few times
+          succeededWithoutResult++;
+          console.log(`[solve] succeeded but no result yet, retry #${succeededWithoutResult}`);
+          if (succeededWithoutResult > 5) {
+            throw new Error('Solver succeeded but result not available');
+          }
+          await this.sleep(100);
+          continue;
+        }
+        if (status.status === 'failed') {
+          console.log('[solve] solver failed:', status.error);
+          throw new Error(status.error || 'Solver run failed');
+        }
+        if (status.status === 'cancelled') {
+          throw new Error('Solver run cancelled');
+        }
+        await this.sleep(delay);
+        if (finalResult) {
+          console.log('[solve] returning finalResult from SSE after sleep');
+          return finalResult;
+        }
+        delay = Math.min(delay * 1.5, 1500);
       }
-      if (status.status === 'failed') {
-        throw new Error(status.error || 'Solver run failed');
-      }
-      if (status.status === 'cancelled') {
-        throw new Error('Solver run cancelled');
-      }
-      await this.sleep(delay);
-      delay = Math.min(delay * 1.5, 4000);
+      throw new Error('Solver run timed out');
+    } finally {
+      console.log('[solve] closing stream');
+      closeStream?.();
     }
-    throw new Error('Solver run timed out');
+  }
+
+  private openSolverStream(runId: string, callbacks?: SolveCallbacks): (() => void) | null {
+    if (!callbacks?.onSnapshot && !callbacks?.onFinal) {
+      return null;
+    }
+    const streamUrl = `${this.baseUrl}/api/solver/runs/${runId}/stream`;
+    let source: EventSource | null = null;
+    try {
+      source = new EventSource(streamUrl);
+    } catch (err) {
+      callbacks.onStreamStatus?.('error');
+      return null;
+    }
+
+    const handleSnapshot = (event: MessageEvent) => {
+      console.log('[SSE] snapshot event received:', event.data?.substring(0, 200));
+      if (!event.data) return;
+      try {
+        const wrapper = JSON.parse(event.data);
+        // Backend wraps payload: {type, payload, timestamp}
+        const result = (wrapper.payload ?? wrapper) as SolveResult;
+        console.log('[SSE] parsed snapshot, assignments:', result.assignments?.length);
+        callbacks.onSnapshot?.(result);
+      } catch (err) {
+        console.error('[SSE] snapshot parse error:', err);
+      }
+    };
+    const handleFinal = (event: MessageEvent) => {
+      console.log('[SSE] final event received:', event.data?.substring(0, 200));
+      if (!event.data) return;
+      try {
+        const wrapper = JSON.parse(event.data);
+        // Backend wraps payload: {type, payload, timestamp}
+        const result = (wrapper.payload ?? wrapper) as SolveResult;
+        console.log('[SSE] parsed final, assignments:', result.assignments?.length);
+        callbacks.onSnapshot?.(result);
+        callbacks.onFinal?.(result);
+      } catch (err) {
+        console.error('[SSE] final parse error:', err);
+      }
+    };
+
+    source.addEventListener('snapshot', handleSnapshot);
+    source.addEventListener('final', handleFinal);
+    source.addEventListener('solver-error', (event) => {
+      console.log('[SSE] solver-error event:', event);
+      callbacks.onStreamStatus?.('error');
+    });
+    source.addEventListener('heartbeat', () => {
+      console.log('[SSE] heartbeat');
+    });
+    source.addEventListener('meta', (event) => {
+      console.log('[SSE] meta event:', (event as MessageEvent).data);
+    });
+    source.onopen = () => {
+      console.log('[SSE] connection opened');
+      callbacks.onStreamStatus?.('open');
+    };
+    source.onerror = (err) => {
+      console.log('[SSE] connection error:', err);
+      callbacks.onStreamStatus?.('error');
+    };
+
+    return () => {
+      if (!source) return;
+      source.close();
+      callbacks.onStreamStatus?.('closed');
+    };
   }
 
   /**
@@ -304,6 +447,59 @@ export class SchedulingAPI {
     return response.json();
   }
 }
+
+const formatYamlValue = (value: unknown): string => {
+  if (value === null || value === undefined) {
+    return 'null';
+  }
+  if (typeof value === 'boolean') {
+    return value ? 'true' : 'false';
+  }
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? String(value) : 'null';
+  }
+  if (typeof value === 'string') {
+    if (!value || /[:#\n]/.test(value) || value.trim() !== value) {
+      return JSON.stringify(value);
+    }
+    return value;
+  }
+  return JSON.stringify(value);
+};
+
+const buildSolverConfigYaml = (options?: SolveOptions): string | undefined => {
+  if (!options) {
+    return undefined;
+  }
+  if (options.solverConfigYaml) {
+    return options.solverConfigYaml;
+  }
+  const config: Record<string, unknown> = {};
+  if (options.solver) config.solver = options.solver;
+  if (options.adjacencyObjective !== undefined) {
+    config.adjacency_objective = options.adjacencyObjective;
+  }
+  if (options.mustPlanAllDefenses !== undefined) {
+    config.must_plan_all_defenses = options.mustPlanAllDefenses;
+  }
+  if (options.allowOnlineDefenses !== undefined) {
+    config.allow_online_defenses = options.allowOnlineDefenses;
+  }
+  if (options.streamStallSeconds !== undefined) {
+    config.stream_stall_seconds = options.streamStallSeconds;
+  }
+  if (options.streamMinSolutions !== undefined) {
+    config.stream_min_solutions = options.streamMinSolutions;
+  }
+  if (options.solverWorkers !== undefined) {
+    config.solver_workers = options.solverWorkers;
+  }
+  const entries = Object.entries(config);
+  if (entries.length === 0) {
+    return undefined;
+  }
+  return entries.map(([key, value]) => `${key}: ${formatYamlValue(value)}`).join('\n');
+};
 
 // Export singleton instance
 export const schedulingAPI = new SchedulingAPI();

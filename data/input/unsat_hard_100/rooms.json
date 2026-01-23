@@ -1,0 +1,54 @@
+{
+  "rooms": [
+    {
+      "id": "200c-00-01",
+      "name": "200C 00.01",
+      "enabled": false
+    },
+    {
+      "id": "200c-00-02",
+      "name": "200C 00.02",
+      "enabled": true
+    },
+    {
+      "id": "200c-00-03",
+      "name": "200C 00.03",
+      "enabled": true
+    },
+    {
+      "id": "200c-00-04",
+      "name": "200C 00.04",
+      "enabled": true
+    },
+    {
+      "id": "200b-01-14",
+      "name": "200B 01.14",
+      "enabled": true
+    },
+    {
+      "id": "200b-01-16",
+      "name": "200B 01.16",
+      "enabled": true
+    },
+    {
+      "id": "200b-01-18",
+      "name": "200B 01.18",
+      "enabled": true
+    },
+    {
+      "id": "ruby",
+      "name": "Ruby",
+      "enabled": true
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "enabled": true
+    },
+    {
+      "id": "java",
+      "name": "Java",
+      "enabled": true
+    }
+  ]
+}

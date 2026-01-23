@@ -10,9 +10,10 @@ export interface DroppableTimeSlotProps {
   cellHoverBg: string;
   borderColor: string;
   onAddEvent?: (day: string, timeSlot: string) => void;
+  onSlotClick?: (day: string, timeSlot: string) => void;
   className?: string;
   priority?: 'normal' | 'prioritized' | 'deprioritized' | 'unavailable';
-  cellPadding?: string; // Theme-controlled cell padding
+  cellPadding?: string;
   columnWidth?: number;
 }
 
@@ -39,6 +40,7 @@ function DroppableTimeSlotComponent({
   cellHoverBg,
   borderColor,
   onAddEvent,
+  onSlotClick,
   className = '',
   priority = 'normal',
   cellPadding = '8px',
@@ -82,7 +84,7 @@ function DroppableTimeSlotComponent({
   return (
     <td
       ref={ref}
-      className={`border align-top transition-colors ${isEmpty ? 'group cursor-pointer' : ''} ${className}`}
+      className={`border align-top transition-colors ${(isEmpty || onSlotClick) ? 'group cursor-pointer' : ''} ${className}`}
       style={{
         borderColor,
         backgroundColor: finalBg,
@@ -95,7 +97,9 @@ function DroppableTimeSlotComponent({
         overflowWrap: 'anywhere',
       }}
       onClick={() => {
-        if (isEmpty) {
+        if (onSlotClick) {
+          onSlotClick(day, timeSlot);
+        } else if (isEmpty) {
           onAddEvent?.(day, timeSlot);
         }
       }}
@@ -115,6 +119,7 @@ export const DroppableTimeSlot = memo(DroppableTimeSlotComponent, (prevProps, ne
     prevProps.className === nextProps.className &&
     prevProps.cellPadding === nextProps.cellPadding &&
     prevProps.columnWidth === nextProps.columnWidth &&
-    prevProps.onAddEvent === nextProps.onAddEvent
+    prevProps.onAddEvent === nextProps.onAddEvent &&
+    prevProps.onSlotClick === nextProps.onSlotClick
   );
 });

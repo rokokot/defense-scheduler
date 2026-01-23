@@ -27,10 +27,11 @@ import {
   X,
   CalendarX,
   Loader2,
+  GanttChart,
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
-export type CardViewMode = 'individual' | 'compact';
+export type CardViewMode = 'individual' | 'compact' | 'gantt';
 
 export interface AdaptiveToolbarProps {
   position?: 'top' | 'right';
@@ -211,16 +212,23 @@ export function AdaptiveToolbar({
         {/* View Mode Toggle */}
         {onCardViewModeChange && (
           <button
-            onClick={() => onCardViewModeChange(cardViewMode === 'individual' ? 'compact' : 'individual')}
+            onClick={() => {
+              const modes: CardViewMode[] = ['individual', 'compact', 'gantt'];
+              const currentIdx = modes.indexOf(cardViewMode);
+              const nextIdx = (currentIdx + 1) % modes.length;
+              onCardViewModeChange(modes[nextIdx]);
+            }}
             className={`p-2 rounded transition-colors ${
-              cardViewMode === 'compact'
+              cardViewMode !== 'individual'
                 ? 'text-blue-600 bg-blue-50 hover:bg-blue-100'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}
-            title={cardViewMode === 'individual' ? 'Compact view' : 'Individual view'}
+            title={cardViewMode === 'individual' ? 'Compact view' : cardViewMode === 'compact' ? 'Gantt view' : 'Individual view'}
           >
             {cardViewMode === 'individual' ? (
               <Layers className="w-5 h-5" />
+            ) : cardViewMode === 'compact' ? (
+              <GanttChart className="w-5 h-5" />
             ) : (
               <Copy className="w-5 h-5" />
             )}
@@ -463,16 +471,23 @@ export function AdaptiveToolbar({
           {/* View Mode Toggle */}
           {onCardViewModeChange && (
             <button
-              onClick={() => onCardViewModeChange(cardViewMode === 'individual' ? 'compact' : 'individual')}
+              onClick={() => {
+                const modes: CardViewMode[] = ['individual', 'compact', 'gantt'];
+                const currentIdx = modes.indexOf(cardViewMode);
+                const nextIdx = (currentIdx + 1) % modes.length;
+                onCardViewModeChange(modes[nextIdx]);
+              }}
               className={`p-1.5 rounded transition-colors ${
-                cardViewMode === 'compact'
+                cardViewMode !== 'individual'
                   ? 'text-blue-600 bg-blue-50 hover:bg-blue-100'
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
-              title={cardViewMode === 'individual' ? 'Compact view' : 'Individual view'}
+              title={cardViewMode === 'individual' ? 'Compact view' : cardViewMode === 'compact' ? 'Gantt view' : 'Individual view'}
             >
               {cardViewMode === 'individual' ? (
                 <Layers className="w-3.5 h-3.5" />
+              ) : cardViewMode === 'compact' ? (
+                <GanttChart className="w-3.5 h-3.5" />
               ) : (
                 <Copy className="w-3.5 h-3.5" />
               )}

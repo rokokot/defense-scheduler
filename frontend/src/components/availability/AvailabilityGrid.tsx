@@ -6,8 +6,8 @@
  */
 import { useState, useRef, useEffect, memo, useMemo, useLayoutEffect, useCallback, Fragment } from 'react';
 import clsx from 'clsx';
-import { AlertCircle, Lock, Check } from 'lucide-react';
-import { PersonAvailability, ViewGranularity, AvailabilityStatus, SlotAvailability, ConflictInfo } from './types';
+import { AlertCircle, Lock, Check, Clock, ChevronDown, X } from 'lucide-react';
+import { PersonAvailability, ViewGranularity, AvailabilityStatus, SlotAvailability, ConflictInfo, AvailabilityRequest } from './types';
 import StatusErrorIcon from '@atlaskit/icon/core/status-error';
 import PersonWarningIcon from '@atlaskit/icon/core/person-warning';
 import { Conflict, DefenceEvent } from '../../types/schedule';
@@ -49,6 +49,10 @@ export interface AvailabilityGridProps {
   showLegend?: boolean;
   programmeColors?: Record<string, string>;
   events?: DefenceEvent[];
+  onRequestAvailability?: (day: string, slot: string, missingPersonIds: string[]) => void;
+  availabilityRequests?: AvailabilityRequest[];
+  onAcceptRequest?: (requestId: string) => void;
+  onDenyRequest?: (requestId: string) => void;
 }
 
 const editableStatuses: AvailabilityStatus[] = ['available', 'unavailable'];
@@ -60,6 +64,7 @@ export const AVAILABILITY_STATUS_CLASSES: Record<AvailabilityStatus, string> = {
   unavailable: `bg-gray-400 border border-gray-500 opacity-60`,
   booked: '',
   empty: `bg-white border border-gray-400`,
+  requested: `bg-white border-2 border-amber-600`,
 };
 
 export const AVAILABILITY_STATUS_LABELS: Record<AvailabilityStatus, string> = {
@@ -67,6 +72,7 @@ export const AVAILABILITY_STATUS_LABELS: Record<AvailabilityStatus, string> = {
   unavailable: 'Unavailable',
   booked: 'Booked',
   empty: 'Available',
+  requested: 'Request availability',
 };
 
 const normalizeStatus = (status: AvailabilityStatus): AvailabilityStatus =>
@@ -100,8 +106,15 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
   showLegend = true,
   programmeColors,
   events,
+  onRequestAvailability,
+  availabilityRequests = [],
+  onAcceptRequest,
+  onDenyRequest,
 }: AvailabilityGridProps) {
   const [editingSlot, setEditingSlot] = useState<{ personId: string; day: string; slot: string } | null>(null);
+  const [showRequestsPanel, setShowRequestsPanel] = useState(false);
+  const [requestHighlightedIds, setRequestHighlightedIds] = useState<string[]>([]);
+  const [requestHighlightedSlots, setRequestHighlightedSlots] = useState<Set<string>>(new Set());
   const [participantSearch, setParticipantSearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const personRowRefs = useRef<Map<string, HTMLTableRowElement>>(new Map());
@@ -125,6 +138,12 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
 
   const visibleDaysSet = useMemo(() => new Set(days), [days]);
   const visibleSlotsSet = useMemo(() => new Set(timeSlots), [timeSlots]);
+
+  const effectiveHighlightedPersons = useMemo(() => {
+    if (requestHighlightedIds.length === 0) return highlightedPersons;
+    const merged = new Set([...highlightedPersons, ...requestHighlightedIds]);
+    return Array.from(merged);
+  }, [highlightedPersons, requestHighlightedIds]);
 
   const personHasVisibleConflicts = useCallback(
     (person: PersonAvailability): boolean => {
@@ -380,7 +399,6 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
       editingSlot?.personId === person.id &&
       editingSlot?.day === day &&
       editingSlot?.slot === slot;
-    const canRequestAvailability = Boolean(nearMatchMissing?.[day]?.[slot]?.includes(person.id));
     const bookedStudents = scheduledBookings?.get(person.name)?.get(day) || [];
     const dayLabel = dayLabels?.[days.indexOf(day)] || day;
 
@@ -441,19 +459,32 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
             )}
           </button>
         ))}
-        {canRequestAvailability && (
-          <button
-            className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition-colors"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setEditingSlot(null);
-            }}
+        <button
+          className={clsx(
+            'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition-colors',
+            slotData.status === 'requested' && 'bg-gray-50'
+          )}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (onRequestAvailability) {
+              onRequestAvailability(day, slot, [person.id]);
+            } else {
+              onSlotEdit?.(person.id, day, slot, 'requested', slotData.locked || false);
+            }
+            setEditingSlot(null);
+          }}
+        >
+          <div
+            className="w-4 h-4 rounded-full flex-shrink-0 bg-white border-2 border-amber-600 flex items-center justify-center"
           >
-            <div className={clsx('w-4 h-4 rounded-full flex-shrink-0', NEAR_MATCH_MISSING_CLASS)} />
-            <span className="text-sm text-gray-900">Request availability</span>
-          </button>
-        )}
+            <Clock className="h-2.5 w-2.5 text-amber-600" strokeWidth={2.5} />
+          </div>
+          <span className="text-sm text-gray-900">{AVAILABILITY_STATUS_LABELS['requested']}</span>
+          {slotData.status === 'requested' && (
+            <Check className="h-4 w-4 ml-auto text-green-600" />
+          )}
+        </button>
         <div className="border-t border-gray-200 my-2" />
         <button
           className="w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition-colors"
@@ -543,8 +574,8 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
         if (aMatches && !bMatches) return -1;
         if (!aMatches && bMatches) return 1;
 
-        const aHighlighted = highlightedPersons.includes(a.id);
-        const bHighlighted = highlightedPersons.includes(b.id);
+        const aHighlighted = effectiveHighlightedPersons.includes(a.id);
+        const bHighlighted = effectiveHighlightedPersons.includes(b.id);
 
         if (aHighlighted && !bHighlighted) return -1;
         if (!aHighlighted && bHighlighted) return 1;
@@ -577,8 +608,8 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
         if (!aMatches && bMatches) return 1;
 
         // Highlighted persons first
-        const aHighlighted = highlightedPersons.includes(a.person.id);
-        const bHighlighted = highlightedPersons.includes(b.person.id);
+        const aHighlighted = effectiveHighlightedPersons.includes(a.person.id);
+        const bHighlighted = effectiveHighlightedPersons.includes(b.person.id);
 
         if (aHighlighted && !bHighlighted) return -1;
         if (!aHighlighted && bHighlighted) return 1;
@@ -592,7 +623,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
         return a.person.name.localeCompare(b.person.name);
       })
       .map(item => item.person);
-  }, [availabilities, highlightedPersons, normalizedParticipantSearch, rosters]);
+  }, [availabilities, effectiveHighlightedPersons, normalizedParticipantSearch, rosters]);
 
   const columnCount = days.length + 1;
   const shouldVirtualize = sortedAvailabilities.length > 40;
@@ -664,7 +695,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
     : sortedAvailabilities;
 
   useEffect(() => {
-    const firstPersonId = highlightedPersons[0];
+    const firstPersonId = effectiveHighlightedPersons[0];
     if (!firstPersonId) return;
 
     if (!shouldVirtualize) {
@@ -687,7 +718,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
       top: Math.max(0, targetTop - rowHeight),
       behavior: 'smooth',
     });
-  }, [highlightedPersons, rowHeight, shouldVirtualize, sortedAvailabilities]);
+  }, [effectiveHighlightedPersons, rowHeight, shouldVirtualize, sortedAvailabilities]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -780,6 +811,146 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                       </button>
                     )}
                   </div>
+                  {availabilityRequests.length > 0 && (
+                    <div className="relative ml-auto">
+                      <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-md">
+                        <button
+                          onClick={() => {
+                            const nextOpen = !showRequestsPanel;
+                            setShowRequestsPanel(nextOpen);
+                            if (nextOpen) {
+                              const pendingNames = new Set(
+                                availabilityRequests
+                                  .filter(r => r.status === 'pending' || r.status === 'draft')
+                                  .map(r => r.personName)
+                              );
+                              setRequestHighlightedIds(
+                                availabilities.filter(a => pendingNames.has(a.name)).map(a => a.id)
+                              );
+                            } else {
+                              setRequestHighlightedIds([]);
+                              setRequestHighlightedSlots(new Set());
+                            }
+                          }}
+                          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                        >
+                          <Clock className="h-4 w-4 text-amber-600" />
+                          <span className="text-sm font-bold text-amber-700">
+                            {availabilityRequests.filter(r => r.status === 'pending' || r.status === 'draft').length}
+                          </span>
+                          <span className="text-sm text-amber-600">pending</span>
+                          <ChevronDown className={clsx(
+                            "h-3.5 w-3.5 text-amber-500 transition-transform",
+                            showRequestsPanel && "rotate-180"
+                          )} />
+                        </button>
+                        {availabilityRequests.some(r => r.status === 'pending') && (
+                          <>
+                            <div className="w-px h-5 bg-amber-200" />
+                            {onAcceptRequest && (
+                              <button
+                                onClick={() => availabilityRequests
+                                  .filter(r => r.status === 'pending')
+                                  .forEach(r => onAcceptRequest(r.id))
+                                }
+                                className="px-2 py-1 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                              >
+                                Accept all
+                              </button>
+                            )}
+                            {onDenyRequest && (
+                              <button
+                                onClick={() => availabilityRequests
+                                  .filter(r => r.status === 'pending')
+                                  .forEach(r => onDenyRequest(r.id))
+                                }
+                                className="px-2 py-1 text-xs font-medium border border-red-200 text-red-600 rounded hover:bg-red-50 transition-colors"
+                              >
+                                Deny all
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                      {showRequestsPanel && (
+                        <div className="absolute top-full right-0 mt-1 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto">
+                          <div className="sticky top-0 bg-white px-3 py-1.5 border-b border-gray-100 flex items-center justify-between">
+                            <span className="text-xs font-semibold text-gray-700">Availability Requests</span>
+                            <button
+                              onClick={() => {
+                                setShowRequestsPanel(false);
+                                setRequestHighlightedIds([]);
+                              setRequestHighlightedSlots(new Set());
+                              }}
+                              className="p-0.5 hover:bg-gray-100 rounded"
+                            >
+                              <X className="h-3.5 w-3.5 text-gray-400" />
+                            </button>
+                          </div>
+                          <div className="py-1">
+                            {availabilityRequests.map(req => {
+                              const person = availabilities.find(a => a.name === req.personName);
+                              return (
+                              <div
+                                key={req.id}
+                                className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 cursor-pointer"
+                                onClick={() => {
+                                  if (person) {
+                                    setRequestHighlightedIds([person.id]);
+                                    const slots = new Set(
+                                      req.requestedSlots.map(s => `${person.id}:${s.day}:${s.timeSlot}`)
+                                    );
+                                    setRequestHighlightedSlots(slots);
+                                  }
+                                }}
+                              >
+                                <span className="text-xs font-medium text-gray-900 truncate flex-1 min-w-0">
+                                  {(() => {
+                                    const parts = req.personName.trim().split(/\s+/);
+                                    if (parts.length < 2) return req.personName;
+                                    return `${parts[0][0].toUpperCase()}. ${parts.slice(1).map(p => p[0].toUpperCase() + p.slice(1).toLowerCase()).join(' ')}`;
+                                  })()}
+                                </span>
+                                <span className="text-[10px] text-gray-400 shrink-0">
+                                  {req.requestedSlots.map(s => s.timeSlot).filter((v, i, a) => a.indexOf(v) === i).join(', ')}
+                                </span>
+                                {(req.status === 'fulfilled' || req.status === 'denied') && (
+                                  <span className={clsx(
+                                    "px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0",
+                                    req.status === 'fulfilled' && "bg-green-100 text-green-700",
+                                    req.status === 'denied' && "bg-red-100 text-red-700"
+                                  )}>
+                                    {req.status}
+                                  </span>
+                                )}
+                                {req.status === 'pending' && (
+                                  <div className="flex gap-1 shrink-0">
+                                    {onDenyRequest && (
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); onDenyRequest(req.id); }}
+                                        className="p-0.5 rounded hover:bg-red-50 text-red-500 hover:text-red-700"
+                                      >
+                                        <X className="h-3.5 w-3.5" />
+                                      </button>
+                                    )}
+                                    {onAcceptRequest && (
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); onAcceptRequest(req.id); }}
+                                        className="p-0.5 rounded hover:bg-green-50 text-green-600 hover:text-green-700"
+                                      >
+                                        <Check className="h-3.5 w-3.5" />
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </th>
@@ -828,9 +999,9 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
             </tr>
           )}
           {visibleAvailabilities.map((person, idx) => {
-            const isHighlighted = highlightedPersons.includes(person.id);
+            const isHighlighted = effectiveHighlightedPersons.includes(person.id);
             const nextPerson = visibleAvailabilities[idx + 1];
-            const nextIsHighlighted = nextPerson ? highlightedPersons.includes(nextPerson.id) : false;
+            const nextIsHighlighted = nextPerson ? effectiveHighlightedPersons.includes(nextPerson.id) : false;
             const isGapRow = isHighlighted && !nextIsHighlighted;
             const normalizedName = normalizeName(person.name);
             const isSearchMatch = normalizedParticipantSearch
@@ -934,6 +1105,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                         const baseStatus: AvailabilityStatus =
                           slotData.status === 'booked' && !bookingInfo ? 'available' : slotData.status;
                         const displayStatus: AvailabilityStatus = bookingInfo ? 'booked' : baseStatus;
+                        const isBookedPending = baseStatus === 'requested' && displayStatus === 'booked';
                         const doubleBooked = bookingInfo ? bookingInfo.length > 1 : false;
                         const isEditing =
                           editingSlot?.personId === person.id &&
@@ -947,6 +1119,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                         const isNearMatchMissing = Boolean(
                           nearMatchMissing?.[day]?.[slot]?.includes(person.id)
                         );
+                        const isRequestHighlighted = requestHighlightedSlots.has(`${person.id}:${day}:${slot}`);
                         const highlightStatus: AvailabilityStatus =
                           columnHighlightType === 'near-match' && !isNearMatchMissing
                             ? 'available'
@@ -1015,6 +1188,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                                     className={clsx(
                                       'w-6 h-6 sm:w-7 sm:h-7 rounded-lg shadow-sm flex items-center justify-center transition-opacity pointer-events-auto',
                                       isHighlightedSlot ? 'ring-2 ring-blue-400/30' : '',
+                                      isRequestHighlighted && 'ring-2 ring-amber-400 ring-offset-1',
                                       slotHighlightClass,
                                       columnHighlightType === 'primary' && 'outline outline-2 outline-blue-900 outline-offset-[-8px] shadow-lg',
                                       isEditing && '!opacity-100'
@@ -1026,11 +1200,21 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                                         : displayStatus === 'unavailable' && !effectiveProgramColor
                                         ? 'repeating-linear-gradient(135deg, transparent 0, transparent 3px, rgba(255,255,255,0.3) 3px, rgba(255,255,255,0.3) 6px)'
                                         : undefined,
-                                      outline: showConflictOverlay ? '2px solid #dc2626' : 'none',
+                                      outline: showConflictOverlay
+                                        ? '2px solid #dc2626'
+                                        : (displayStatus === 'requested' || isBookedPending)
+                                        ? '2px solid #d97706'
+                                        : 'none',
                                       outlineOffset: '-2px',
                                     }}
                                   >
-                                    {slotData.locked && !dayLocked && (
+                                    {(displayStatus === 'requested' || isBookedPending) && (
+                                      <Clock
+                                        className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-600"
+                                        strokeWidth={2.5}
+                                      />
+                                    )}
+                                    {slotData.locked && !dayLocked && displayStatus !== 'requested' && !isBookedPending && (
                                       <Lock
                                         className={clsx(
                                           'h-2 w-2 sm:h-3 sm:w-3 drop-shadow-md',
@@ -1091,6 +1275,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                               const baseStatus: AvailabilityStatus =
                                 rosterSlot.status === 'booked' && !bookingInfo ? 'available' : rosterSlot.status;
                               const displayStatus: AvailabilityStatus = bookingInfo ? 'booked' : baseStatus;
+                              const isBookedPending = baseStatus === 'requested' && displayStatus === 'booked';
                               const programmeColor = displayStatus === 'booked'
                                 ? getProgrammeColorForSlot(bookingInfo)
                                 : undefined;
@@ -1145,9 +1330,20 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                                     backgroundImage: displayStatus === 'unavailable' && !effectiveProgramColor
                                       ? 'repeating-linear-gradient(135deg, transparent 0, transparent 3px, rgba(255,255,255,0.3) 3px, rgba(255,255,255,0.3) 6px)'
                                       : undefined,
+                                    outline: (displayStatus === 'requested' || isBookedPending)
+                                      ? '2px solid #d97706'
+                                      : undefined,
+                                    outlineOffset: (displayStatus === 'requested' || isBookedPending)
+                                      ? '-2px'
+                                      : undefined,
                                     zIndex: isEditing ? 100 : 1
                                   }}
                                 >
+                                  {(displayStatus === 'requested' || isBookedPending) && (
+                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                      <Clock className="h-3 w-3 text-amber-600" strokeWidth={2.5} />
+                                    </div>
+                                  )}
                                   {showEditor && renderSlotEditor(slotData, person, day, slot, 'top-14')}
                                 </div>
                               );
@@ -1167,6 +1363,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                         const baseStatus: AvailabilityStatus =
                           slotData.status === 'booked' && !bookingInfo ? 'available' : slotData.status;
                         const displayStatus: AvailabilityStatus = bookingInfo ? 'booked' : baseStatus;
+                        const isBookedPending = baseStatus === 'requested' && displayStatus === 'booked';
                         const doubleBooked = bookingInfo ? bookingInfo.length > 1 : false;
                         const isEditing =
                           editingSlot?.personId === person.id &&
@@ -1179,6 +1376,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                         const isNearMatchMissing = Boolean(
                           nearMatchMissing?.[day]?.[slot]?.includes(person.id)
                         );
+                        const isRequestHighlighted = requestHighlightedSlots.has(`${person.id}:${day}:${slot}`);
                         const highlightStatus: AvailabilityStatus =
                           columnHighlightType === 'near-match' && !isNearMatchMissing
                             ? 'available'
@@ -1202,6 +1400,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                             className={clsx(
                             'flex-1 min-w-0 cursor-pointer transition-opacity relative overflow-visible rounded-sm border pointer-events-auto',
                             slotHighlightClass,
+                            isRequestHighlighted && 'ring-2 ring-amber-400 ring-offset-1',
                             columnHighlightType === 'primary' && 'outline outline-2 outline-blue-900 outline-offset-2 shadow-lg',
                             isEditing && '!opacity-100'
                           )}
@@ -1212,11 +1411,15 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                                 : displayStatus === 'unavailable' && !effectiveProgramColor
                                 ? 'repeating-linear-gradient(135deg, transparent 0, transparent 3px, rgba(255,255,255,0.3) 3px, rgba(255,255,255,0.3) 6px)'
                                 : undefined,
-                              outline: showConflictOverlay ? '2px solid #dc2626' : 'none',
+                              outline: showConflictOverlay
+                                ? '2px solid #dc2626'
+                                : (displayStatus === 'requested' || isBookedPending)
+                                ? '2px solid #d97706'
+                                : 'none',
                               outlineOffset: '-2px',
                               zIndex: isEditing ? 100 : 1,
                             }}
-                            aria-label={`${person.name} - ${slot}: ${AVAILABILITY_STATUS_LABELS[displayStatus]}${conflict ? ' (CONFLICT)' : ''}${bookingInfo ? ' (BOOKED)' : ''}`}
+                            aria-label={`${person.name} - ${slot}: ${AVAILABILITY_STATUS_LABELS[displayStatus]}${conflict ? ' (CONFLICT)' : ''}${bookingInfo ? ' (BOOKED)' : ''}${isBookedPending ? ' (PENDING)' : ''}`}
                             title={getSlotTooltip(
                               person.name,
                               day,
@@ -1235,6 +1438,14 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                               onSlotClick?.(person.id, day, slot);
                             }}
                           >
+                            {(displayStatus === 'requested' || isBookedPending) && (
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <Clock
+                                  className="h-4 w-4 text-amber-600"
+                                  strokeWidth={2.5}
+                                />
+                              </div>
+                            )}
                             {showWarnings && (
                               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-gray-900 pointer-events-none">
                                 {doubleBooked && (
@@ -1278,9 +1489,10 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
             .map((status) => (
               <div key={status} className="flex items-center gap-2">
                 <span
-                  className="w-6 h-6 rounded shadow-sm border border-gray-700"
+                  className="w-6 h-6 rounded shadow-sm flex items-center justify-center"
                   style={{
                     display: 'inline-block',
+                    border: status === 'requested' ? '2px solid #d97706' : '1px solid #374151',
                     ...(status === 'available' && {
                       backgroundColor: 'white'
                     }),
@@ -1291,9 +1503,16 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                     }),
                     ...(status === 'booked' && {
                       backgroundImage: 'linear-gradient(135deg, #3b82f6 0%, #3b82f6 25%, #8b5cf6 25%, #8b5cf6 50%, #ec4899 50%, #ec4899 75%, #f59e0b 75%, #f59e0b 100%)'
+                    }),
+                    ...(status === 'requested' && {
+                      backgroundColor: 'white'
                     })
                   }}
-                />
+                >
+                  {status === 'requested' && (
+                    <Clock className="h-3 w-3 text-amber-600" strokeWidth={2.5} />
+                  )}
+                </span>
                 <span className="capitalize">{AVAILABILITY_STATUS_LABELS[status]}</span>
               </div>
             ))}

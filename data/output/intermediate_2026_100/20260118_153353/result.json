@@ -1,0 +1,5147 @@
+{
+  "assignments": [
+    {
+      "assignment_id": "assign-0",
+      "entity_id": "def-15",
+      "entity_name": "DDOS protection in industrial control systems",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-109",
+      "day_index": 13,
+      "date": "2025-02-28",
+      "day_name": "Friday",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "participant_ids": [
+        "neyens-toon",
+        "danny-hughes",
+        "sam-michiels",
+        "nan",
+        "nan",
+        "tom-van-eyck",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 109
+    },
+    {
+      "assignment_id": "assign-2",
+      "entity_id": "def-132",
+      "entity_name": "Safe digital money transfer on the Internet Computer",
+      "resource_id": "room-9",
+      "resource_name": "Python",
+      "timeslot_id": "ts-15",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "marti-gimeno-josep",
+        "tom-van-cutsem",
+        "nan",
+        "nan",
+        "nan",
+        "dominique-devriese",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 15
+    },
+    {
+      "assignment_id": "assign-3",
+      "entity_id": "def-89",
+      "entity_name": "Leveraging Chunked Transfer-Encoding to Improve Remote Timing Attacks",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-88",
+      "day_index": 11,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "16:00",
+      "end_time": "17:00",
+      "participant_ids": [
+        "truijen-thomas",
+        "mathy-vanhoef",
+        "nan",
+        "nan",
+        "nan",
+        "tom-van-goethem",
+        "vik-vanderlinden",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 88
+    },
+    {
+      "assignment_id": "assign-5",
+      "entity_id": "def-70",
+      "entity_name": "Detecting fingerprinting scripts of third-party trackers accross websites",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-106",
+      "day_index": 13,
+      "date": "2025-02-28",
+      "day_name": "Friday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "jacobs-sibren",
+        "lieven-desmet",
+        "wouter-joosen",
+        "nan",
+        "nan",
+        "yana-dimova",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 106
+    },
+    {
+      "assignment_id": "assign-6",
+      "entity_id": "def-56",
+      "entity_name": "Explain to Restrain: Designing Human-Centered Explanations for a Smart App Blocker",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-34",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "baeyens-luna-mei",
+        "katrien-verbert",
+        "nan",
+        "nan",
+        "nan",
+        "anna-verheyden",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 34
+    },
+    {
+      "assignment_id": "assign-7",
+      "entity_id": "def-79",
+      "entity_name": "Checking correctness of proofs for general inductive definitions",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-13",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "participant_ids": [
+        "schurmans-melvin",
+        "marc-denecker",
+        "bart-bogaerts",
+        "nan",
+        "nan",
+        "robbe-van-den-eede",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 13
+    },
+    {
+      "assignment_id": "assign-8",
+      "entity_id": "def-57",
+      "entity_name": "AI Tutors: Enhancing Student Learning Through LLM-Powered Support Systems",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "carrera-monterde-pilar",
+        "katrien-verbert",
+        "nan",
+        "nan",
+        "nan",
+        "grzegorz-meller",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    },
+    {
+      "assignment_id": "assign-9",
+      "entity_id": "def-99",
+      "entity_name": "Rust Optimizations for Efficient Reasoning over Internet of Things Data",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "mandelings-rob",
+        "pieter-bonte",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-10",
+      "entity_id": "def-34",
+      "entity_name": "Decomposing KAN networks: A tensor decomposition analysis of Kolmogorov-Arnold neural networks",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-62",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "geybels-maarten",
+        "hendrik-blockeel",
+        "mariya-ishteva",
+        "nan",
+        "nan",
+        "joppe-de-jonghe",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 62
+    },
+    {
+      "assignment_id": "assign-12",
+      "entity_id": "def-133",
+      "entity_name": "Optimizing Time Series Anomaly Detection: Automatic Algorithm and Hyperparameter Selection",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-64",
+      "day_index": 8,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "16:00",
+      "end_time": "17:00",
+      "participant_ids": [
+        "deliever-thibaut",
+        "mathias-verbeke",
+        "wannes-meert",
+        "nan",
+        "nan",
+        "ilyas-lemmens",
+        "louis-carpentier",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 64
+    },
+    {
+      "assignment_id": "assign-13",
+      "entity_id": "def-2",
+      "entity_name": "Generative Locomotion in VR",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-57",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "li-haoyang",
+        "adalberto-simeone",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 57
+    },
+    {
+      "assignment_id": "assign-14",
+      "entity_id": "def-126",
+      "entity_name": "Het genereren van studie-gerelateerd programmeeroefeningen op basis van interesses van leerlingen",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "van-cleemput-gino",
+        "tom-schrijvers",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-16",
+      "entity_id": "def-146",
+      "entity_name": "Detecting Backdoors in Federated Learning",
+      "resource_id": "room-10",
+      "resource_name": "Java",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "lobera-vilar-enrique",
+        "wouter-joosen",
+        "davy-preuveneers",
+        "nan",
+        "nan",
+        "qianying-liao",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-17",
+      "entity_id": "def-93",
+      "entity_name": "Enhancing Healthcare Interpretation through Conversational AI: Exploring Large Language Model (LLM)",
+      "resource_id": "room-5",
+      "resource_name": "200B 01.14",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "tahsin-mustafa-turan",
+        "miryam-de-lhoneux",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-19",
+      "entity_id": "def-149",
+      "entity_name": "Enhancing Kubernetes Deployments: Harnessing the Power of Blue-Green Strategies with In-Place Pod Updates",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-15",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "wu-hanlin",
+        "wouter-joosen",
+        "nan",
+        "nan",
+        "nan",
+        "eddy-truyen",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 15
+    },
+    {
+      "assignment_id": "assign-21",
+      "entity_id": "def-45",
+      "entity_name": "Developing a Global Model for Predictive Maintenance in Industrial Compressors",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "devlamminck-thomas",
+        "jesse-davis",
+        "michel-hillen",
+        "nan",
+        "nan",
+        "timo-martens",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-22",
+      "entity_id": "def-95",
+      "entity_name": "Analyse van BVH strategie\u00ebn voor ray tracing",
+      "resource_id": "room-10",
+      "resource_name": "Java",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "bekaert-eline",
+        "philip-dutr\u00e9",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-23",
+      "entity_id": "def-86",
+      "entity_name": "Behind Enemy LANS: Protecting Local Networks from Malicious Mobile Apps",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-86",
+      "day_index": 10,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "schepers-daan",
+        "mathy-vanhoef",
+        "nan",
+        "nan",
+        "nan",
+        "jeroen-robben",
+        "angelos-beitis",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 86
+    },
+    {
+      "assignment_id": "assign-24",
+      "entity_id": "def-10",
+      "entity_name": "Video-Based Remote Control for Battery-Free Robot",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-107",
+      "day_index": 13,
+      "date": "2025-02-28",
+      "day_name": "Friday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "de-vos-milan",
+        "danny-hughes",
+        "sam-michiels",
+        "nan",
+        "nan",
+        "yinze-li",
+        "mengyao-liu",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 107
+    },
+    {
+      "assignment_id": "assign-25",
+      "entity_id": "def-109",
+      "entity_name": "Preference learning for multi-objective optimization",
+      "resource_id": "room-5",
+      "resource_name": "200B 01.14",
+      "timeslot_id": "ts-40",
+      "day_index": 5,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "16:00",
+      "end_time": "17:00",
+      "participant_ids": [
+        "de-maeseneer-dries",
+        "tias-guns",
+        "nan",
+        "nan",
+        "nan",
+        "marco-foschini",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 40
+    },
+    {
+      "assignment_id": "assign-26",
+      "entity_id": "def-123",
+      "entity_name": "PISA-Booster: A software tool to accelerate math learning through self-assessment training",
+      "resource_id": "room-10",
+      "resource_name": "Java",
+      "timeslot_id": "ts-14",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "kindekens-naten",
+        "tom-schrijvers",
+        "nan",
+        "nan",
+        "nan",
+        "elien-bellon",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 14
+    },
+    {
+      "assignment_id": "assign-27",
+      "entity_id": "def-49",
+      "entity_name": "Whole-Fly 3D foundational model: a predictive and explainable model of spatial gene regulation",
+      "resource_id": "room-9",
+      "resource_name": "Python",
+      "timeslot_id": "ts-59",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "vermeire-lukas",
+        "jesse-davis",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 59
+    },
+    {
+      "assignment_id": "assign-28",
+      "entity_id": "def-51",
+      "entity_name": "Estimating rider power in smart indoor cycling trainers with machine learning",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-14",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "isotupa-ca\u00f1izal-marko",
+        "jesse-davis",
+        "wannes-meert",
+        "nan",
+        "nan",
+        "kilian-hendrickx",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 14
+    },
+    {
+      "assignment_id": "assign-29",
+      "entity_id": "def-122",
+      "entity_name": "Testing the Tests: A Tool-Driven Approach to Understanding Test Suite Quality",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-39",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "vandenbulcke-zeno",
+        "tom-holvoet",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 39
+    },
+    {
+      "assignment_id": "assign-31",
+      "entity_id": "def-119",
+      "entity_name": "Safe Reinforcement Learning in Robotics",
+      "resource_id": "room-7",
+      "resource_name": "200B 01.18",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "mystriotis-dimitrios",
+        "tom-holvoet",
+        "nan",
+        "nan",
+        "nan",
+        "yi-yang",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-32",
+      "entity_id": "def-48",
+      "entity_name": "Matching KBO entries with be domain name registrations",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-12",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "maris-arno",
+        "jesse-davis",
+        "maarten-bosteels",
+        "nan",
+        "nan",
+        "thomas-daniels",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 12
+    },
+    {
+      "assignment_id": "assign-33",
+      "entity_id": "def-23",
+      "entity_name": "Attack prototyping on a research RISC-V processor",
+      "resource_id": "room-5",
+      "resource_name": "200B 01.14",
+      "timeslot_id": "ts-83",
+      "day_index": 10,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "huybrechts-nik",
+        "frank-piessens",
+        "nan",
+        "nan",
+        "nan",
+        "m\u00e1rton-bogn\u00e1r",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 83
+    },
+    {
+      "assignment_id": "assign-34",
+      "entity_id": "def-105",
+      "entity_name": "Detecting Misconceptions in Programming Exercises",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-15",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "pauwels-michiel",
+        "siegfried-nijssen",
+        "tom-schrijvers",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 15
+    },
+    {
+      "assignment_id": "assign-35",
+      "entity_id": "def-71",
+      "entity_name": "Leveraging URL parameters in phishing links to track campaigns",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-40",
+      "day_index": 5,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "16:00",
+      "end_time": "17:00",
+      "participant_ids": [
+        "segers-michiel",
+        "lieven-desmet",
+        "nan",
+        "nan",
+        "nan",
+        "daan-vansteenhuyse",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 40
+    },
+    {
+      "assignment_id": "assign-36",
+      "entity_id": "def-124",
+      "entity_name": "Efficient bidirectional parser combinators",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-64",
+      "day_index": 8,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "16:00",
+      "end_time": "17:00",
+      "participant_ids": [
+        "pauwels-wouter",
+        "tom-schrijvers",
+        "nan",
+        "nan",
+        "nan",
+        "ruifeng-xie",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 64
+    },
+    {
+      "assignment_id": "assign-37",
+      "entity_id": "def-82",
+      "entity_name": "Behind Enemy LANS: Protecting Local Networks from Malicious Mobile Apps",
+      "resource_id": "room-10",
+      "resource_name": "Java",
+      "timeslot_id": "ts-59",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "olson-nicholas",
+        "mathy-vanhoef",
+        "nan",
+        "nan",
+        "nan",
+        "jeroen-robben",
+        "angelos-beitis",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 59
+    },
+    {
+      "assignment_id": "assign-38",
+      "entity_id": "def-53",
+      "entity_name": "ARM Your Code: Practical Symbolic Validation of TrustZone Programs on Cortex-M Microcontrollers",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-36",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "bellefroid-tijs",
+        "jo-van-bulck",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 36
+    },
+    {
+      "assignment_id": "assign-39",
+      "entity_id": "def-58",
+      "entity_name": "Intelligent Tutors: Predicting Learning Struggles and Guiding Students with AI-Powered Support.",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-63",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "cools-michiel",
+        "katrien-verbert",
+        "nan",
+        "nan",
+        "nan",
+        "grzegorz-meller",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 63
+    },
+    {
+      "assignment_id": "assign-40",
+      "entity_id": "def-98",
+      "entity_name": "Advanced Monte Carlo Ray Tracing Methods",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "debois-lowie",
+        "philip-dutr\u00e9",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-41",
+      "entity_id": "def-66",
+      "entity_name": "Privacy analysis of subdomains",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-108",
+      "day_index": 13,
+      "date": "2025-02-28",
+      "day_name": "Friday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "frank-raoul",
+        "lieven-desmet",
+        "nan",
+        "nan",
+        "nan",
+        "yana-dimova",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 108
+    },
+    {
+      "assignment_id": "assign-42",
+      "entity_id": "def-100",
+      "entity_name": "Hybrid AI for advanced Internet of Things analytics",
+      "resource_id": "room-5",
+      "resource_name": "200B 01.14",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "sanyal-srinjoy",
+        "pieter-bonte",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    },
+    {
+      "assignment_id": "assign-44",
+      "entity_id": "def-101",
+      "entity_name": "mapping real world combinational optimization problems to an Ising formulation",
+      "resource_id": "room-9",
+      "resource_name": "Python",
+      "timeslot_id": "ts-86",
+      "day_index": 10,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "feng-shannon",
+        "roel-wuyts",
+        "marian-verhelst",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 86
+    },
+    {
+      "assignment_id": "assign-46",
+      "entity_id": "def-18",
+      "entity_name": "Providing availability guarantees to OTA updates for IoT systems",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-60",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "vanhentenrijk-liam",
+        "danny-hughes",
+        "sam-michiels",
+        "nan",
+        "nan",
+        "tom-van-eyck",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 60
+    },
+    {
+      "assignment_id": "assign-49",
+      "entity_id": "def-8",
+      "entity_name": "Monitoring of super users in a PON network and guaranteeing fairness versus other users",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-81",
+      "day_index": 10,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "embrechts-jonas",
+        "bart-jacobs",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 81
+    },
+    {
+      "assignment_id": "assign-50",
+      "entity_id": "def-72",
+      "entity_name": "Evaluating the privacy of authentication on the web",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-60",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "vandenhoeck-robin",
+        "lieven-desmet",
+        "nan",
+        "nan",
+        "nan",
+        "yana-dimova",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 60
+    },
+    {
+      "assignment_id": "assign-51",
+      "entity_id": "def-131",
+      "entity_name": "Decentralized games: A far-away dream or near-by reality?",
+      "resource_id": "room-5",
+      "resource_name": "200B 01.14",
+      "timeslot_id": "ts-35",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "ingelaere-hannes",
+        "tom-van-cutsem",
+        "nan",
+        "nan",
+        "nan",
+        "glenn-de-witte",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 35
+    },
+    {
+      "assignment_id": "assign-52",
+      "entity_id": "def-102",
+      "entity_name": "Deriving Platform Requirements for Autonomous Driving: A Chiplets-oriented Approach",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "toye-tristan",
+        "roel-wuyts",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    },
+    {
+      "assignment_id": "assign-53",
+      "entity_id": "def-76",
+      "entity_name": "Be Lazy: Exploiting Symmetries while Counting Models",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-60",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "el-kaddouri-ibrahim",
+        "luc-de-raedt",
+        "nan",
+        "nan",
+        "nan",
+        "vincent-derkinderen",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 60
+    },
+    {
+      "assignment_id": "assign-54",
+      "entity_id": "def-61",
+      "entity_name": "An AI-Driven Clinical Decision Support System for Evidence-Based Personalized Diabetes Management",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-37",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "participant_ids": [
+        "lampaert-marie",
+        "katrien-verbert",
+        "nan",
+        "nan",
+        "nan",
+        "reza-samimi",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 37
+    },
+    {
+      "assignment_id": "assign-55",
+      "entity_id": "def-87",
+      "entity_name": "Time to stop: Defending against Timeless Timing Attacks",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-105",
+      "day_index": 13,
+      "date": "2025-02-28",
+      "day_name": "Friday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "schryvers-wietze",
+        "mathy-vanhoef",
+        "nan",
+        "nan",
+        "nan",
+        "tom-van-goethem",
+        "vik-vanderlinden",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 105
+    },
+    {
+      "assignment_id": "assign-57",
+      "entity_id": "def-44",
+      "entity_name": "Towards Body Orientationbased -Performance Metrics in Soccer",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-34",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "de-bruyn-lo\u00efc",
+        "jesse-davis",
+        "jan-van-haaren",
+        "nan",
+        "nan",
+        "pieter-robberechts",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 34
+    },
+    {
+      "assignment_id": "assign-58",
+      "entity_id": "def-128",
+      "entity_name": "Catch Me If You Can: Privacy-Preserving Transparency Logs",
+      "resource_id": "room-9",
+      "resource_name": "Python",
+      "timeslot_id": "ts-38",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "de-klerck-andries",
+        "tom-van-cutsem",
+        "nan",
+        "nan",
+        "nan",
+        "glenn-de-witte",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 38
+    },
+    {
+      "assignment_id": "assign-59",
+      "entity_id": "def-5",
+      "entity_name": "Lunar Interaction: validating VR as a user research tool",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-33",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "vanhee-lowie",
+        "adalberto-simeone",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 33
+    },
+    {
+      "assignment_id": "assign-60",
+      "entity_id": "def-130",
+      "entity_name": "The proof is yours; the secrets are mine!: Glue Web2 Confidential Data to Web3 with Zero-Knowledge Proofs",
+      "resource_id": "room-7",
+      "resource_name": "200B 01.18",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "hoek-emile",
+        "tom-van-cutsem",
+        "nan",
+        "nan",
+        "nan",
+        "weihong-wang",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-61",
+      "entity_id": "def-96",
+      "entity_name": "3D Gaussiaanse splats voor 3D rendering",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "cockaerts-kwinten",
+        "philip-dutr\u00e9",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    },
+    {
+      "assignment_id": "assign-62",
+      "entity_id": "def-7",
+      "entity_name": "Achieving World Dominion Through Proof Logging",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-82",
+      "day_index": 10,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "muys-toby",
+        "bart-bogaerts",
+        "nan",
+        "nan",
+        "nan",
+        "dieter-vandesande",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 82
+    },
+    {
+      "assignment_id": "assign-64",
+      "entity_id": "def-106",
+      "entity_name": "Using LLMs to form natural language explanations for constraint satisfaction problems",
+      "resource_id": "room-7",
+      "resource_name": "200B 01.18",
+      "timeslot_id": "ts-57",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "are-mathias",
+        "tias-guns",
+        "nan",
+        "nan",
+        "nan",
+        "konstantinos-alexandros-michailidis",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 57
+    },
+    {
+      "assignment_id": "assign-65",
+      "entity_id": "def-25",
+      "entity_name": "Attack prototyping on a research RISC-V processor",
+      "resource_id": "room-7",
+      "resource_name": "200B 01.18",
+      "timeslot_id": "ts-12",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "titeca-robbe",
+        "frank-piessens",
+        "nan",
+        "nan",
+        "nan",
+        "m\u00e1rton-bogn\u00e1r",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 12
+    },
+    {
+      "assignment_id": "assign-66",
+      "entity_id": "def-50",
+      "entity_name": "Predicting the injury risk of acute hamstring and overuse bone stress injury",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-62",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "willems-thibault",
+        "jesse-davis",
+        "nan",
+        "nan",
+        "nan",
+        "stijn-bogaerts",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 62
+    },
+    {
+      "assignment_id": "assign-67",
+      "entity_id": "def-97",
+      "entity_name": "Hamiltonian Monte Carlo processes applied to global illumination algorithm in computer graphics",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-57",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "croes-wannes",
+        "philip-dutr\u00e9",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 57
+    },
+    {
+      "assignment_id": "assign-68",
+      "entity_id": "def-114",
+      "entity_name": "Perception-based Constraint Solving for Non-Standard Sudoku Images",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-34",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "shum-pak-ning",
+        "tias-guns",
+        "nan",
+        "nan",
+        "nan",
+        "orestis-lomis",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 34
+    },
+    {
+      "assignment_id": "assign-69",
+      "entity_id": "def-136",
+      "entity_name": "Eventdriven -timeseries forecasting for compressed air systems",
+      "resource_id": "room-9",
+      "resource_name": "Python",
+      "timeslot_id": "ts-35",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "sleurs-wenzel",
+        "wannes-meert",
+        "nan",
+        "nan",
+        "nan",
+        "wim-van-roy",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 35
+    },
+    {
+      "assignment_id": "assign-71",
+      "entity_id": "def-137",
+      "entity_name": "Reinforcement learning of action sequences in table football",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-38",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "van-meulder-yani",
+        "wannes-meert",
+        "nan",
+        "nan",
+        "nan",
+        "jens-b\u00fcrger",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 38
+    },
+    {
+      "assignment_id": "assign-72",
+      "entity_id": "def-9",
+      "entity_name": "Oxidize your gearbox: Evaluating the feasibility and benefits of Rust in automotive embedded software",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-33",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "lambrecht-wouter",
+        "bart-jacobs",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 33
+    },
+    {
+      "assignment_id": "assign-74",
+      "entity_id": "def-67",
+      "entity_name": "Mapping infrastructural overlap and relations in malicious online campaigns",
+      "resource_id": "room-9",
+      "resource_name": "Python",
+      "timeslot_id": "ts-36",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "grosemans-ward",
+        "lieven-desmet",
+        "nan",
+        "nan",
+        "nan",
+        "daan-vansteenhuyse",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 36
+    },
+    {
+      "assignment_id": "assign-75",
+      "entity_id": "def-127",
+      "entity_name": "Benchmarking and Evaluating Post Quantum Signature Schemes for Public Blockchain System",
+      "resource_id": "room-5",
+      "resource_name": "200B 01.14",
+      "timeslot_id": "ts-12",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "cautaerts-vincent",
+        "tom-van-cutsem",
+        "bart-preneel",
+        "nan",
+        "nan",
+        "varesh-mishra",
+        "kevin-bogner",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 12
+    },
+    {
+      "assignment_id": "assign-76",
+      "entity_id": "def-118",
+      "entity_name": "Breaking Bad Testing: Analysis and Improvement of Test Suites in Java Open Source Software",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-10",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "10:00",
+      "end_time": "11:00",
+      "participant_ids": [
+        "monden-nicolas",
+        "tom-holvoet",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 10
+    },
+    {
+      "assignment_id": "assign-77",
+      "entity_id": "def-21",
+      "entity_name": "Microarchitectural Side Channels? Rust in Peace.",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-59",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "bielecki-jakub",
+        "frank-piessens",
+        "nan",
+        "nan",
+        "nan",
+        "daan-vanoverloop",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 59
+    },
+    {
+      "assignment_id": "assign-78",
+      "entity_id": "def-121",
+      "entity_name": "Breaking Bad Testing: Analysis and Improvement of Test Suites in Java Open Source Software",
+      "resource_id": "room-8",
+      "resource_name": "Ruby",
+      "timeslot_id": "ts-12",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "strobbe-jacob",
+        "tom-holvoet",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 12
+    },
+    {
+      "assignment_id": "assign-80",
+      "entity_id": "def-46",
+      "entity_name": "Detecting and Evaluating Pressing in Soccer using AI",
+      "resource_id": "room-7",
+      "resource_name": "200B 01.18",
+      "timeslot_id": "ts-63",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "elzawawi-adham",
+        "jesse-davis",
+        "matteo-balliauw",
+        "nan",
+        "nan",
+        "lorenzo-cascioli",
+        "max-goldsmith",
+        "maxim-wouters",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 63
+    },
+    {
+      "assignment_id": "assign-81",
+      "entity_id": "def-63",
+      "entity_name": "Developing XAI-Enhanced Dashboards for Employee Well-being and Skill Development in Workplace Learning",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-57",
+      "day_index": 7,
+      "date": "2025-02-26",
+      "day_name": "Wednesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "van-nieuwenhove-barteld",
+        "katrien-verbert",
+        "lode-godderis",
+        "nan",
+        "nan",
+        "shana-v-f-hazboun",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 57
+    },
+    {
+      "assignment_id": "assign-82",
+      "entity_id": "def-60",
+      "entity_name": "Renters of the world, unite! Designing housing recommendations for mobile devices",
+      "resource_id": "room-5",
+      "resource_name": "200B 01.14",
+      "timeslot_id": "ts-33",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "grieten-cedric",
+        "katrien-verbert",
+        "nan",
+        "nan",
+        "nan",
+        "maxwell-szymanski",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 33
+    },
+    {
+      "assignment_id": "assign-84",
+      "entity_id": "def-4",
+      "entity_name": "Exploring Natural Interaction Methods for Initiating Conversations with AR Assistants",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-81",
+      "day_index": 10,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "paredis-benneth",
+        "adalberto-simeone",
+        "nan",
+        "nan",
+        "nan",
+        "taiyu-zhang",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 81
+    },
+    {
+      "assignment_id": "assign-85",
+      "entity_id": "def-24",
+      "entity_name": "Evaluating and improving the extensibility of a research RISC-V processor with security features",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-16",
+      "day_index": 2,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "16:00",
+      "end_time": "17:00",
+      "participant_ids": [
+        "penders-vincent",
+        "frank-piessens",
+        "nan",
+        "nan",
+        "nan",
+        "m\u00e1rton-bogn\u00e1r",
+        "hans-winderix",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 16
+    },
+    {
+      "assignment_id": "assign-86",
+      "entity_id": "def-41",
+      "entity_name": "Optimizing Squad Size: A Data-Driven Analysis of First-Team Squad size management in Professional Football",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "casta\u00f1os-s\u00e1nchez-h\u00e9ctor",
+        "jesse-davis",
+        "ruben-tirezjan-boden",
+        "nan",
+        "nan",
+        "maaike-van-roy",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    },
+    {
+      "assignment_id": "assign-87",
+      "entity_id": "def-83",
+      "entity_name": "Detection of Fake Base Stations in 5G networks",
+      "resource_id": "room-2",
+      "resource_name": "200C 00.02",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "oyen-kevin",
+        "mathy-vanhoef",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-88",
+      "entity_id": "def-129",
+      "entity_name": "Decentralized games: A far-away dream or nearby -reality?",
+      "resource_id": "room-6",
+      "resource_name": "200B 01.16",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "droogmans-benjamin",
+        "tom-van-cutsem",
+        "nan",
+        "nan",
+        "nan",
+        "glenn-de-witte",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    },
+    {
+      "assignment_id": "assign-89",
+      "entity_id": "def-107",
+      "entity_name": "Finding Optimal Weights for Predictive Prescriptions",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-38",
+      "day_index": 4,
+      "date": "2025-02-25",
+      "day_name": "Tuesday",
+      "start_time": "14:00",
+      "end_time": "15:00",
+      "participant_ids": [
+        "brosens-mathias",
+        "tias-guns",
+        "nan",
+        "nan",
+        "nan",
+        "ali-irfan-mahmutogullari",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 38
+    },
+    {
+      "assignment_id": "assign-90",
+      "entity_id": "def-148",
+      "entity_name": "The Security of Adversarial Patches Detectors in Biometric Authentication",
+      "resource_id": "room-5",
+      "resource_name": "200B 01.14",
+      "timeslot_id": "ts-87",
+      "day_index": 10,
+      "date": "2025-02-27",
+      "day_name": "Thursday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "van-vlerken-kobe",
+        "wouter-joosen",
+        "davy-preuveneers",
+        "nan",
+        "nan",
+        "sander-joos",
+        "willem-verheyen",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 87
+    },
+    {
+      "assignment_id": "assign-91",
+      "entity_id": "def-111",
+      "entity_name": "INTERACTIVE CONSTRAINT ACQUISITION WITH THE PRESENCE OF NOISE IN THE ANSWERS OF THE ORACLE",
+      "resource_id": "room-7",
+      "resource_name": "200B 01.18",
+      "timeslot_id": "ts-13",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "participant_ids": [
+        "gillis-gert-jan",
+        "tias-guns",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 13
+    },
+    {
+      "assignment_id": "assign-93",
+      "entity_id": "def-69",
+      "entity_name": "Large scale cross-browser analysis of the web",
+      "resource_id": "room-4",
+      "resource_name": "200C 00.04",
+      "timeslot_id": "ts-111",
+      "day_index": 13,
+      "date": "2025-02-28",
+      "day_name": "Friday",
+      "start_time": "15:00",
+      "end_time": "16:00",
+      "participant_ids": [
+        "ingelaere-floris",
+        "lieven-desmet",
+        "nan",
+        "nan",
+        "nan",
+        "gertjan-franken",
+        "daan-vansteenhuyse",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 111
+    },
+    {
+      "assignment_id": "assign-95",
+      "entity_id": "def-103",
+      "entity_name": "Generative Decision Trees",
+      "resource_id": "room-5",
+      "resource_name": "200B 01.14",
+      "timeslot_id": "ts-13",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "13:00",
+      "end_time": "14:00",
+      "participant_ids": [
+        "van-calsteren-brent",
+        "siegfried-nijssen",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 13
+    },
+    {
+      "assignment_id": "assign-96",
+      "entity_id": "def-59",
+      "entity_name": "Creating New Interfaces to interact with LLMs: The Archaeologist Case Study",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-12",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "12:00",
+      "end_time": "13:00",
+      "participant_ids": [
+        "cremelie-arthur",
+        "katrien-verbert",
+        "nan",
+        "nan",
+        "nan",
+        "ivania-nadine-donoso-guzm\u00e1n",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 12
+    },
+    {
+      "assignment_id": "assign-97",
+      "entity_id": "def-134",
+      "entity_name": "Early detection of battery faults through datadriven -models",
+      "resource_id": "room-3",
+      "resource_name": "200C 00.03",
+      "timeslot_id": "ts-16",
+      "day_index": 2,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "16:00",
+      "end_time": "17:00",
+      "participant_ids": [
+        "mensch-robbe",
+        "wannes-meert",
+        "nan",
+        "nan",
+        "nan",
+        "annelies-vroman",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 16
+    },
+    {
+      "assignment_id": "assign-98",
+      "entity_id": "def-125",
+      "entity_name": "Gotta Master 'Em All: Generating Code Tracing Assignments to Determine Mastery of Programming Concepts",
+      "resource_id": "room-7",
+      "resource_name": "200B 01.18",
+      "timeslot_id": "ts-11",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "11:00",
+      "end_time": "12:00",
+      "participant_ids": [
+        "steenhoudt-ebbe",
+        "tom-schrijvers",
+        "nan",
+        "nan",
+        "nan",
+        "jesse-hoabergs",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 11
+    },
+    {
+      "assignment_id": "assign-99",
+      "entity_id": "def-36",
+      "entity_name": "Few chords in longest cycles of 3-connected graphs",
+      "resource_id": "room-1",
+      "resource_name": "200C 00.01",
+      "timeslot_id": "ts-9",
+      "day_index": 1,
+      "date": "2025-02-24",
+      "day_name": "Monday",
+      "start_time": "09:00",
+      "end_time": "10:00",
+      "participant_ids": [
+        "anseeuw-ruben",
+        "jan-goedgebeur",
+        "nan",
+        "nan",
+        "nan",
+        "jorik-jooken",
+        "nan",
+        "nan",
+        "nan"
+      ],
+      "num_participants": 9,
+      "resource_capacity": 1,
+      "utilization": 1.0,
+      "slot_index": 9
+    }
+  ],
+  "unscheduled": [
+    {
+      "entity_id": "def-145",
+      "entity_name": "I got 99 secure design problems, but I'm not sure which ones"
+    },
+    {
+      "entity_id": "def-78",
+      "entity_name": "Neurosymbolic OCR for Biological Specimen Labels"
+    },
+    {
+      "entity_id": "def-33",
+      "entity_name": "Tricking AI: comparison of adversarial examples"
+    },
+    {
+      "entity_id": "def-90",
+      "entity_name": "Automated Vulnerability Discovery in Wi-Fi Authentication Protocols"
+    },
+    {
+      "entity_id": "def-88",
+      "entity_name": "Security Testing of Multiplayer Video Game Protocols"
+    },
+    {
+      "entity_id": "def-139",
+      "entity_name": "Operationalizing Security Threat Models"
+    },
+    {
+      "entity_id": "def-16",
+      "entity_name": "Low-Latency Ultra-Wideband Network Support for Multi-Robot Flocking"
+    },
+    {
+      "entity_id": "def-13",
+      "entity_name": "Energy-Aware Task Scheduling for Battery Free Wildlife Tracking"
+    },
+    {
+      "entity_id": "def-31",
+      "entity_name": "Tricking AI: comparison of adversarial examples"
+    },
+    {
+      "entity_id": "def-12",
+      "entity_name": "Robot Tracking for Ultra-Dense Swarms Using mmWave Radar"
+    },
+    {
+      "entity_id": "def-55",
+      "entity_name": "General-Relativistic Hydronamics with AMREX"
+    },
+    {
+      "entity_id": "def-84",
+      "entity_name": "Locate Me If You Can: Deanonymizing and Geolocating VPN/Proxy Users Through Network Latency"
+    },
+    {
+      "entity_id": "def-32",
+      "entity_name": "Semi-supervised classification of IoT failure Data"
+    },
+    {
+      "entity_id": "def-3",
+      "entity_name": "From Silence to Feedback: Coping with Latency in Conversational VR Agents through Design Cues"
+    },
+    {
+      "entity_id": "def-73",
+      "entity_name": "Extending DPMF to support Fundamental Rights Impact Assessments (FRIAS) under the EU AI act"
+    },
+    {
+      "entity_id": "def-14",
+      "entity_name": "Wireless Controller Area Network (CAN) Bus"
+    },
+    {
+      "entity_id": "def-135",
+      "entity_name": "Reinforcement learning of action sequences in table football"
+    },
+    {
+      "entity_id": "def-19",
+      "entity_name": "Constraint Generation with Parametric Higher-Order Abstract Syntax"
+    },
+    {
+      "entity_id": "def-17",
+      "entity_name": "Battery Free Environmental Monitoring Sensor Networks"
+    }
+  ],
+  "summary": {
+    "total": 100,
+    "scheduled": 81,
+    "unscheduled": 19
+  },
+  "objectives": {},
+  "utilization": {
+    "rooms": [
+      {
+        "resource": "200C 00.01",
+        "type": "room",
+        "available_hours": 32,
+        "busy_hours": 20,
+        "utilization": 0.625
+      },
+      {
+        "resource": "200C 00.02",
+        "type": "room",
+        "available_hours": 25,
+        "busy_hours": 7,
+        "utilization": 0.28
+      },
+      {
+        "resource": "200C 00.03",
+        "type": "room",
+        "available_hours": 36,
+        "busy_hours": 6,
+        "utilization": 0.16666666666666666
+      },
+      {
+        "resource": "200C 00.04",
+        "type": "room",
+        "available_hours": 31,
+        "busy_hours": 10,
+        "utilization": 0.3225806451612903
+      },
+      {
+        "resource": "200B 01.14",
+        "type": "room",
+        "available_hours": 31,
+        "busy_hours": 9,
+        "utilization": 0.2903225806451613
+      },
+      {
+        "resource": "200B 01.16",
+        "type": "room",
+        "available_hours": 27,
+        "busy_hours": 7,
+        "utilization": 0.25925925925925924
+      },
+      {
+        "resource": "200B 01.18",
+        "type": "room",
+        "available_hours": 32,
+        "busy_hours": 7,
+        "utilization": 0.21875
+      },
+      {
+        "resource": "Ruby",
+        "type": "room",
+        "available_hours": 27,
+        "busy_hours": 5,
+        "utilization": 0.18518518518518517
+      },
+      {
+        "resource": "Python",
+        "type": "room",
+        "available_hours": 35,
+        "busy_hours": 6,
+        "utilization": 0.17142857142857143
+      },
+      {
+        "resource": "Java",
+        "type": "room",
+        "available_hours": 37,
+        "busy_hours": 4,
+        "utilization": 0.10810810810810811
+      }
+    ],
+    "people": [
+      {
+        "resource": "Adalberto Simeone",
+        "type": "person",
+        "available_hours": 13,
+        "busy_hours": 3,
+        "utilization": 0.23076923076923078
+      },
+      {
+        "resource": "Ali Irfan Mahmutogullari",
+        "type": "person",
+        "available_hours": 24,
+        "busy_hours": 1,
+        "utilization": 0.041666666666666664
+      },
+      {
+        "resource": "Angelos Beitis",
+        "type": "person",
+        "available_hours": 20,
+        "busy_hours": 2,
+        "utilization": 0.1
+      },
+      {
+        "resource": "Anna Verheyden",
+        "type": "person",
+        "available_hours": 22,
+        "busy_hours": 1,
+        "utilization": 0.045454545454545456
+      },
+      {
+        "resource": "Annelies Vroman",
+        "type": "person",
+        "available_hours": 13,
+        "busy_hours": 1,
+        "utilization": 0.07692307692307693
+      },
+      {
+        "resource": "Arthur Offermans",
+        "type": "person",
+        "available_hours": 5,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Bart Bogaerts",
+        "type": "person",
+        "available_hours": 26,
+        "busy_hours": 2,
+        "utilization": 0.07692307692307693
+      },
+      {
+        "resource": "Bart Jacobs",
+        "type": "person",
+        "available_hours": 8,
+        "busy_hours": 2,
+        "utilization": 0.25
+      },
+      {
+        "resource": "Bart Preneel",
+        "type": "person",
+        "available_hours": 17,
+        "busy_hours": 1,
+        "utilization": 0.058823529411764705
+      },
+      {
+        "resource": "Daan Vanoverloop",
+        "type": "person",
+        "available_hours": 4,
+        "busy_hours": 1,
+        "utilization": 0.25
+      },
+      {
+        "resource": "Daan Vansteenhuyse",
+        "type": "person",
+        "available_hours": 20,
+        "busy_hours": 3,
+        "utilization": 0.15
+      },
+      {
+        "resource": "Danny Hughes",
+        "type": "person",
+        "available_hours": 23,
+        "busy_hours": 3,
+        "utilization": 0.13043478260869565
+      },
+      {
+        "resource": "Davy Preuveneers",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 2,
+        "utilization": 0.14285714285714285
+      },
+      {
+        "resource": "Denis Carnier",
+        "type": "person",
+        "available_hours": 3,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Dieter Vandesande",
+        "type": "person",
+        "available_hours": 19,
+        "busy_hours": 1,
+        "utilization": 0.05263157894736842
+      },
+      {
+        "resource": "Dominique Devriese",
+        "type": "person",
+        "available_hours": 12,
+        "busy_hours": 1,
+        "utilization": 0.08333333333333333
+      },
+      {
+        "resource": "Eddy Truyen",
+        "type": "person",
+        "available_hours": 8,
+        "busy_hours": 1,
+        "utilization": 0.125
+      },
+      {
+        "resource": "Elien Bellon",
+        "type": "person",
+        "available_hours": 15,
+        "busy_hours": 1,
+        "utilization": 0.06666666666666667
+      },
+      {
+        "resource": "Frank Piessens",
+        "type": "person",
+        "available_hours": 18,
+        "busy_hours": 4,
+        "utilization": 0.2222222222222222
+      },
+      {
+        "resource": "Frederik Allaeys",
+        "type": "person",
+        "available_hours": 18,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Frederik De Ceuster",
+        "type": "person",
+        "available_hours": 12,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Gertjan Franken",
+        "type": "person",
+        "available_hours": 12,
+        "busy_hours": 1,
+        "utilization": 0.08333333333333333
+      },
+      {
+        "resource": "Glenn De Witte",
+        "type": "person",
+        "available_hours": 7,
+        "busy_hours": 3,
+        "utilization": 0.42857142857142855
+      },
+      {
+        "resource": "Grzegorz Meller",
+        "type": "person",
+        "available_hours": 16,
+        "busy_hours": 2,
+        "utilization": 0.125
+      },
+      {
+        "resource": "Hans Winderix",
+        "type": "person",
+        "available_hours": 7,
+        "busy_hours": 1,
+        "utilization": 0.14285714285714285
+      },
+      {
+        "resource": "Hendrik Blockeel",
+        "type": "person",
+        "available_hours": 6,
+        "busy_hours": 1,
+        "utilization": 0.16666666666666666
+      },
+      {
+        "resource": "H\u00e9lo\u00efse Gollier",
+        "type": "person",
+        "available_hours": 21,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Ilyas Lemmens",
+        "type": "person",
+        "available_hours": 18,
+        "busy_hours": 1,
+        "utilization": 0.05555555555555555
+      },
+      {
+        "resource": "Ivania Nadine Donoso Guzm\u00e1n",
+        "type": "person",
+        "available_hours": 20,
+        "busy_hours": 1,
+        "utilization": 0.05
+      },
+      {
+        "resource": "Jan Goedgebeur",
+        "type": "person",
+        "available_hours": 10,
+        "busy_hours": 1,
+        "utilization": 0.1
+      },
+      {
+        "resource": "Jan Van Haaren",
+        "type": "person",
+        "available_hours": 29,
+        "busy_hours": 1,
+        "utilization": 0.034482758620689655
+      },
+      {
+        "resource": "Jens B\u00fcrger",
+        "type": "person",
+        "available_hours": 5,
+        "busy_hours": 1,
+        "utilization": 0.2
+      },
+      {
+        "resource": "Jeroen Robben",
+        "type": "person",
+        "available_hours": 3,
+        "busy_hours": 2,
+        "utilization": 0.6666666666666666
+      },
+      {
+        "resource": "Jesse Davis",
+        "type": "person",
+        "available_hours": 33,
+        "busy_hours": 8,
+        "utilization": 0.24242424242424243
+      },
+      {
+        "resource": "Jesse Hoabergs",
+        "type": "person",
+        "available_hours": 27,
+        "busy_hours": 1,
+        "utilization": 0.037037037037037035
+      },
+      {
+        "resource": "Jo Van Bulck",
+        "type": "person",
+        "available_hours": 13,
+        "busy_hours": 1,
+        "utilization": 0.07692307692307693
+      },
+      {
+        "resource": "Jonah Bellemans",
+        "type": "person",
+        "available_hours": 21,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Jonathan Oostvogels",
+        "type": "person",
+        "available_hours": 8,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Joppe De Jonghe",
+        "type": "person",
+        "available_hours": 9,
+        "busy_hours": 1,
+        "utilization": 0.1111111111111111
+      },
+      {
+        "resource": "Jorik Jooken",
+        "type": "person",
+        "available_hours": 18,
+        "busy_hours": 1,
+        "utilization": 0.05555555555555555
+      },
+      {
+        "resource": "Karl Meerbergen",
+        "type": "person",
+        "available_hours": 22,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Katrien Verbert",
+        "type": "person",
+        "available_hours": 27,
+        "busy_hours": 7,
+        "utilization": 0.25925925925925924
+      },
+      {
+        "resource": "Kevin Bogner",
+        "type": "person",
+        "available_hours": 19,
+        "busy_hours": 1,
+        "utilization": 0.05263157894736842
+      },
+      {
+        "resource": "Kilian Hendrickx",
+        "type": "person",
+        "available_hours": 28,
+        "busy_hours": 1,
+        "utilization": 0.03571428571428571
+      },
+      {
+        "resource": "Konstantinos Alexandros Michailidis",
+        "type": "person",
+        "available_hours": 12,
+        "busy_hours": 1,
+        "utilization": 0.08333333333333333
+      },
+      {
+        "resource": "Laurens Sion",
+        "type": "person",
+        "available_hours": 7,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Lieven Desmet",
+        "type": "person",
+        "available_hours": 12,
+        "busy_hours": 6,
+        "utilization": 0.5
+      },
+      {
+        "resource": "Lode Godderis",
+        "type": "person",
+        "available_hours": 13,
+        "busy_hours": 1,
+        "utilization": 0.07692307692307693
+      },
+      {
+        "resource": "Lorenzo Cascioli",
+        "type": "person",
+        "available_hours": 19,
+        "busy_hours": 1,
+        "utilization": 0.05263157894736842
+      },
+      {
+        "resource": "Louis Carpentier",
+        "type": "person",
+        "available_hours": 25,
+        "busy_hours": 1,
+        "utilization": 0.04
+      },
+      {
+        "resource": "Luc De Raedt",
+        "type": "person",
+        "available_hours": 28,
+        "busy_hours": 1,
+        "utilization": 0.03571428571428571
+      },
+      {
+        "resource": "Luca Stradiotti",
+        "type": "person",
+        "available_hours": 3,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Maaike Van Roy",
+        "type": "person",
+        "available_hours": 27,
+        "busy_hours": 1,
+        "utilization": 0.037037037037037035
+      },
+      {
+        "resource": "Maarten Bosteels",
+        "type": "person",
+        "available_hours": 18,
+        "busy_hours": 1,
+        "utilization": 0.05555555555555555
+      },
+      {
+        "resource": "Marc Denecker",
+        "type": "person",
+        "available_hours": 30,
+        "busy_hours": 1,
+        "utilization": 0.03333333333333333
+      },
+      {
+        "resource": "Marco Foschini",
+        "type": "person",
+        "available_hours": 15,
+        "busy_hours": 1,
+        "utilization": 0.06666666666666667
+      },
+      {
+        "resource": "Marian Verhelst",
+        "type": "person",
+        "available_hours": 11,
+        "busy_hours": 1,
+        "utilization": 0.09090909090909091
+      },
+      {
+        "resource": "Marie Sch\u00f6nfeld",
+        "type": "person",
+        "available_hours": 16,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Mariya Ishteva",
+        "type": "person",
+        "available_hours": 18,
+        "busy_hours": 1,
+        "utilization": 0.05555555555555555
+      },
+      {
+        "resource": "Mathias Verbeke",
+        "type": "person",
+        "available_hours": 9,
+        "busy_hours": 1,
+        "utilization": 0.1111111111111111
+      },
+      {
+        "resource": "Mathy Vanhoef",
+        "type": "person",
+        "available_hours": 25,
+        "busy_hours": 5,
+        "utilization": 0.2
+      },
+      {
+        "resource": "Matteo Balliauw",
+        "type": "person",
+        "available_hours": 6,
+        "busy_hours": 1,
+        "utilization": 0.16666666666666666
+      },
+      {
+        "resource": "Max Goldsmith",
+        "type": "person",
+        "available_hours": 31,
+        "busy_hours": 1,
+        "utilization": 0.03225806451612903
+      },
+      {
+        "resource": "Maxim Wouters",
+        "type": "person",
+        "available_hours": 13,
+        "busy_hours": 1,
+        "utilization": 0.07692307692307693
+      },
+      {
+        "resource": "Maxwell Szymanski",
+        "type": "person",
+        "available_hours": 10,
+        "busy_hours": 1,
+        "utilization": 0.1
+      },
+      {
+        "resource": "Mengyao Liu",
+        "type": "person",
+        "available_hours": 18,
+        "busy_hours": 1,
+        "utilization": 0.05555555555555555
+      },
+      {
+        "resource": "Michel Hillen",
+        "type": "person",
+        "available_hours": 19,
+        "busy_hours": 1,
+        "utilization": 0.05263157894736842
+      },
+      {
+        "resource": "Miryam de Lhoneux",
+        "type": "person",
+        "available_hours": 24,
+        "busy_hours": 1,
+        "utilization": 0.041666666666666664
+      },
+      {
+        "resource": "M\u00e1rton Bogn\u00e1r",
+        "type": "person",
+        "available_hours": 4,
+        "busy_hours": 3,
+        "utilization": 0.75
+      },
+      {
+        "resource": "Orestis Lomis",
+        "type": "person",
+        "available_hours": 15,
+        "busy_hours": 1,
+        "utilization": 0.06666666666666667
+      },
+      {
+        "resource": "Philip Dutr\u00e9",
+        "type": "person",
+        "available_hours": 19,
+        "busy_hours": 4,
+        "utilization": 0.21052631578947367
+      },
+      {
+        "resource": "Pieter Bonte",
+        "type": "person",
+        "available_hours": 17,
+        "busy_hours": 2,
+        "utilization": 0.11764705882352941
+      },
+      {
+        "resource": "Pieter Robberechts",
+        "type": "person",
+        "available_hours": 10,
+        "busy_hours": 1,
+        "utilization": 0.1
+      },
+      {
+        "resource": "Qianying Liao",
+        "type": "person",
+        "available_hours": 10,
+        "busy_hours": 1,
+        "utilization": 0.1
+      },
+      {
+        "resource": "Quinten Dewulf",
+        "type": "person",
+        "available_hours": 8,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Reza Samimi",
+        "type": "person",
+        "available_hours": 7,
+        "busy_hours": 1,
+        "utilization": 0.14285714285714285
+      },
+      {
+        "resource": "Robbe Van den Eede",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 1,
+        "utilization": 0.07142857142857142
+      },
+      {
+        "resource": "Roel Wuyts",
+        "type": "person",
+        "available_hours": 7,
+        "busy_hours": 2,
+        "utilization": 0.2857142857142857
+      },
+      {
+        "resource": "Ruifeng Xie",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 1,
+        "utilization": 0.07142857142857142
+      },
+      {
+        "resource": "Sam Michiels",
+        "type": "person",
+        "available_hours": 9,
+        "busy_hours": 3,
+        "utilization": 0.3333333333333333
+      },
+      {
+        "resource": "Sander Joos",
+        "type": "person",
+        "available_hours": 20,
+        "busy_hours": 1,
+        "utilization": 0.05
+      },
+      {
+        "resource": "Shana V F Hazboun",
+        "type": "person",
+        "available_hours": 19,
+        "busy_hours": 1,
+        "utilization": 0.05263157894736842
+      },
+      {
+        "resource": "Shuaibu Musa Adam",
+        "type": "person",
+        "available_hours": 17,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Siegfried Nijssen",
+        "type": "person",
+        "available_hours": 27,
+        "busy_hours": 2,
+        "utilization": 0.07407407407407407
+      },
+      {
+        "resource": "Simiao Lin",
+        "type": "person",
+        "available_hours": 19,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Stef Verreydt",
+        "type": "person",
+        "available_hours": 6,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Stefano Viazzi",
+        "type": "person",
+        "available_hours": 11,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Steven Keuchel",
+        "type": "person",
+        "available_hours": 3,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Stijn Bogaerts",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 1,
+        "utilization": 0.07142857142857142
+      },
+      {
+        "resource": "Taiyu Zhang",
+        "type": "person",
+        "available_hours": 5,
+        "busy_hours": 1,
+        "utilization": 0.2
+      },
+      {
+        "resource": "Thomas Daniels",
+        "type": "person",
+        "available_hours": 15,
+        "busy_hours": 1,
+        "utilization": 0.06666666666666667
+      },
+      {
+        "resource": "Tias Guns",
+        "type": "person",
+        "available_hours": 9,
+        "busy_hours": 5,
+        "utilization": 0.5555555555555556
+      },
+      {
+        "resource": "Timo Martens",
+        "type": "person",
+        "available_hours": 23,
+        "busy_hours": 1,
+        "utilization": 0.043478260869565216
+      },
+      {
+        "resource": "Tjonnie Guang Feng Li",
+        "type": "person",
+        "available_hours": 20,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Tom Holvoet",
+        "type": "person",
+        "available_hours": 29,
+        "busy_hours": 4,
+        "utilization": 0.13793103448275862
+      },
+      {
+        "resource": "Tom Schrijvers",
+        "type": "person",
+        "available_hours": 26,
+        "busy_hours": 5,
+        "utilization": 0.19230769230769232
+      },
+      {
+        "resource": "Tom Van Cutsem",
+        "type": "person",
+        "available_hours": 26,
+        "busy_hours": 6,
+        "utilization": 0.23076923076923078
+      },
+      {
+        "resource": "Tom Van Eyck",
+        "type": "person",
+        "available_hours": 13,
+        "busy_hours": 2,
+        "utilization": 0.15384615384615385
+      },
+      {
+        "resource": "Tom Van Goethem",
+        "type": "person",
+        "available_hours": 18,
+        "busy_hours": 2,
+        "utilization": 0.1111111111111111
+      },
+      {
+        "resource": "Van Vu Bui",
+        "type": "person",
+        "available_hours": 10,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Varesh Mishra",
+        "type": "person",
+        "available_hours": 25,
+        "busy_hours": 1,
+        "utilization": 0.04
+      },
+      {
+        "resource": "Vik Vanderlinden",
+        "type": "person",
+        "available_hours": 7,
+        "busy_hours": 2,
+        "utilization": 0.2857142857142857
+      },
+      {
+        "resource": "Vincent Derkinderen",
+        "type": "person",
+        "available_hours": 8,
+        "busy_hours": 1,
+        "utilization": 0.125
+      },
+      {
+        "resource": "Wannes Meert",
+        "type": "person",
+        "available_hours": 13,
+        "busy_hours": 5,
+        "utilization": 0.38461538461538464
+      },
+      {
+        "resource": "Weihong Wang",
+        "type": "person",
+        "available_hours": 27,
+        "busy_hours": 1,
+        "utilization": 0.037037037037037035
+      },
+      {
+        "resource": "Willem Verheyen",
+        "type": "person",
+        "available_hours": 33,
+        "busy_hours": 1,
+        "utilization": 0.030303030303030304
+      },
+      {
+        "resource": "Wim Van Roy",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 1,
+        "utilization": 0.07142857142857142
+      },
+      {
+        "resource": "Wout Ceulemans",
+        "type": "person",
+        "available_hours": 3,
+        "busy_hours": 0,
+        "utilization": 0.0
+      },
+      {
+        "resource": "Wouter Joosen",
+        "type": "person",
+        "available_hours": 13,
+        "busy_hours": 4,
+        "utilization": 0.3076923076923077
+      },
+      {
+        "resource": "Yana Dimova",
+        "type": "person",
+        "available_hours": 25,
+        "busy_hours": 3,
+        "utilization": 0.12
+      },
+      {
+        "resource": "Yi Yang",
+        "type": "person",
+        "available_hours": 14,
+        "busy_hours": 1,
+        "utilization": 0.07142857142857142
+      },
+      {
+        "resource": "Yinze Li",
+        "type": "person",
+        "available_hours": 18,
+        "busy_hours": 1,
+        "utilization": 0.05555555555555555
+      },
+      {
+        "resource": "Ruben TirezJan Boden",
+        "type": "person",
+        "available_hours": 40,
+        "busy_hours": 1,
+        "utilization": 0.025
+      }
+    ]
+  },
+  "slack": [
+    {
+      "defense_id": 0,
+      "student": "Neyens Toon",
+      "start_slot": 109,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Danny Hughes",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Sam Michiels",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Tom Van Eyck",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 2,
+      "student": "Marti Gimeno Josep",
+      "start_slot": 15,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "Python",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Tom Van Cutsem",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Dominique Devriese",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 3,
+      "student": "Truijen Thomas",
+      "start_slot": 88,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Mathy Vanhoef",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Tom Van Goethem",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Vik Vanderlinden",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 5,
+      "student": "Jacobs Sibren",
+      "start_slot": 106,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Lieven Desmet",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Wouter Joosen",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Yana Dimova",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 6,
+      "student": "Baeyens Luna Mei",
+      "start_slot": 34,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "slack_hours": 6
+        },
+        {
+          "resource": "Katrien Verbert",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Anna Verheyden",
+          "type": "person",
+          "slack_hours": 2
+        }
+      ]
+    },
+    {
+      "defense_id": 7,
+      "student": "Schurmans Melvin",
+      "start_slot": 13,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Marc Denecker",
+          "type": "person",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Bart Bogaerts",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Robbe Van den Eede",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 8,
+      "student": "Carrera Monterde Pilar",
+      "start_slot": 11,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Katrien Verbert",
+          "type": "person",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Grzegorz Meller",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 9,
+      "student": "Mandelings Rob",
+      "start_slot": 9,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "slack_hours": 7
+        },
+        {
+          "resource": "Pieter Bonte",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 10,
+      "student": "Geybels Maarten",
+      "start_slot": 62,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Hendrik Blockeel",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Mariya Ishteva",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Joppe De Jonghe",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 12,
+      "student": "Deliever Thibaut",
+      "start_slot": 64,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Mathias Verbeke",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Ilyas Lemmens",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Louis Carpentier",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 13,
+      "student": "Li Haoyang",
+      "start_slot": 57,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Adalberto Simeone",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 14,
+      "student": "Van Cleemput Gino",
+      "start_slot": 10,
+      "min_slack_hours": 2,
+      "by_resource": [
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Tom Schrijvers",
+          "type": "person",
+          "slack_hours": 2
+        }
+      ]
+    },
+    {
+      "defense_id": 16,
+      "student": "Lobera Vilar Enrique",
+      "start_slot": 10,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "Java",
+          "type": "room",
+          "slack_hours": 6
+        },
+        {
+          "resource": "Wouter Joosen",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Davy Preuveneers",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Qianying Liao",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 17,
+      "student": "Tahsin Mustafa Turan",
+      "start_slot": 10,
+      "min_slack_hours": 2,
+      "by_resource": [
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Miryam de Lhoneux",
+          "type": "person",
+          "slack_hours": 2
+        }
+      ]
+    },
+    {
+      "defense_id": 19,
+      "student": "Wu Hanlin",
+      "start_slot": 15,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Wouter Joosen",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Eddy Truyen",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 21,
+      "student": "Devlamminck Thomas",
+      "start_slot": 10,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "slack_hours": 6
+        },
+        {
+          "resource": "Jesse Davis",
+          "type": "person",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Michel Hillen",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Timo Martens",
+          "type": "person",
+          "slack_hours": 2
+        }
+      ]
+    },
+    {
+      "defense_id": 22,
+      "student": "Bekaert Eline",
+      "start_slot": 9,
+      "min_slack_hours": 7,
+      "by_resource": [
+        {
+          "resource": "Java",
+          "type": "room",
+          "slack_hours": 7
+        },
+        {
+          "resource": "Philip Dutr\u00e9",
+          "type": "person",
+          "slack_hours": 7
+        }
+      ]
+    },
+    {
+      "defense_id": 23,
+      "student": "Schepers Daan",
+      "start_slot": 86,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Mathy Vanhoef",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Jeroen Robben",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Angelos Beitis",
+          "type": "person",
+          "slack_hours": 2
+        }
+      ]
+    },
+    {
+      "defense_id": 24,
+      "student": "De Vos Milan",
+      "start_slot": 107,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Danny Hughes",
+          "type": "person",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Sam Michiels",
+          "type": "person",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Yinze Li",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Mengyao Liu",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 25,
+      "student": "De Maeseneer Dries",
+      "start_slot": 40,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Tias Guns",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Marco Foschini",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 26,
+      "student": "Kindekens Naten",
+      "start_slot": 14,
+      "min_slack_hours": 2,
+      "by_resource": [
+        {
+          "resource": "Java",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Tom Schrijvers",
+          "type": "person",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Elien Bellon",
+          "type": "person",
+          "slack_hours": 2
+        }
+      ]
+    },
+    {
+      "defense_id": 27,
+      "student": "Vermeire Lukas",
+      "start_slot": 59,
+      "min_slack_hours": 4,
+      "by_resource": [
+        {
+          "resource": "Python",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Jesse Davis",
+          "type": "person",
+          "slack_hours": 5
+        }
+      ]
+    },
+    {
+      "defense_id": 28,
+      "student": "Isotupa Ca\u00f1izal Marko",
+      "start_slot": 14,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Jesse Davis",
+          "type": "person",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Kilian Hendrickx",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 29,
+      "student": "Vandenbulcke Zeno",
+      "start_slot": 39,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Tom Holvoet",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 31,
+      "student": "Mystriotis Dimitrios",
+      "start_slot": 9,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "slack_hours": 7
+        },
+        {
+          "resource": "Tom Holvoet",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Yi Yang",
+          "type": "person",
+          "slack_hours": 3
+        }
+      ]
+    },
+    {
+      "defense_id": 32,
+      "student": "Maris Arno",
+      "start_slot": 12,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Jesse Davis",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Maarten Bosteels",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Thomas Daniels",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 33,
+      "student": "Huybrechts Nik",
+      "start_slot": 83,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Frank Piessens",
+          "type": "person",
+          "slack_hours": 5
+        },
+        {
+          "resource": "M\u00e1rton Bogn\u00e1r",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 34,
+      "student": "Pauwels Michiel",
+      "start_slot": 15,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Siegfried Nijssen",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Tom Schrijvers",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 35,
+      "student": "Segers Michiel",
+      "start_slot": 40,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Lieven Desmet",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Daan Vansteenhuyse",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 36,
+      "student": "Pauwels Wouter",
+      "start_slot": 64,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Tom Schrijvers",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Ruifeng Xie",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 37,
+      "student": "Olson Nicholas",
+      "start_slot": 59,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "Java",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Mathy Vanhoef",
+          "type": "person",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Jeroen Robben",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Angelos Beitis",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 38,
+      "student": "Bellefroid Tijs",
+      "start_slot": 36,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Jo Van Bulck",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 39,
+      "student": "Cools Michiel",
+      "start_slot": 63,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Katrien Verbert",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Grzegorz Meller",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 40,
+      "student": "Debois Lowie",
+      "start_slot": 10,
+      "min_slack_hours": 6,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 6
+        },
+        {
+          "resource": "Philip Dutr\u00e9",
+          "type": "person",
+          "slack_hours": 6
+        }
+      ]
+    },
+    {
+      "defense_id": 41,
+      "student": "Frank Raoul",
+      "start_slot": 108,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Lieven Desmet",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Yana Dimova",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 42,
+      "student": "Sanyal Srinjoy",
+      "start_slot": 11,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Pieter Bonte",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 44,
+      "student": "Feng Shannon",
+      "start_slot": 86,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "Python",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Roel Wuyts",
+          "type": "person",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Marian Verhelst",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 46,
+      "student": "Vanhentenrijk Liam",
+      "start_slot": 60,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Danny Hughes",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Sam Michiels",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Tom Van Eyck",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 49,
+      "student": "Embrechts Jonas",
+      "start_slot": 81,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Bart Jacobs",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 50,
+      "student": "Vandenhoeck Robin",
+      "start_slot": 60,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Lieven Desmet",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Yana Dimova",
+          "type": "person",
+          "slack_hours": 3
+        }
+      ]
+    },
+    {
+      "defense_id": 51,
+      "student": "Ingelaere Hannes",
+      "start_slot": 35,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Tom Van Cutsem",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Glenn De Witte",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 52,
+      "student": "Toye Tristan",
+      "start_slot": 11,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Roel Wuyts",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 53,
+      "student": "El Kaddouri Ibrahim",
+      "start_slot": 60,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Luc De Raedt",
+          "type": "person",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Vincent Derkinderen",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 54,
+      "student": "Lampaert Marie",
+      "start_slot": 37,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Katrien Verbert",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Reza Samimi",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 55,
+      "student": "Schryvers Wietze",
+      "start_slot": 105,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "slack_hours": 7
+        },
+        {
+          "resource": "Mathy Vanhoef",
+          "type": "person",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Tom Van Goethem",
+          "type": "person",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Vik Vanderlinden",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 57,
+      "student": "De Bruyn Lo\u00efc",
+      "start_slot": 34,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 6
+        },
+        {
+          "resource": "Jesse Davis",
+          "type": "person",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Jan Van Haaren",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Pieter Robberechts",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 58,
+      "student": "De Klerck Andries",
+      "start_slot": 38,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "Python",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Tom Van Cutsem",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Glenn De Witte",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 59,
+      "student": "Vanhee Lowie",
+      "start_slot": 33,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 7
+        },
+        {
+          "resource": "Adalberto Simeone",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 60,
+      "student": "Hoek Emile",
+      "start_slot": 10,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "slack_hours": 6
+        },
+        {
+          "resource": "Tom Van Cutsem",
+          "type": "person",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Weihong Wang",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 61,
+      "student": "Cockaerts Kwinten",
+      "start_slot": 11,
+      "min_slack_hours": 5,
+      "by_resource": [
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Philip Dutr\u00e9",
+          "type": "person",
+          "slack_hours": 5
+        }
+      ]
+    },
+    {
+      "defense_id": 62,
+      "student": "Muys Toby",
+      "start_slot": 82,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Bart Bogaerts",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Dieter Vandesande",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 64,
+      "student": "Are Mathias",
+      "start_slot": 57,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Tias Guns",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Konstantinos Alexandros Michailidis",
+          "type": "person",
+          "slack_hours": 2
+        }
+      ]
+    },
+    {
+      "defense_id": 65,
+      "student": "Titeca Robbe",
+      "start_slot": 12,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Frank Piessens",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "M\u00e1rton Bogn\u00e1r",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 66,
+      "student": "Willems Thibault",
+      "start_slot": 62,
+      "min_slack_hours": 2,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Jesse Davis",
+          "type": "person",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Stijn Bogaerts",
+          "type": "person",
+          "slack_hours": 2
+        }
+      ]
+    },
+    {
+      "defense_id": 67,
+      "student": "Croes Wannes",
+      "start_slot": 57,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Philip Dutr\u00e9",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 68,
+      "student": "Shum Pak Ning",
+      "start_slot": 34,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Tias Guns",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Orestis Lomis",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 69,
+      "student": "Sleurs Wenzel",
+      "start_slot": 35,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "Python",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Wim Van Roy",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 71,
+      "student": "Van Meulder Yani",
+      "start_slot": 38,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Jens B\u00fcrger",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 72,
+      "student": "Lambrecht Wouter",
+      "start_slot": 33,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Bart Jacobs",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 74,
+      "student": "Grosemans Ward",
+      "start_slot": 36,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "Python",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Lieven Desmet",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Daan Vansteenhuyse",
+          "type": "person",
+          "slack_hours": 4
+        }
+      ]
+    },
+    {
+      "defense_id": 75,
+      "student": "Cautaerts Vincent",
+      "start_slot": 12,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Tom Van Cutsem",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Bart Preneel",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Varesh Mishra",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Kevin Bogner",
+          "type": "person",
+          "slack_hours": 4
+        }
+      ]
+    },
+    {
+      "defense_id": 76,
+      "student": "Monden Nicolas",
+      "start_slot": 10,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Tom Holvoet",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 77,
+      "student": "Bielecki Jakub",
+      "start_slot": 59,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Frank Piessens",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Daan Vanoverloop",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 78,
+      "student": "Strobbe Jacob",
+      "start_slot": 12,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "Ruby",
+          "type": "room",
+          "slack_hours": 4
+        },
+        {
+          "resource": "Tom Holvoet",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 80,
+      "student": "Elzawawi Adham",
+      "start_slot": 63,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Jesse Davis",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Matteo Balliauw",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Lorenzo Cascioli",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Max Goldsmith",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Maxim Wouters",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 81,
+      "student": "Van Nieuwenhove Barteld",
+      "start_slot": 57,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Katrien Verbert",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Lode Godderis",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Shana V F Hazboun",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 82,
+      "student": "Grieten Cedric",
+      "start_slot": 33,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "slack_hours": 7
+        },
+        {
+          "resource": "Katrien Verbert",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Maxwell Szymanski",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 84,
+      "student": "Paredis Benneth",
+      "start_slot": 81,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "slack_hours": 7
+        },
+        {
+          "resource": "Adalberto Simeone",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Taiyu Zhang",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 85,
+      "student": "Penders Vincent",
+      "start_slot": 16,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Frank Piessens",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "M\u00e1rton Bogn\u00e1r",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Hans Winderix",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 86,
+      "student": "Casta\u00f1os S\u00e1nchez H\u00e9ctor",
+      "start_slot": 11,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Jesse Davis",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Ruben TirezJan Boden",
+          "type": "person",
+          "slack_hours": 108
+        },
+        {
+          "resource": "Maaike Van Roy",
+          "type": "person",
+          "slack_hours": 2
+        }
+      ]
+    },
+    {
+      "defense_id": 87,
+      "student": "Oyen Kevin",
+      "start_slot": 9,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.02",
+          "type": "room",
+          "slack_hours": 7
+        },
+        {
+          "resource": "Mathy Vanhoef",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 88,
+      "student": "Droogmans Benjamin",
+      "start_slot": 9,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.16",
+          "type": "room",
+          "slack_hours": 6
+        },
+        {
+          "resource": "Tom Van Cutsem",
+          "type": "person",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Glenn De Witte",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 89,
+      "student": "Brosens Mathias",
+      "start_slot": 38,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Tias Guns",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Ali Irfan Mahmutogullari",
+          "type": "person",
+          "slack_hours": 2
+        }
+      ]
+    },
+    {
+      "defense_id": 90,
+      "student": "Van Vlerken Kobe",
+      "start_slot": 87,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Wouter Joosen",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Davy Preuveneers",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Sander Joos",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Willem Verheyen",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 91,
+      "student": "Gillis Gert-Jan",
+      "start_slot": 13,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Tias Guns",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 93,
+      "student": "Ingelaere Floris",
+      "start_slot": 111,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.04",
+          "type": "room",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Lieven Desmet",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Gertjan Franken",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Daan Vansteenhuyse",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    },
+    {
+      "defense_id": 95,
+      "student": "Van Calsteren Brent",
+      "start_slot": 13,
+      "min_slack_hours": 2,
+      "by_resource": [
+        {
+          "resource": "200B 01.14",
+          "type": "room",
+          "slack_hours": 2
+        },
+        {
+          "resource": "Siegfried Nijssen",
+          "type": "person",
+          "slack_hours": 3
+        }
+      ]
+    },
+    {
+      "defense_id": 96,
+      "student": "Cremelie Arthur",
+      "start_slot": 12,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Katrien Verbert",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Ivania Nadine Donoso Guzm\u00e1n",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 97,
+      "student": "Mensch Robbe",
+      "start_slot": 16,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.03",
+          "type": "room",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Wannes Meert",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Annelies Vroman",
+          "type": "person",
+          "slack_hours": 0
+        }
+      ]
+    },
+    {
+      "defense_id": 98,
+      "student": "Steenhoudt Ebbe",
+      "start_slot": 11,
+      "min_slack_hours": 1,
+      "by_resource": [
+        {
+          "resource": "200B 01.18",
+          "type": "room",
+          "slack_hours": 5
+        },
+        {
+          "resource": "Tom Schrijvers",
+          "type": "person",
+          "slack_hours": 1
+        },
+        {
+          "resource": "Jesse Hoabergs",
+          "type": "person",
+          "slack_hours": 4
+        }
+      ]
+    },
+    {
+      "defense_id": 99,
+      "student": "Anseeuw Ruben",
+      "start_slot": 9,
+      "min_slack_hours": 0,
+      "by_resource": [
+        {
+          "resource": "200C 00.01",
+          "type": "room",
+          "slack_hours": 3
+        },
+        {
+          "resource": "Jan Goedgebeur",
+          "type": "person",
+          "slack_hours": 0
+        },
+        {
+          "resource": "Jorik Jooken",
+          "type": "person",
+          "slack_hours": 1
+        }
+      ]
+    }
+  ],
+  "capacity_gaps": [
+    {
+      "resource": "Jeroen Robben",
+      "type": "person",
+      "defenses_needed": 4,
+      "available_slots": 3,
+      "deficit": 1,
+      "free_slots": [
+        40,
+        59,
+        86
+      ],
+      "free_slots_human": [
+        "Tue 2025-02-25 16:00",
+        "Wed 2025-02-26 11:00",
+        "Thu 2025-02-27 14:00"
+      ]
+    }
+  ]
+}

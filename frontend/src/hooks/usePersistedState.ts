@@ -5,7 +5,14 @@ import { SchedulingContext } from '../components/panels/SetupPanel';
 import { FilterState } from '../components/panels/FilterPanel';
 import { logger } from '../utils/logger';
 import { API_BASE_URL } from '../lib/apiConfig';
-import { PersonAvailability, SlotAvailability } from '../components/availability/types';
+import { PersonAvailability, SlotAvailability, AvailabilityRequest } from '../components/availability/types';
+import { SolveResult } from '../types/scheduling';
+
+export interface PersistedSolverResult {
+  id: string;
+  result: SolveResult;
+  receivedAt: number;
+}
 
 export interface PersistedDashboardState {
   datasetId: string;
@@ -22,9 +29,12 @@ export interface PersistedDashboardState {
   roomAvailability: RoomAvailabilityState[];
   uiPreferences: {
     toolbarPosition: 'top' | 'right';
-    cardViewMode: 'individual' | 'compact';
+    cardViewMode: 'individual' | 'compact' | 'gantt';
     filterPanelCollapsed: boolean;
+    solverPanelOpen?: boolean;
   };
+  availabilityRequests?: AvailabilityRequest[];
+  solverResults?: PersistedSolverResult[];
   version: number;
   lastSaved: number;
 }
@@ -44,9 +54,12 @@ export interface PersistedStateInput {
   roomAvailability?: RoomAvailabilityState[];
   uiPreferences: {
     toolbarPosition: 'top' | 'right';
-    cardViewMode: 'individual' | 'compact';
+    cardViewMode: 'individual' | 'compact' | 'gantt';
     filterPanelCollapsed: boolean;
+    solverPanelOpen?: boolean;
   };
+  availabilityRequests?: AvailabilityRequest[];
+  solverResults?: PersistedSolverResult[];
   lastSaved?: number;
 }
 
@@ -88,6 +101,8 @@ export function createPersistedStateSnapshot(input: PersistedStateInput): Persis
     gridData: input.gridData,
     roomAvailability: cloneRoomAvailability(input.roomAvailability),
     uiPreferences: input.uiPreferences,
+    availabilityRequests: input.availabilityRequests,
+    solverResults: input.solverResults,
     version: STORAGE_VERSION,
     lastSaved: input.lastSaved ?? Date.now(),
   };
@@ -271,22 +286,26 @@ export function usePersistedState(
   gridData: { days: string[]; dayLabels: string[]; timeSlots: string[] },
   uiPreferences: {
     toolbarPosition: 'top' | 'right';
-    cardViewMode: 'individual' | 'compact';
+    cardViewMode: 'individual' | 'compact' | 'gantt';
     filterPanelCollapsed: boolean;
+    solverPanelOpen?: boolean;
   },
   roomAvailability: RoomAvailabilityState[],
-  datasetVersion?: string
+  datasetVersion?: string,
+  availabilityRequests?: AvailabilityRequest[],
+  solverResults?: PersistedSolverResult[]
 ) {
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
   const lastSavedRef = useRef<string>('');
   const datasetRef = useRef<string>(datasetId);
+  const persistStateRef = useRef<() => Promise<string | undefined> | undefined>(() => undefined);
 
   useEffect(() => {
     datasetRef.current = datasetId;
   }, [datasetId]);
 
-  const syncStateWithBackend = useCallback((payload: SerializableDashboardState): Promise<void> | undefined => {
-    if (!datasetRef.current) return undefined;
+  const syncStateWithBackend = useCallback((payload: SerializableDashboardState): Promise<string | undefined> => {
+    if (!datasetRef.current) return Promise.resolve(undefined);
     const body = {
       dataset_id: datasetRef.current,
       state: payload,
@@ -297,13 +316,15 @@ export function usePersistedState(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
-      .then(() => undefined)
+      .then(res => res.json())
+      .then((data: { dataset_version?: string }) => data.dataset_version)
       .catch(error => {
         logger.warn('Failed to sync state with backend', error);
+        return undefined;
       });
   }, []);
 
-  const persistState = useCallback((): Promise<void> | undefined => {
+  const persistState = useCallback((): Promise<string | undefined> | undefined => {
     const state = createPersistedStateSnapshot({
       datasetId,
       datasetVersion,
@@ -314,6 +335,8 @@ export function usePersistedState(
       gridData,
       roomAvailability,
       uiPreferences,
+      availabilityRequests,
+      solverResults,
     });
 
     // Skip save if state hasn't changed
@@ -368,6 +391,12 @@ export function usePersistedState(
       },
       roomAvailabilitySignature: buildRoomAvailabilitySignature(roomAvailability),
       uiPreferences,
+      requestCount: availabilityRequests?.length ?? 0,
+      requestIds: availabilityRequests?.map(r =>
+        `${r.id}:${r.status}:${(r.requestedSlots || []).map(s => `${s.day}-${s.timeSlot}`).join('|')}`
+      ).join(',') ?? '',
+      solverResultCount: solverResults?.length ?? 0,
+      solverResultIds: solverResults?.map(r => r.id).join(',') ?? '',
     });
 
     if (currentHash === lastSavedRef.current) {
@@ -380,10 +409,27 @@ export function usePersistedState(
     if (serialized) {
       console.log('✓ State changes saved');
       logger.info('State persisted to localStorage');
-      return syncStateWithBackend(serialized);
+      return syncStateWithBackend(serialized).then(newVersion => {
+        if (newVersion && newVersion !== datasetVersion) {
+          // Immediately patch localStorage version so a reload before the next
+          // React-driven persist cycle won't trigger a version mismatch.
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              parsed.datasetVersion = newVersion;
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+            }
+          } catch { /* best-effort */ }
+        }
+        return newVersion;
+      });
     }
     return undefined;
-  }, [datasetId, datasetVersion, rosters, activeRosterId, schedulingContext, filters, gridData, roomAvailability, uiPreferences, syncStateWithBackend]);
+  }, [datasetId, datasetVersion, rosters, activeRosterId, schedulingContext, filters, gridData, roomAvailability, uiPreferences, availabilityRequests, solverResults, syncStateWithBackend]);
+
+  // Keep ref in sync so beforeunload always calls the latest version
+  persistStateRef.current = persistState;
 
   // Debounced auto-save on state changes
   // CRITICAL: Only depend on persistState callback, not raw state
@@ -394,7 +440,7 @@ export function usePersistedState(
     }
 
     saveTimeoutRef.current = setTimeout(() => {
-      persistState();
+      persistStateRef.current();
     }, DEBOUNCE_MS);
 
     return () => {
@@ -405,16 +451,18 @@ export function usePersistedState(
   }, [persistState]); // Removed rosters, activeRosterId dependencies
 
   // Save immediately on unmount (browser close)
+  // Uses ref to avoid stale closure: effects run after paint, but beforeunload
+  // can fire between a state update commit and effect re-registration.
   useEffect(() => {
     const handleBeforeUnload = () => {
-      persistState();
+      persistStateRef.current();
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [persistState]);
+  }, []); // Stable — reads latest via ref
 
   return {
     persistNow: persistState,

@@ -103,3 +103,7 @@ Thumbs.db
 
 
 Defense-rostering/
+data/output/*/
+
+ort_callback.md
+ort_callback.ipynb

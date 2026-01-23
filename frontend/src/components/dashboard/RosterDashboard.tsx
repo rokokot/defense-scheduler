@@ -386,6 +386,9 @@ export function RosterDashboard({
 
   // Roster management with global counter for proper naming
   const rosterCounterRef = useRef(persistedSnapshot ? persistedSnapshot.rosters.length : 1);
+  const pinnedCounterRef = useRef(
+    persistedSnapshot ? persistedSnapshot.rosters.filter(r => r.id.startsWith('pinned-')).length : 0
+  );
   const [rosters, setRosters] = useState<Roster[]>(() =>
     persistedSnapshot
       ? persistedSnapshot.rosters
@@ -458,6 +461,7 @@ export function RosterDashboard({
   );
   const [detailPanelMode, setDetailPanelMode] = useState<'list' | 'detail'>('detail');
   const [searchQuery, setSearchQuery] = useState('');
+  const [insufficiencyFilterActive, setInsufficiencyFilterActive] = useState(false);
   const [priorityEventIds, setPriorityEventIds] = useState<Set<string>>(new Set());
   const [selectedPersonName, setSelectedPersonName] = useState<string | undefined>(undefined);
   const [highlightedEventId, setHighlightedEventId] = useState<string | undefined>(undefined);
@@ -478,7 +482,7 @@ export function RosterDashboard({
   const [activeSolverRunId, setActiveSolverRunId] = useState<string | null>(null);
   const [cancellingSolverRun, setCancellingSolverRun] = useState(false);
   const [cancelledPhase, setCancelledPhase] = useState<'solving' | 'optimizing' | null>(null);
-  const [_solverStreamStatus, setSolverStreamStatus] = useState<'open' | 'error' | 'closed' | null>(null);
+  const [, setSolverStreamStatus] = useState<'open' | 'error' | 'closed' | null>(null);
   const [solverRunStartedAt, setSolverRunStartedAt] = useState<number | null>(null);
   const [solverElapsedSeconds, setSolverElapsedSeconds] = useState(0);
   const [solverLogOpen, setSolverLogOpen] = useState(false);
@@ -1790,7 +1794,7 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
       } : null;
       const newRoster: Roster = {
         id: `pinned-${now}`,
-        label: `Pinned ${new Date(now).toLocaleTimeString()}`,
+        label: `Pinned #${++pinnedCounterRef.current}`,
         state: {
           events: newEvents,
           locks: new Map(),
@@ -1877,7 +1881,6 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
       const result = persistNowRef.current();
       if (result) result.then(v => { if (v) setCurrentDatasetVersion(v); });
     }, 50);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rosters, activeRosterId]);
 
   const handleAcceptRequest = useCallback((requestId: string) => {
@@ -1897,7 +1900,6 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
       const result = persistNowRef.current();
       if (result) result.then(v => { if (v) setCurrentDatasetVersion(v); });
     }, 50);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availabilities]);
 
   const handleDenyRequest = useCallback((requestId: string) => {
@@ -1917,7 +1919,6 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
       const result = persistNowRef.current();
       if (result) result.then(v => { if (v) setCurrentDatasetVersion(v); });
     }, 50);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availabilities]);
 
   const streamedSolutionsSummary = useMemo(() => {
@@ -3986,24 +3987,16 @@ const prevRosterSyncRef = useRef<{
     const rosterToDelete = rosters.find(r => r.id === rosterId);
     if (!rosterToDelete) return;
 
-    // Filter out deleted roster and renumber remaining rosters
     const remainingRosters = rosters.filter(r => r.id !== rosterId);
-    const renumberedRosters = remainingRosters.map((r, index) => ({
-      ...r,
-      label: `Schedule ${index + 1}`,
-    }));
-
-    // Update counter to match the new count
-    rosterCounterRef.current = renumberedRosters.length;
 
     // Batch all updates in a transition
     startTransition(() => {
-      setRosters(renumberedRosters);
+      setRosters(remainingRosters);
 
       // If we deleted the active roster, switch to the first one
       if (activeRosterId === rosterId) {
-        if (renumberedRosters.length > 0) {
-          const newActiveRoster = renumberedRosters[0];
+        if (remainingRosters.length > 0) {
+          const newActiveRoster = remainingRosters[0];
           setActiveRosterId(newActiveRoster.id);
           push({
             type: 'manual-edit',
@@ -4805,13 +4798,6 @@ const prevRosterSyncRef = useRef<{
 
       case 'participants': {
         const nonStudentParticipants = availabilities.filter(p => !isStudentRole(p.role));
-        const participantSearch = searchQuery.toLowerCase();
-        const filteredParticipants = participantSearch
-          ? nonStudentParticipants.filter(p =>
-              p.name.toLowerCase().includes(participantSearch)
-            )
-          : nonStudentParticipants;
-
         // Compute available slots per person and flag insufficient
         const insufficientParticipants: string[] = [];
         for (const person of nonStudentParticipants) {
@@ -4820,7 +4806,7 @@ const prevRosterSyncRef = useRef<{
             for (const slot of timeSlots) {
               const slotData = person.availability?.[day]?.[slot];
               const status = typeof slotData === 'object' ? slotData?.status : slotData;
-              if (status !== 'unavailable') {
+              if (status === 'available' || status === 'booked' || status === 'requested') {
                 availableCount++;
               }
             }
@@ -4829,6 +4815,18 @@ const prevRosterSyncRef = useRef<{
           if (stats && stats.required > 0 && availableCount < stats.required) {
             insufficientParticipants.push(person.name);
           }
+        }
+
+        const participantSearch = searchQuery.toLowerCase();
+        let filteredParticipants = participantSearch
+          ? nonStudentParticipants.filter(p =>
+              p.name.toLowerCase().includes(participantSearch)
+            )
+          : nonStudentParticipants;
+        if (insufficiencyFilterActive && insufficientParticipants.length > 0) {
+          filteredParticipants = filteredParticipants.filter(p =>
+            insufficientParticipants.includes(p.name)
+          );
         }
 
         return (
@@ -4848,10 +4846,18 @@ const prevRosterSyncRef = useRef<{
                   />
                 </div>
                 {insufficientParticipants.length > 0 && (
-                  <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setInsufficiencyFilterActive(prev => !prev)}
+                    className={`flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors ${
+                      insufficiencyFilterActive
+                        ? 'bg-red-50 ring-1 ring-red-200'
+                        : 'hover:bg-red-50'
+                    }`}
+                    title={insufficiencyFilterActive ? 'Show all participants' : 'Show only participants with insufficient availability'}
+                  >
                     <span className="text-xl font-bold text-red-500">{insufficientParticipants.length}</span>
                     <AlertCircle className="h-5 w-5 text-red-500" />
-                  </div>
+                  </button>
                 )}
               </div>
               <div className="divide-y divide-gray-100">

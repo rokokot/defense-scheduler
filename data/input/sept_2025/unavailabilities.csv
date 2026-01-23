@@ -26,7 +26,6 @@ name,type,day,start_time,end_time,status
 200C 00.03,room,2025-09-05,12:00,13:00,unavailable
 200C 00.03,room,2025-09-05,15:00,16:00,unavailable
 200C 00.03,room,2025-09-05,16:00,17:00,unavailable
-Adalberto Simeone,person,2025-09-01,09:00,10:00,unavailable
 Adalberto Simeone,person,2025-09-01,10:00,11:00,unavailable
 Adalberto Simeone,person,2025-09-01,11:00,12:00,unavailable
 Adalberto Simeone,person,2025-09-01,12:00,13:00,unavailable
@@ -638,7 +637,6 @@ Silvia Cazacu-Bucica,person,2025-09-05,16:00,17:00,unavailable
 Steffen Luypaert,person,2025-09-01,09:00,10:00,unavailable
 Steffen Luypaert,person,2025-09-01,10:00,11:00,unavailable
 Steffen Luypaert,person,2025-09-01,11:00,12:00,unavailable
-Steffen Luypaert,person,2025-09-01,12:00,13:00,unavailable
 Steffen Luypaert,person,2025-09-01,13:00,14:00,unavailable
 Steffen Luypaert,person,2025-09-01,14:00,15:00,unavailable
 Steffen Luypaert,person,2025-09-01,15:00,16:00,unavailable
@@ -711,7 +709,6 @@ Yannick Van Loon,person,2025-09-01,09:00,10:00,unavailable
 Yannick Van Loon,person,2025-09-01,10:00,11:00,unavailable
 Yannick Van Loon,person,2025-09-01,11:00,12:00,unavailable
 Yannick Van Loon,person,2025-09-01,12:00,13:00,unavailable
-Yannick Van Loon,person,2025-09-01,13:00,14:00,unavailable
 Yannick Van Loon,person,2025-09-01,14:00,15:00,unavailable
 Yannick Van Loon,person,2025-09-01,15:00,16:00,unavailable
 Yannick Van Loon,person,2025-09-01,16:00,17:00,unavailable

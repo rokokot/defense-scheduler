@@ -116,6 +116,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
   const [requestHighlightedIds, setRequestHighlightedIds] = useState<string[]>([]);
   const [requestHighlightedSlots, setRequestHighlightedSlots] = useState<Set<string>>(new Set());
   const [participantSearch, setParticipantSearch] = useState('');
+  const [insufficiencyFilterActive, setInsufficiencyFilterActive] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const personRowRefs = useRef<Map<string, HTMLTableRowElement>>(new Map());
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -138,6 +139,29 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
 
   const visibleDaysSet = useMemo(() => new Set(days), [days]);
   const visibleSlotsSet = useMemo(() => new Set(timeSlots), [timeSlots]);
+
+  const insufficientParticipants = useMemo(() => {
+    if (!workloadStats || workloadStats.size === 0) return new Map<string, { available: number; required: number }>();
+    const result = new Map<string, { available: number; required: number }>();
+    for (const person of availabilities) {
+      const stats = workloadStats.get(normalizeName(person.name));
+      if (!stats || stats.required <= 0) continue;
+      let availableCount = 0;
+      for (const day of days) {
+        for (const slot of timeSlots) {
+          const slotData = person.availability?.[day]?.[slot];
+          const status = typeof slotData === 'object' ? slotData?.status : slotData;
+          if (status === 'available' || status === 'booked' || status === 'requested') {
+            availableCount++;
+          }
+        }
+      }
+      if (availableCount < stats.required) {
+        result.set(normalizeName(person.name), { available: availableCount, required: stats.required });
+      }
+    }
+    return result;
+  }, [availabilities, days, timeSlots, workloadStats]);
 
   const effectiveHighlightedPersons = useMemo(() => {
     if (requestHighlightedIds.length === 0) return highlightedPersons;
@@ -690,9 +714,20 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
     recomputeVirtualRange();
   }, [recomputeVirtualRange]);
 
+  const prioritizedAvailabilities = useMemo(() => {
+    if (!insufficiencyFilterActive || insufficientParticipants.size === 0) return sortedAvailabilities;
+    return [...sortedAvailabilities].sort((a, b) => {
+      const aInsuff = insufficientParticipants.has(normalizeName(a.name));
+      const bInsuff = insufficientParticipants.has(normalizeName(b.name));
+      if (aInsuff && !bInsuff) return -1;
+      if (!aInsuff && bInsuff) return 1;
+      return 0;
+    });
+  }, [sortedAvailabilities, insufficiencyFilterActive, insufficientParticipants]);
+
   const visibleAvailabilities = shouldVirtualize
-    ? sortedAvailabilities.slice(virtualRange.startIndex, virtualRange.endIndex)
-    : sortedAvailabilities;
+    ? prioritizedAvailabilities.slice(virtualRange.startIndex, virtualRange.endIndex)
+    : prioritizedAvailabilities;
 
   useEffect(() => {
     const firstPersonId = effectiveHighlightedPersons[0];
@@ -811,6 +846,21 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                       </button>
                     )}
                   </div>
+                  {insufficientParticipants.size > 0 && (
+                    <button
+                      onClick={() => setInsufficiencyFilterActive(prev => !prev)}
+                      className={clsx(
+                        'flex items-center gap-1 px-2 py-1 rounded-md transition-colors',
+                        insufficiencyFilterActive
+                          ? 'bg-red-50 ring-1 ring-red-200'
+                          : 'hover:bg-red-50'
+                      )}
+                      title={`${insufficientParticipants.size} participant${insufficientParticipants.size === 1 ? '' : 's'} with fewer available slots than required defenses`}
+                    >
+                      <span className="text-lg font-bold text-red-500">{insufficientParticipants.size}</span>
+                      <AlertCircle className="h-4 w-4 text-red-500" />
+                    </button>
+                  )}
                   {availabilityRequests.length > 0 && (
                     <div className="relative ml-auto">
                       <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-md">
@@ -1015,6 +1065,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
             const nameCellPadding = isGapRow ? 'pt-2 pb-7 sm:pt-3 sm:pb-8' : 'py-2 sm:py-3';
             const slotCellPadding = isGapRow ? 'pt-1.5 pb-6 sm:pt-2 sm:pb-7' : 'py-1.5 sm:py-2';
             const showConflictBadge = personHasVisibleConflicts(person) && (requiredCount > 0 || scheduledCount > 0);
+            const isInsufficient = insufficientParticipants.has(normalizedName);
             return (
               <Fragment key={person.id}>
                 <tr
@@ -1028,6 +1079,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
               className={clsx(
                 'transition-colors',
                 (isHighlighted || isSearchMatch) && 'bg-blue-50',
+                insufficiencyFilterActive && isInsufficient && 'bg-red-50',
                 isGapRow && 'border-b-2 border-b-gray-800'
               )}
             >
@@ -1035,6 +1087,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                 className={clsx(
                   'border px-2 sm:px-3 sticky left-0 z-20 cursor-pointer hover:bg-blue-50 shadow-sm',
                   nameCellPadding,
+                  insufficiencyFilterActive && isInsufficient ? 'bg-red-50' :
                   (isHighlighted || isSearchMatch) ? 'bg-blue-50' : 'bg-white'
                 )}
                 onClick={() => onPersonClick?.(person.id)}
@@ -1046,9 +1099,17 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                     </div>
                     <div className="text-[10px] sm:text-sm text-gray-500">{formatRole(person.role)}</div>
                   </div>
-                  {showConflictBadge && (
-                    <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-400 flex-shrink-0 -mt-5" />
-                  )}
+                  {(showConflictBadge || isInsufficient) && (() => {
+                    const info = insufficientParticipants.get(normalizedName);
+                    const tooltip = isInsufficient && info
+                      ? `${info.available} available slot${info.available === 1 ? '' : 's'}, ${info.required} defense${info.required === 1 ? '' : 's'} required`
+                      : 'Scheduling conflict';
+                    return (
+                      <span title={tooltip} className="flex-shrink-0 -mt-5">
+                        <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-400" />
+                      </span>
+                    );
+                  })()}
                   {showWorkloadBar && (
                     <div className="flex items-center gap-1 -mt-5">
                       {stats && (

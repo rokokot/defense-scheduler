@@ -30,6 +30,7 @@ def format_solver_response(raw: Dict[str, Any], opts: SolverOptions) -> Dict[str
     summary = _to_native(raw.get("summary", {}))
     return {
         "status": raw.get("status", "unknown"),
+        "solver_status": raw.get("solver_status"),
         "solve_time_ms": int(raw.get("solve_time_sec", 0) * 1000),
         "solver_name": opts.solver,
         "assignments": native_assignments,
@@ -57,6 +58,7 @@ def format_solver_snapshot(raw: Dict[str, Any], opts: SolverOptions) -> Dict[str
     native_assignments = _to_native(assignments_list)
     return {
         "status": raw.get("status", "unknown"),
+        "solver_status": raw.get("solver_status"),
         "solve_time_ms": int(raw.get("solve_time_sec", 0) * 1000),
         "solver_name": opts.solver,
         "assignments": native_assignments,

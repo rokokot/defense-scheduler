@@ -157,7 +157,7 @@ export function ConflictResolutionView({
   blocking,
   relaxCandidates,
   timeslotInfo,
-  unscheduledDefenseIds: _unscheduledDefenseIds,
+  unscheduledDefenseIds: _unscheduledDefenseIds, // eslint-disable-line @typescript-eslint/no-unused-vars
   onResolve,
   initialState,
   onStateChange,

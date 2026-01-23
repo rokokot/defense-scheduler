@@ -40,7 +40,7 @@ const DEFAULT_ROOMS = ['Room A', 'Room B'];
 export const GanttScheduleView = memo(function GanttScheduleView({
   events,
   days,
-  dayLabels: _dayLabels,
+  dayLabels: _dayLabels, // eslint-disable-line @typescript-eslint/no-unused-vars
   timeSlots,
   colorScheme,
   selectedEvent,

@@ -89,9 +89,9 @@ export function BlockingMatrixView({
   onColumnDoubleClick,
 }: BlockingMatrixViewProps) {
   const [expandedCategories, setExpandedCategories] = useState<CategoryState>({
-    person: true,
-    room: true,
-    time: true,
+    person: false,
+    room: false,
+    time: false,
   });
 
   const { columns, rows } = data;

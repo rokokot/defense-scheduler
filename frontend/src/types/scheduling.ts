@@ -110,6 +110,7 @@ export type SolveStatus =
 
 export interface SolveResult {
   status: SolveStatus;
+  solver_status?: string;
   solve_time_ms: number;
   solver_name: string;
   assignments?: Assignment[];

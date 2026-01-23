@@ -174,7 +174,7 @@ function AdjacencyCard({
   };
 
   // Determine the card label based on state
-  const cardLabel = isOptimal ? 'Optimal' : isOptimizing ? 'Optimizing' : 'Current best';
+  const cardLabel = isOptimal ? 'Optimal' : isOptimizing ? 'Optimizing' : 'Best found (timeout)';
   const showSpinner = isOptimizing && !isOptimal;
 
   return (
@@ -249,7 +249,7 @@ function AdjacencyCard({
         </div>
         <div className="mt-1.5 flex items-center gap-5">
           <span className="text-xs text-slate-500">
-            {isOptimal ? 'optimal solution found' : isOptimizing ? 'optimizing adjacency...' : 'current best solution'}
+            {isOptimal ? 'optimal solution found' : isOptimizing ? 'optimizing adjacency...' : 'solver timed out — best solution found'}
           </span>
           {cancelled && (
             <span className="px-1.5 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded">

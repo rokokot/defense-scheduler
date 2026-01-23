@@ -38,12 +38,12 @@ const CARD_VIEW_TEXT_STYLE_OVERRIDES: Record<'compact' | 'individual', CardTextS
       alignItems: 'flex-start',
     },
     student: {
-      fontSize: '12px',
+      fontSize: '15.5px',
       fontWeight: 600,
       lineHeight: '1.25',
     },
     supervisor: {
-      fontSize: '11px',
+      fontSize: '11.5px',
       fontWeight: 500,
       lineHeight: '1.25',
       opacity: 0.95,

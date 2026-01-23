@@ -70,7 +70,7 @@ DEFAULT_SOLVER_SETTINGS = {
     "max_days": "NA",
     "stream_stall_seconds": 2.0,
     "stream_min_solutions": 5,
-    "phase2_time_limit_sec": 30.0,
+    "phase2_time_limit_sec": 0,
     "explain": False,
     "no_plots": True,
     "must_plan_all_defenses": False,
@@ -599,22 +599,30 @@ class SolverRunner:
                         last_improve_p1 = time.time()
                 if stall_seconds > 0 and (time.time() - last_improve_p1) >= stall_seconds:
                     if self_inner.solution_count() >= min_solutions:
-                        self_inner.StopSearch()
+                        logger.debug("solver.p1.stall_detected solutions=%s", self_inner.solution_count())
 
         callback_p1 = StreamPrinterP1(solver_p1, display=emit_snapshot_p1)
         status_p1 = solver_p1.solve(solution_callback=callback_p1)
         phase1_time = time.time() - start
 
+        ort_status_p1 = "UNKNOWN"
+        try:
+            ort_status_p1 = solver_p1.ort_solver.StatusName()
+        except Exception:
+            pass
+
         logger.info(
-            "solver.run.two_phase.p1_done run_id=%s status=%s solve_sec=%.3f",
+            "solver.run.two_phase.p1_done run_id=%s status=%s ort_status=%s solve_sec=%.3f",
             run_id,
             status_p1,
+            ort_status_p1,
             phase1_time,
         )
 
         if not status_p1:
             result = {
                 "status": "unsatisfiable",
+                "solver_status": ort_status_p1,
                 "run_id": run_id,
                 "dataset": opts.dataset,
                 "solve_time_sec": phase1_time,
@@ -664,8 +672,10 @@ class SolverRunner:
                 include_metrics=opts.include_metrics,
             )
             payload["planned_count"] = len(payload.get("assignments", []))
+            partial_status = "optimal" if ort_status_p1 == "OPTIMAL" else "satisfiable"
             result = {
-                "status": "satisfiable",
+                "status": partial_status,
+                "solver_status": ort_status_p1,
                 "run_id": run_id,
                 "dataset": opts.dataset,
                 "solve_time_sec": phase1_time,
@@ -771,9 +781,12 @@ class SolverRunner:
 
         solver_p2 = cp.SolverLookup.get("ortools", model_p2)
         self._apply_ortools_parameters(solver_p2, cfg, opts)
-        solver_p2.ort_solver.parameters.num_search_workers = 1
-        # Phase 2 uses a dedicated time limit (no stall) to allow optimality proofs
-        phase2_limit = cfg.get("phase2_time_limit_sec", 30.0)
+        solver_p2.ort_solver.parameters.num_search_workers = os.cpu_count() or 8
+        # Phase 2 uses remaining time budget to allow optimality proofs
+        elapsed = time.time() - start
+        remaining = max(opts.timeout - elapsed, 10.0)
+        phase2_cfg_limit = cfg.get("phase2_time_limit_sec", 0)
+        phase2_limit = min(phase2_cfg_limit, remaining) if phase2_cfg_limit > 0 else remaining
         solver_p2.ort_solver.parameters.max_time_in_seconds = float(phase2_limit)
 
         best_obj_p2 = None
@@ -800,6 +813,7 @@ class SolverRunner:
 
         # Detect if OR-Tools proved optimality (vs stall/timeout with feasible solution)
         is_optimal = False
+        ort_status_name = "UNKNOWN"
         try:
             ort_status_name = solver_p2.ort_solver.StatusName()
             is_optimal = (ort_status_name == "OPTIMAL")
@@ -858,6 +872,7 @@ class SolverRunner:
         final_status = "optimal" if (status_p2 and is_optimal) else "satisfiable" if status_p2 else "unsatisfiable"
         result = {
             "status": final_status,
+            "solver_status": ort_status_name,
             "run_id": run_id,
             "dataset": opts.dataset,
             "solve_time_sec": total_time,
@@ -1186,7 +1201,7 @@ class SolverRunner:
                         last_improve = time.time()
                 if stall_seconds > 0 and (time.time() - last_improve) >= stall_seconds:
                     if self.solution_count() >= min_solutions:
-                        self.StopSearch()
+                        logger.debug("solver.stream.stall_detected solutions=%s", self.solution_count())
 
         # display=emit_snapshot is REQUIRED - it tells OrtSolutionPrinter to populate variable values
         # (when display is callable, it populates solver.user_vars before calling display)
@@ -1196,6 +1211,7 @@ class SolverRunner:
 
         # Detect if OR-Tools proved optimality
         is_optimal = False
+        ort_status_name = "UNKNOWN"
         try:
             ort_status_name = solver.ort_solver.StatusName()
             is_optimal = (ort_status_name == "OPTIMAL")
@@ -1224,6 +1240,7 @@ class SolverRunner:
         final_status = "optimal" if (status and is_optimal) else "satisfiable" if status else "unsatisfiable"
         result = {
             "status": final_status,
+            "solver_status": ort_status_name,
             "run_id": run_id,
             "dataset": opts.dataset,
             "solve_time_sec": solve_time,

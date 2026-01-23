@@ -658,13 +658,27 @@ class SolverRunManager:
         planned = summary.get("scheduled", result.get("planned_count"))
         total = summary.get("total", result.get("total_defenses"))
         status = result.get("status", "unknown")
-        status_label = "Optimal solution found" if status == "optimal" else "Best feasible solution found"
+        solver_status = result.get("solver_status", "")
+        if status == "unsatisfiable":
+            status_label = "No feasible solution found"
+        elif status == "optimal" and planned is not None and total is not None and planned < total:
+            status_label = "Optimal partial solution found"
+        elif status == "optimal":
+            status_label = "Optimal solution found"
+        else:
+            status_label = "Best feasible solution found"
+        timeout_note = None
+        if solver_status == "FEASIBLE" and timestamp is not None:
+            timeout_note = f"Solver timed out at {timestamp:.0f}s — result is best found, not proven optimal"
         lines = [
             f"{status_label} in {timestamp:.3f} seconds" if timestamp is not None else status_label,
+            f"Solver status: {solver_status}" if solver_status else None,
+            timeout_note,
             f"Adjacency objective: {adj_score} out of {adj_possible}",
             f"Defenses planned: {planned} out of {total}",
             "_______________________",
         ]
+        lines = [l for l in lines if l is not None]
         for line in lines:
             self._publish_debug(run_id, line)
 

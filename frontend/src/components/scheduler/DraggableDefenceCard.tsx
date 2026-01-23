@@ -38,18 +38,15 @@ const CARD_VIEW_TEXT_STYLE_OVERRIDES: Record<'compact' | 'individual', CardTextS
       alignItems: 'flex-start',
     },
     student: {
-      fontSize: '15.36px',
+      fontSize: '12px',
       fontWeight: 600,
-      lineHeight: '1.2',
-      marginTop: '-8px',
+      lineHeight: '1.25',
     },
     supervisor: {
-      fontSize: '13px',
+      fontSize: '11px',
       fontWeight: 500,
-      lineHeight: '1.2',
+      lineHeight: '1.25',
       opacity: 0.95,
-      marginTop: '-8px',
-
     },
     roomTag: {
       top: '4px',
@@ -76,16 +73,16 @@ const CARD_VIEW_TEXT_STYLE_OVERRIDES: Record<'compact' | 'individual', CardTextS
       letterSpacing: '0.01em',
     },
     student: {
-      fontSize: '17.6px',
+      fontSize: '17px',
       fontWeight: 600,
       lineHeight: '1.25',
       marginTop: '-30px'
     },
     supervisor: {
-      fontSize: '13px',
+      fontSize: '12px',
       fontWeight: 500,
       lineHeight: '1.25',
-      marginBottom: '10px'
+      marginBottom: '7px'
     },
     roomTag: {
       minHeight: '35px',
@@ -137,6 +134,7 @@ export interface DraggableDefenceCardProps {
   programmeId?: string;
   onParticipantClick?: (participantName: string) => void;
   onRoomClick?: (room: unknown) => void;
+  hideRoomBadge?: boolean;
 }
 
 function DraggableDefenceCardComponent({
@@ -161,6 +159,7 @@ function DraggableDefenceCardComponent({
   programmeId: _programmeId, // eslint-disable-line @typescript-eslint/no-unused-vars
   onParticipantClick,
   onRoomClick,
+  hideRoomBadge = false,
 }: DraggableDefenceCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -216,12 +215,16 @@ function DraggableDefenceCardComponent({
 
   const renderParticipantList = (names: string[]) => {
     if (!names || names.length === 0) return null;
-    return names.map((name, index) => (
-      <span key={`${name}-${index}`} className="inline-flex items-center">
-        {index > 0 && <span className="mx-1 text-current opacity-70">•</span>}
-        {renderParticipantName(name)}
+    return (
+      <span className="break-words" style={{ wordBreak: 'break-word' }}>
+        {names.map((name, index) => (
+          <span key={`${name}-${index}`}>
+            {renderParticipantName(name)}
+            {index < names.length - 1 && ', '}
+          </span>
+        ))}
       </span>
-    ));
+    );
   };
 
   const handleRoomTagClick = (e: React.MouseEvent) => {
@@ -609,8 +612,8 @@ function DraggableDefenceCardComponent({
       {compact ? (
         <>
         <div
-          className="flex items-center justify-between"
-          style={{ gap: resolvedTheme.spacing.card.internalGap, ...viewStyleOverrides.compactContainer }}
+          className="flex items-start justify-between h-full"
+          style={{ gap: '4px', ...viewStyleOverrides.compactContainer }}
         >
           {/* Selection checkbox */}
           <div
@@ -633,25 +636,19 @@ function DraggableDefenceCardComponent({
             {isCheckboxSelected && <Check className="text-slate-900" style={{ width: '9.5px', height: '9.5px' }} strokeWidth={3} />}
           </div>
 
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 flex flex-col min-h-0">
             <div
-              className="break-words whitespace-normal"
-              style={{ ...studentStyle, ...viewStyleOverrides.student, wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+              className="flex-shrink-0 break-words"
+              style={{ ...studentStyle, ...viewStyleOverrides.student, wordBreak: 'break-word' }}
             >
               {event.student}
             </div>
             <div
-              className="break-words whitespace-normal"
+              className="flex-1 min-h-0 overflow-hidden"
               style={{
                 ...supervisorStyle,
                 ...viewStyleOverrides.supervisor,
-                marginTop: resolvedTheme.spacing.card.internalGap,
-                wordBreak: 'break-word',
-                overflowWrap: 'anywhere',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
+                marginTop: '2px',
               }}
             >
               {renderParticipantList(participantLineNames)}
@@ -671,9 +668,11 @@ function DraggableDefenceCardComponent({
             transformOrigin: 'right center',
           }}
         >
-          <div style={{ ...viewStyleOverrides.programmeIdWrapper }}>
-            {renderRoomTag()}
-          </div>
+          {!hideRoomBadge && (
+            <div style={{ ...viewStyleOverrides.programmeIdWrapper }}>
+              {renderRoomTag()}
+            </div>
+          )}
         </div>
         </>
       ) : (
@@ -697,9 +696,11 @@ function DraggableDefenceCardComponent({
               ...viewStyleOverrides.roomTag,
             }}
           >
-            <div style={{ ...viewStyleOverrides.programmeIdWrapper }}>
-              {renderRoomTag()}
-            </div>
+            {!hideRoomBadge && (
+              <div style={{ ...viewStyleOverrides.programmeIdWrapper }}>
+                {renderRoomTag()}
+              </div>
+            )}
           </div>
         </div>
 

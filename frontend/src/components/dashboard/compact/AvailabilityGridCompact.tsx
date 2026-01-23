@@ -20,6 +20,7 @@ const AVAILABILITY_STATUS_CLASSES: Record<AvailabilityStatus, string> = {
   unavailable: AVAILABILITY_STATUS_BG.unavailable,
   booked: '',
   empty: 'bg-white border border-gray-300',
+  requested: 'bg-white border-2 border-amber-600',
 };
 
 function getProgrammeColorForSlot(

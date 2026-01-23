@@ -17,7 +17,7 @@ import time
 import yaml
 
 from .analysis import detect_conflicts, validate_schedule_state, ScheduleValidationError
-from .config import DATA_INPUT_DIR
+from .config import DATA_INPUT_DIR, DATA_OUTPUT_DIR
 from .datasets import list_datasets
 from .schedule_builder import build_schedule_payload
 from .schemas import (
@@ -205,6 +205,23 @@ async def upload_dataset(dataset_id: str = Form(...), archive: UploadFile = File
         return {"status": "uploaded", "dataset": safe_name}
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+@app.delete("/api/datasets/{dataset_id}")
+def delete_dataset(dataset_id: str):
+    safe_name = _validate_dataset_name(dataset_id)
+    input_dir = DATA_INPUT_DIR / safe_name
+    if not input_dir.exists():
+        raise HTTPException(status_code=404, detail=f"Dataset '{safe_name}' not found")
+    try:
+        shutil.rmtree(input_dir)
+    except OSError as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete dataset: {e}")
+    # Also remove solver output for this dataset if it exists
+    output_dir = DATA_OUTPUT_DIR / safe_name
+    if output_dir.exists():
+        shutil.rmtree(output_dir, ignore_errors=True)
+    return {"status": "deleted", "dataset": safe_name}
 
 
 @app.post("/api/schedule/load")
@@ -523,7 +540,7 @@ def save_session_state(req: SessionSaveRequest):
         )
 
     try:
-        apply_dashboard_state(req.dataset_id, req.state)
+        new_version = apply_dashboard_state(req.dataset_id, req.state)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     snapshot_id = None
@@ -531,7 +548,7 @@ def save_session_state(req: SessionSaveRequest):
         snap_name = req.snapshot_name or f"autosave-{req.dataset_id}"
         snap = save_snapshot(snap_name, req.snapshot_name, req.state)
         snapshot_id = snap.id
-    return {"status": "saved", "dataset": req.dataset_id, "snapshot_id": snapshot_id}
+    return {"status": "saved", "dataset": req.dataset_id, "snapshot_id": snapshot_id, "dataset_version": new_version}
 
 
 @app.post("/api/session/export")

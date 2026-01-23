@@ -32,16 +32,26 @@ export function checkRoomTimeslotCollision(
   events: DefenceEvent[],
   targetDay: string,
   targetTime: string,
-  movingIds: string[]
+  movingIds: string[],
+  targetRoom?: string
 ): { hasCollision: boolean; collidingRoom: string | null } {
   const movingSet = new Set(movingIds);
-  const movingEvents = events.filter(e => movingSet.has(e.id));
   const targetEvents = events.filter(
     e => e.day === targetDay &&
          e.startTime === targetTime &&
          !movingSet.has(e.id)
   );
 
+  // If a target room is specified (Gantt drop), check if that room is already occupied
+  if (targetRoom) {
+    const occupied = targetEvents.some(e => (e.room || 'unassigned') === targetRoom);
+    return occupied
+      ? { hasCollision: true, collidingRoom: targetRoom }
+      : { hasCollision: false, collidingRoom: null };
+  }
+
+  // Fallback for drops without explicit room: check each moving event's current room
+  const movingEvents = events.filter(e => movingSet.has(e.id));
   for (const moving of movingEvents) {
     const movingRoom = moving.room || 'unassigned';
     for (const target of targetEvents) {

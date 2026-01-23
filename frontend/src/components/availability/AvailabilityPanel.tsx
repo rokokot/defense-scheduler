@@ -3,13 +3,13 @@
  * WIP v0.2.0 (29-10)
  */
 import { useState, useRef, useEffect, useMemo, useTransition, useCallback } from 'react';
-import { AlertCircle, GripHorizontal, Lock } from 'lucide-react';
+import { AlertCircle, GripHorizontal, Lock, Clock } from 'lucide-react';
 import {
   AvailabilityGrid,
   RosterInfo,
   AVAILABILITY_STATUS_LABELS,
 } from './AvailabilityGrid';
-import { PersonAvailability, ViewGranularity, PersonRole, AvailabilityStatus } from './types';
+import { PersonAvailability, ViewGranularity, PersonRole, AvailabilityStatus, AvailabilityRequest } from './types';
 import { Conflict, DefenceEvent } from '../../types/schedule';
 
 export interface AvailabilityPanelProps {
@@ -42,6 +42,10 @@ export interface AvailabilityPanelProps {
   onHeightChange?: (height: number) => void;
   registerResizeHandle?: (handler: ((event: React.MouseEvent) => void) | null) => void;
   hideInternalHandle?: boolean;
+  onRequestAvailability?: (day: string, slot: string, missingPersonIds: string[]) => void;
+  availabilityRequests?: AvailabilityRequest[];
+  onAcceptRequest?: (requestId: string) => void;
+  onDenyRequest?: (requestId: string) => void;
 }
 
 export function AvailabilityPanel({
@@ -72,6 +76,10 @@ export function AvailabilityPanel({
   onHeightChange,
   registerResizeHandle,
   hideInternalHandle = false,
+  onRequestAvailability,
+  availabilityRequests = [],
+  onAcceptRequest,
+  onDenyRequest,
 }: AvailabilityPanelProps) {
   const [granularity, setGranularity] = useState<ViewGranularity>('day');
   const [roleFilter, setRoleFilter] = useState<PersonRole | 'all'>('all');
@@ -240,6 +248,10 @@ export function AvailabilityPanel({
               programmeColors={programmeColors}
               events={events}
               showLegend={false}
+              onRequestAvailability={onRequestAvailability}
+              availabilityRequests={availabilityRequests}
+              onAcceptRequest={onAcceptRequest}
+              onDenyRequest={onDenyRequest}
             />
           </div>
           <div className="shrink-0 sticky bottom-0 left-0 right-0 px-4 py-3 bg-gray-50 border-t border-gray-100 z-10">
@@ -250,9 +262,10 @@ export function AvailabilityPanel({
                 .map(status => (
                   <div key={status} className="flex items-center gap-2">
                     <span
-                      className="w-6 h-6 rounded shadow-sm border border-gray-700"
+                      className="w-6 h-6 rounded shadow-sm flex items-center justify-center"
                       style={{
                         display: 'inline-block',
+                        border: status === 'requested' ? '2px solid #d97706' : '1px solid #374151',
                         ...(status === 'available' && {
                           backgroundColor: 'white'
                         }),
@@ -263,12 +276,29 @@ export function AvailabilityPanel({
                         }),
                         ...(status === 'booked' && {
                           backgroundImage: 'linear-gradient(135deg, #3b82f6 0%, #3b82f6 25%, #8b5cf6 25%, #8b5cf6 50%, #ec4899 50%, #ec4899 75%, #f59e0b 75%, #f59e0b 100%)'
+                        }),
+                        ...(status === 'requested' && {
+                          backgroundColor: 'white'
                         })
                       }}
                     />
                     <span className="capitalize">{AVAILABILITY_STATUS_LABELS[status]}</span>
                   </div>
                 ))}
+              <div className="flex items-center gap-2">
+                <span
+                  className="w-6 h-6 rounded shadow-sm flex items-center justify-center"
+                  style={{
+                    backgroundImage: 'linear-gradient(135deg, #3b82f6 0%, #3b82f6 25%, #8b5cf6 25%, #8b5cf6 50%, #ec4899 50%, #ec4899 75%, #f59e0b 75%, #f59e0b 100%)',
+                    border: '1px solid #374151',
+                    outline: '2px solid #d97706',
+                    outlineOffset: '-2px',
+                  }}
+                >
+                  <Clock className="h-3 w-3 text-amber-600" strokeWidth={2.5} />
+                </span>
+                <span>Booked + Pending</span>
+              </div>
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center flex-shrink-0">
                   <Lock className="h-3 w-3 text-white" strokeWidth={2.5} />

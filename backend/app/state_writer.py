@@ -50,10 +50,13 @@ def _write_state_bundle(dataset_dir: Path, state: Dict[str, Any], roster: Dict[s
     _write_rooms(dataset_dir, state)
 
 
-def apply_dashboard_state(dataset_name: str, state: Dict[str, Any]) -> None:
+def apply_dashboard_state(dataset_name: str, state: Dict[str, Any]) -> Optional[str]:
     dataset_dir = DATA_INPUT_DIR / dataset_name
     roster = _select_roster(state)
     _write_state_bundle(dataset_dir, state, roster)
+    from .datasets import get_dataset_metadata
+    meta = get_dataset_metadata(dataset_name)
+    return meta.get("updated_at")
 
 
 def _sanitize_folder_name(name: str) -> str:

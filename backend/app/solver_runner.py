@@ -70,6 +70,7 @@ DEFAULT_SOLVER_SETTINGS = {
     "max_days": "NA",
     "stream_stall_seconds": 2.0,
     "stream_min_solutions": 5,
+    "phase2_time_limit_sec": 30.0,
     "explain": False,
     "no_plots": True,
     "must_plan_all_defenses": False,
@@ -85,7 +86,7 @@ class SolverOptions:
     must_plan_all: Optional[bool] = None
     adjacency_objective: Optional[bool] = None
     allow_online_defenses: Optional[bool] = None
-    two_phase_adjacency: Optional[bool] = None  # Default True when adjacency enabled
+    two_phase_adjacency: Optional[bool] = None  # Ignored; adjacency always uses two-phase
     stream: bool = False
     stream_interval_sec: float = 0.0
     include_metrics: bool = True
@@ -373,19 +374,41 @@ class SolverRunner:
         assumptions = None
         if opts.explain and hasattr(model, "assumption_literals"):
             assumptions = model.assumption_literals
-        status = model.solve(solver=cfg["solver"], log_search_progress=False, assumptions=assumptions)
+
+        is_optimal = False
+        if cfg["solver"] == "ortools":
+            try:
+                import cpmpy as cp
+                solver = cp.SolverLookup.get("ortools", model)
+                self._apply_ortools_parameters(solver, cfg, opts)
+                solve_kwargs = {}
+                if assumptions:
+                    solve_kwargs["assumptions"] = assumptions
+                status = solver.solve(**solve_kwargs)
+                try:
+                    is_optimal = solver.ort_solver.StatusName() == "OPTIMAL"
+                except Exception:
+                    pass
+            except Exception:
+                status = model.solve(solver=cfg["solver"], log_search_progress=False, assumptions=assumptions)
+        else:
+            status = model.solve(solver=cfg["solver"], log_search_progress=False, assumptions=assumptions)
+
         solve_time = time.time() - start
         logger.info(
-            "solver.run.solve run_id=%s dataset=%s load_sec=%.3f model_sec=%.3f solve_sec=%.3f total_sec=%.3f",
+            "solver.run.solve run_id=%s dataset=%s load_sec=%.3f model_sec=%.3f solve_sec=%.3f total_sec=%.3f optimal=%s",
             run_id,
             opts.dataset,
             load_elapsed,
             model_elapsed,
             solve_time,
             time.monotonic() - start_wall,
+            is_optimal,
         )
+
+        final_status = "optimal" if (status and is_optimal) else "satisfiable" if status else "unsatisfiable"
         result = {
-            "status": "satisfiable" if status else "unsatisfiable",
+            "status": final_status,
             "run_id": run_id,
             "dataset": opts.dataset,
             "solve_time_sec": solve_time,
@@ -436,6 +459,28 @@ class SolverRunner:
                 payload["status"] = "invalid"
             (Path(run_folder) / "result.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
             result.update(payload)
+            # Trivial optimality: all defenses scheduled without adjacency = upper bound achieved
+            if not is_optimal and not cfg.get("adjacency_objective"):
+                planned = result.get("planned_count", 0)
+                total = result.get("total_defenses", 0)
+                if planned == total and total > 0:
+                    result["status"] = "optimal"
+            # Compute blocking for partial results (some defenses unscheduled)
+            unscheduled_count = len(payload.get("unscheduled", []))
+            if unscheduled_count > 0:
+                try:
+                    blocking = self._module.compute_blocking_reasons(model)
+                    relax = self._module.aggregate_relax_candidates(blocking, top_k=10, top_k_per_type=5)
+                    result["blocking"] = blocking
+                    result["relax_candidates"] = relax
+                    logger.info(
+                        "solver.run.blocking_computed run_id=%s unscheduled=%s blocking_entries=%s",
+                        run_id,
+                        unscheduled_count,
+                        len(blocking),
+                    )
+                except Exception as e:
+                    logger.warning("solver.run.blocking_failed run_id=%s error=%s", run_id, e)
         else:
             blocking = self._module.compute_blocking_reasons(model)
             relax = self._module.aggregate_relax_candidates(blocking, top_k=10, top_k_per_type=5)
@@ -593,11 +638,59 @@ class SolverRunner:
             if self._get_var_value(model_p1.is_planned[d]):
                 scheduled_indices.add(d)
 
+        total_defenses = int(getattr(model_p1, "no_defenses", 0))
         logger.info(
-            "solver.run.two_phase.scheduled run_id=%s count=%s",
+            "solver.run.two_phase.scheduled run_id=%s count=%s total=%s",
             run_id,
             len(scheduled_indices),
+            total_defenses,
         )
+
+        # Only enter phase 2 (adjacency) if we have a complete schedule.
+        # Partial schedules indicate insufficient capacity - adjacency optimization
+        # is meaningless when defenses are already unschedulable.
+        if len(scheduled_indices) < total_defenses:
+            logger.info(
+                "solver.run.two_phase.partial run_id=%s scheduled=%s total=%s skipping_phase2=true",
+                run_id,
+                len(scheduled_indices),
+                total_defenses,
+            )
+            payload = self._build_sat_payload(
+                model=model_p1,
+                timeslot_info=timeslot_info,
+                raw_defences=defences,
+                cfg=cfg_p1,
+                include_metrics=opts.include_metrics,
+            )
+            payload["planned_count"] = len(payload.get("assignments", []))
+            result = {
+                "status": "satisfiable",
+                "run_id": run_id,
+                "dataset": opts.dataset,
+                "solve_time_sec": phase1_time,
+                "assignments": [],
+                "unscheduled": [],
+                "summary": {},
+                "utilization": None,
+                "planned_count": 0,
+                "total_defenses": total_defenses,
+                "solution_index": solution_index,
+                "phase": 1,
+            }
+            result.update(payload)
+            # Compute blocking reasons for unscheduled defenses
+            unscheduled_count = len(payload.get("unscheduled", []))
+            if unscheduled_count > 0:
+                try:
+                    blocking = self._module.compute_blocking_reasons(model_p1)
+                    relax = self._module.aggregate_relax_candidates(blocking, top_k=10, top_k_per_type=5)
+                    result["blocking"] = blocking
+                    result["relax_candidates"] = relax
+                except Exception as e:
+                    logger.warning("solver.run.two_phase.partial.blocking_failed run_id=%s error=%s", run_id, e)
+            (Path(run_folder) / "result.json").write_text(json.dumps(result, indent=2, default=str), encoding="utf-8")
+            return result
 
         # Emit phase transition
         on_progress({
@@ -679,6 +772,9 @@ class SolverRunner:
         solver_p2 = cp.SolverLookup.get("ortools", model_p2)
         self._apply_ortools_parameters(solver_p2, cfg, opts)
         solver_p2.ort_solver.parameters.num_search_workers = 1
+        # Phase 2 uses a dedicated time limit (no stall) to allow optimality proofs
+        phase2_limit = cfg.get("phase2_time_limit_sec", 30.0)
+        solver_p2.ort_solver.parameters.max_time_in_seconds = float(phase2_limit)
 
         best_obj_p2 = None
         last_improve_p2 = time.time()
@@ -696,26 +792,72 @@ class SolverRunner:
                     if best_obj_p2 is None or obj_val > best_obj_p2:
                         best_obj_p2 = obj_val
                         last_improve_p2 = time.time()
-                if stall_seconds > 0 and (time.time() - last_improve_p2) >= stall_seconds:
-                    if self_inner.solution_count() >= min_solutions:
-                        self_inner.StopSearch()
 
         callback_p2 = StreamPrinterP2(solver_p2, display=emit_snapshot_p2)
         status_p2 = solver_p2.solve(solution_callback=callback_p2)
         phase2_time = time.time() - phase2_start
         total_time = time.time() - start
 
+        # Detect if OR-Tools proved optimality (vs stall/timeout with feasible solution)
+        is_optimal = False
+        try:
+            ort_status_name = solver_p2.ort_solver.StatusName()
+            is_optimal = (ort_status_name == "OPTIMAL")
+        except Exception:
+            pass
+
         logger.info(
-            "solver.run.two_phase.done run_id=%s p1_sec=%.3f p2_sec=%.3f total_sec=%.3f",
+            "solver.run.two_phase.done run_id=%s p1_sec=%.3f p2_sec=%.3f total_sec=%.3f optimal=%s",
             run_id,
             phase1_time,
             phase2_time,
             total_time,
+            is_optimal,
         )
 
+        # Emit final optimal snapshot so frontend receives it before final result
+        if status_p2 and is_optimal:
+            solution_index += 1
+            assignments = self._assignment_rows(
+                model=model_p2,
+                timeslot_info=timeslot_info,
+                raw_defences=defences,
+                include_participants=False,
+            )
+            adj_value = self._get_var_value(model_p2.adj_obj)
+            score = int(adj_value) if adj_value is not None else 0
+            total_def = int(getattr(model_p2, "no_defenses", 0))
+            on_progress({
+                "status": "optimal",
+                "run_id": run_id,
+                "dataset": opts.dataset,
+                "solve_time_sec": total_time,
+                "planned_count": len(assignments),
+                "total_defenses": total_def,
+                "solution_index": solution_index,
+                "phase": 2,
+                "phase_description": "Optimal adjacency found",
+                "assignments": assignments,
+                "unscheduled": [],
+                "summary": {
+                    "total": total_def,
+                    "scheduled": len(assignments),
+                    "unscheduled": max(total_def - len(assignments), 0),
+                    "adjacency_score": score,
+                    "adjacency_possible": int(getattr(model_p2, "adj_obj_ub", 0)),
+                },
+                "objectives": {
+                    "adjacency": {
+                        "score": score,
+                        "possible": int(getattr(model_p2, "adj_obj_ub", 0)),
+                    }
+                },
+            })
+
         # Build final result from Phase 2 model
+        final_status = "optimal" if (status_p2 and is_optimal) else "satisfiable" if status_p2 else "unsatisfiable"
         result = {
-            "status": "satisfiable" if status_p2 else "unsatisfiable",
+            "status": final_status,
             "run_id": run_id,
             "dataset": opts.dataset,
             "solve_time_sec": total_time,
@@ -759,6 +901,22 @@ class SolverRunner:
                 payload["status"] = "invalid"
             (Path(run_folder) / "result.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
             result.update(payload)
+            # Compute blocking for partial results (some defenses unscheduled)
+            unscheduled_count = len(payload.get("unscheduled", []))
+            if unscheduled_count > 0:
+                try:
+                    blocking = self._module.compute_blocking_reasons(model_p2)
+                    relax = self._module.aggregate_relax_candidates(blocking, top_k=10, top_k_per_type=5)
+                    result["blocking"] = blocking
+                    result["relax_candidates"] = relax
+                    logger.info(
+                        "solver.run.two_phase.blocking_computed run_id=%s unscheduled=%s blocking_entries=%s",
+                        run_id,
+                        unscheduled_count,
+                        len(blocking),
+                    )
+                except Exception as e:
+                    logger.warning("solver.run.two_phase.blocking_failed run_id=%s error=%s", run_id, e)
         else:
             # Phase 2 failed - return Phase 1 result without adjacency
             payload = self._build_sat_payload(
@@ -772,6 +930,22 @@ class SolverRunner:
             result.update(payload)
             result["status"] = "satisfiable"
             result["warning"] = "Phase 2 (adjacency optimization) failed; returning Phase 1 result"
+            # Compute blocking for partial results (some defenses unscheduled)
+            unscheduled_count = len(payload.get("unscheduled", []))
+            if unscheduled_count > 0:
+                try:
+                    blocking = self._module.compute_blocking_reasons(model_p1)
+                    relax = self._module.aggregate_relax_candidates(blocking, top_k=10, top_k_per_type=5)
+                    result["blocking"] = blocking
+                    result["relax_candidates"] = relax
+                    logger.info(
+                        "solver.run.two_phase.p1_fallback.blocking_computed run_id=%s unscheduled=%s blocking_entries=%s",
+                        run_id,
+                        unscheduled_count,
+                        len(blocking),
+                    )
+                except Exception as e:
+                    logger.warning("solver.run.two_phase.p1_fallback.blocking_failed run_id=%s error=%s", run_id, e)
 
         return result
 
@@ -811,9 +985,9 @@ class SolverRunner:
             except (TypeError, ValueError):
                 pass
 
-        # Dispatch to two-phase solving when adjacency is enabled (unless explicitly disabled)
-        two_phase = cfg.get("two_phase_adjacency", True)
-        if cfg.get("adjacency_objective") and two_phase and opts.solver == "ortools":
+        # Always use two-phase when adjacency is enabled: check feasibility first,
+        # then optimize adjacency only for scheduled defenses.
+        if cfg.get("adjacency_objective") and opts.solver == "ortools":
             return self._solve_two_phase(
                 opts=opts,
                 cfg=cfg,
@@ -1019,17 +1193,37 @@ class SolverRunner:
         callback = StreamPrinter(solver, display=emit_snapshot)
         status = solver.solve(solution_callback=callback)
         solve_time = time.time() - start
+
+        # Detect if OR-Tools proved optimality
+        is_optimal = False
+        try:
+            ort_status_name = solver.ort_solver.StatusName()
+            is_optimal = (ort_status_name == "OPTIMAL")
+        except Exception:
+            pass
+
+        # Trivial optimality: scheduling-only and all defenses planned = upper bound achieved
+        if status and not is_optimal and not cfg.get("adjacency_objective"):
+            total = int(getattr(model, "no_defenses", 0))
+            if total > 0:
+                planned = sum(1 for d in range(total) if self._get_var_value(model.is_planned[d]))
+                if planned == total:
+                    is_optimal = True
+
         logger.info(
-            "solver.run.solve_stream run_id=%s dataset=%s load_sec=%.3f model_sec=%.3f solve_sec=%.3f total_sec=%.3f",
+            "solver.run.solve_stream run_id=%s dataset=%s load_sec=%.3f model_sec=%.3f solve_sec=%.3f total_sec=%.3f optimal=%s",
             run_id,
             opts.dataset,
             load_elapsed,
             model_elapsed,
             solve_time,
             time.monotonic() - start_wall,
+            is_optimal,
         )
+
+        final_status = "optimal" if (status and is_optimal) else "satisfiable" if status else "unsatisfiable"
         result = {
-            "status": "satisfiable" if status else "unsatisfiable",
+            "status": final_status,
             "run_id": run_id,
             "dataset": opts.dataset,
             "solve_time_sec": solve_time,
@@ -1073,6 +1267,22 @@ class SolverRunner:
                 payload["status"] = "invalid"
             (Path(run_folder) / "result.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
             result.update(payload)
+            # Compute blocking for partial results (some defenses unscheduled)
+            unscheduled_count = len(payload.get("unscheduled", []))
+            if unscheduled_count > 0:
+                try:
+                    blocking = self._module.compute_blocking_reasons(model)
+                    relax = self._module.aggregate_relax_candidates(blocking, top_k=10, top_k_per_type=5)
+                    result["blocking"] = blocking
+                    result["relax_candidates"] = relax
+                    logger.info(
+                        "solver.run.stream.blocking_computed run_id=%s unscheduled=%s blocking_entries=%s",
+                        run_id,
+                        unscheduled_count,
+                        len(blocking),
+                    )
+                except Exception as e:
+                    logger.warning("solver.run.stream.blocking_failed run_id=%s error=%s", run_id, e)
         else:
             blocking = self._module.compute_blocking_reasons(model)
             relax = self._module.aggregate_relax_candidates(blocking, top_k=10, top_k_per_type=5)

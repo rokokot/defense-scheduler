@@ -6,7 +6,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef, useMemo, useCallback, startTransition } from 'react';
 import type { ReactNode } from 'react';
-import { GripHorizontal, X, Terminal } from 'lucide-react';
+import { GripHorizontal, X, AlertCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
@@ -21,7 +21,7 @@ import { AvailabilityPanel } from '../availability/AvailabilityPanel';
 import { RosterInfo } from '../availability/AvailabilityGrid';
 import { ObjectivesPanel } from '../objectives/ObjectivesPanel';
 import { AdaptiveToolbar, CardViewMode } from '../toolbar/AdaptiveToolbar';
-import { PersonAvailability, AvailabilityStatus, SlotAvailability } from '../availability/types';
+import { PersonAvailability, AvailabilityStatus, SlotAvailability, AvailabilityRequest } from '../availability/types';
 import { GlobalObjective, LocalObjective } from '../../types/objectives';
 import { DefenceEvent, ScheduleState, ScheduleAction, Conflict, ConflictSeverity, SolverRunInfo, RoomOption, RoomAvailabilityState, LockInfo } from '../../types/schedule';
 import { Roster } from '../../types/roster';
@@ -33,8 +33,9 @@ import {
   createPersistedStateSnapshot,
   STORAGE_KEY,
 } from '../../hooks/usePersistedState';
-import { DraggableDefenceCard } from '../scheduler/DraggableDefenceCard';
+import { DraggableDefenceCard, GanttScheduleView } from '../scheduler';
 import { DroppableTimeSlot } from '../scheduler/DroppableTimeSlot';
+import { ScrollHint } from '../scheduler/ScrollHint';
 import { generateGridFromTimeHorizon } from '../../utils/gridGenerator';
 import { generatePlaceholderAvailabilities } from '../../utils/availabilityGenerator';
 import { logger } from '../../utils/logger';
@@ -58,6 +59,9 @@ import { SolveResult } from '../../types/scheduling';
 import { schedulingAPI } from '../../api/scheduling';
 import { API_BASE_URL } from '../../lib/apiConfig';
 import { exportRosterSnapshot } from '../../services/snapshotService';
+import { SolverResultsPanel } from '../solver/SolverResultsPanel';
+import { ConflictResolutionView } from '../resolution';
+import type { DefenseBlocking, RelaxCandidate, StagedRelaxation, ResolveResult } from '../resolution/types';
 
 
 const normalizeName = (name?: string | null) => (name || '').trim().toLowerCase();
@@ -329,11 +333,12 @@ export function RosterDashboard({
     persistedState.current = loadPersistedState();
   }
 
+  // Dataset ID mismatch: clear stale state from a different dataset.
+  // (Version/mtime checks removed — the backend sync itself modifies file
+  // mtimes, which would falsely invalidate persisted state on every reload.)
   if (
     persistedState.current &&
-    datasetVersion &&
-    persistedState.current.datasetVersion &&
-    persistedState.current.datasetVersion !== datasetVersion
+    persistedState.current.datasetId !== datasetId
   ) {
     localStorage.removeItem(STORAGE_KEY);
     persistedState.current = null;
@@ -444,6 +449,7 @@ export function RosterDashboard({
   );
   const [availabilityExpanded, setAvailabilityExpanded] = useState(false);
   const [highlightedSlot, setHighlightedSlot] = useState<{ day: string; timeSlot: string } | null>(null);
+  const [dragHighlights, setDragHighlights] = useState<Record<string, Record<string, Record<string, 'match'>>> | null>(null);
   const [roomsExpanded, setRoomsExpanded] = useState(false);
   const [highlightedPersons, setHighlightedPersons] = useState<string[]>([]);
   const [highlightedRoomId, setHighlightedRoomId] = useState<string | null>(null);
@@ -471,7 +477,8 @@ export function RosterDashboard({
   const [solverRunning, setSolverRunning] = useState(false);
   const [activeSolverRunId, setActiveSolverRunId] = useState<string | null>(null);
   const [cancellingSolverRun, setCancellingSolverRun] = useState(false);
-  const [solverStreamStatus, setSolverStreamStatus] = useState<'open' | 'error' | 'closed' | null>(null);
+  const [cancelledPhase, setCancelledPhase] = useState<'solving' | 'optimizing' | null>(null);
+  const [_solverStreamStatus, setSolverStreamStatus] = useState<'open' | 'error' | 'closed' | null>(null);
   const [solverRunStartedAt, setSolverRunStartedAt] = useState<number | null>(null);
   const [solverElapsedSeconds, setSolverElapsedSeconds] = useState(0);
   const [solverLogOpen, setSolverLogOpen] = useState(false);
@@ -566,18 +573,33 @@ export function RosterDashboard({
     result: SolveResult;
     receivedAt: number;
   };
-  const [streamedSolveAlternatives, setStreamedSolveAlternatives] = useState<StreamedAlternative[]>([]);
+  const [streamedSolveAlternatives, setStreamedSolveAlternatives] = useState<StreamedAlternative[]>(
+    () => persistedSnapshot?.solverResults || []
+  );
   const [selectedStreamSolutionId, setSelectedStreamSolutionId] = useState<string | null>(null);
   const [manualStreamPreview, setManualStreamPreview] = useState(false);
-  const [solverPanelOpen, setSolverPanelOpen] = useState(false);
+  const [solverPanelOpen, setSolverPanelOpen] = useState(
+    () => persistedSnapshot?.uiPreferences?.solverPanelOpen ?? false
+  );
   const [streamGateOpen, setStreamGateOpen] = useState(false);
   const [pendingStreamAlternatives, setPendingStreamAlternatives] = useState<StreamedAlternative[]>([]);
   const [streamSnapshotCount, setStreamSnapshotCount] = useState(0);
   const [streamGateHintVisible, setStreamGateHintVisible] = useState(false);
+  // Track best live adjacency score for display (not subject to clamping)
+  const [bestLiveAdjacency, setBestLiveAdjacency] = useState<{score: number, possible: number} | null>(null);
+  // Conflict resolution state
+  const [showResolutionView, setShowResolutionView] = useState(false);
+  const [currentBlocking, setCurrentBlocking] = useState<DefenseBlocking[]>([]);
+  const [relaxCandidates, setRelaxCandidates] = useState<RelaxCandidate[]>([]);
+  // Availability requests state (persisted)
+  const [availabilityRequests, setAvailabilityRequests] = useState<AvailabilityRequest[]>(
+    () => persistedSnapshot?.availabilityRequests || []
+  );
   const selectedStreamSolutionIdRef = useRef<string | null>(null);
   const streamGateOpenRef = useRef(false);
   const pendingSolutionsRef = useRef<StreamedAlternative[]>([]);
   const plannedAdjacencyRef = useRef<Map<number, Set<number>>>(new Map());
+  const hasAutoSelectedFullScheduleRef = useRef(false);
   const selectedStreamedResult = useMemo(() => {
     if (!selectedStreamSolutionId) return null;
     return streamedSolveAlternatives.find(entry => entry.id === selectedStreamSolutionId)?.result ?? null;
@@ -1149,24 +1171,56 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     }
   }, [events, partialScheduleNotice]);
 
+  // Patch active roster with latest availabilities/state before persisting.
+  // The roster sync effect is debounced (100ms), so rosters may be stale when
+  // beforeunload fires. This memo ensures persistence always uses fresh data.
+  const rostersForPersistence = useMemo(() =>
+    rosters.map(r =>
+      r.id === activeRosterId
+        ? { ...r, state: currentState ?? r.state, availabilities }
+        : r
+    ),
+    [rosters, activeRosterId, currentState, availabilities]
+  );
+
   // Auto-persist state with debouncing
   const { persistNow, clearPersistedState } = usePersistedState(
     currentDatasetId,
-    rosters,
+    rostersForPersistence,
     activeRosterId,
     schedulingContext,
     filters,
     { days, dayLabels, timeSlots },
-    { toolbarPosition, cardViewMode, filterPanelCollapsed },
+    { toolbarPosition, cardViewMode, filterPanelCollapsed, solverPanelOpen },
     roomAvailabilityState,
-    currentDatasetVersion || undefined
+    currentDatasetVersion || undefined,
+    availabilityRequests,
+    streamedSolveAlternatives
   );
+
+  // Ref to always have latest persistNow for use in handlers (avoids stale closures)
+  const persistNowRef = useRef(persistNow);
+  persistNowRef.current = persistNow;
+
+  // Immediately persist when availability requests change (bypass 800ms debounce)
+  const requestSig = availabilityRequests.map(r =>
+    `${r.id}:${r.status}:${(r.requestedSlots || []).map(s => `${s.day}-${s.timeSlot}`).join('|')}`
+  ).join(',');
+  const prevRequestSigRef = useRef(requestSig);
+  useEffect(() => {
+    if (requestSig !== prevRequestSigRef.current) {
+      prevRequestSigRef.current = requestSig;
+      const result = persistNow();
+      if (result) result.then(v => { if (v) setCurrentDatasetVersion(v); });
+    }
+  }, [requestSig, persistNow]);
+
   const currentSnapshotState = useMemo(
     () =>
       createPersistedStateSnapshot({
         datasetId: currentDatasetId,
         datasetVersion: currentDatasetVersion || undefined,
-        rosters,
+        rosters: rostersForPersistence,
         activeRosterId,
         schedulingContext,
         filters,
@@ -1176,12 +1230,15 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
           toolbarPosition,
           cardViewMode,
           filterPanelCollapsed,
+          solverPanelOpen,
         },
+        availabilityRequests,
+        solverResults: streamedSolveAlternatives,
       }),
     [
       currentDatasetId,
       currentDatasetVersion,
-      rosters,
+      rostersForPersistence,
       activeRosterId,
       schedulingContext,
       filters,
@@ -1190,6 +1247,9 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
       toolbarPosition,
       cardViewMode,
       filterPanelCollapsed,
+      solverPanelOpen,
+      streamedSolveAlternatives,
+      availabilityRequests,
     ]
   );
 
@@ -1208,7 +1268,88 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
   // Monitor drag and drop with pragmatic-dnd (stable handler; avoids reattaching each render)
   useEffect(() => {
     return monitorForElements({
+      onDragStart({ source }) {
+        if (source.data.type !== 'defence-card') return;
+        const eventId = source.data.eventId as string;
+        const eventsSnapshot = eventsRef.current;
+        const event = eventsSnapshot.find(e => e.id === eventId);
+        if (!event) return;
+
+        const allDays = daysRef.current;
+        const allSlots = timeSlotsRef.current;
+        const roomAvail = roomAvailabilityStateRef.current;
+        const personAvail = availabilitiesRef.current;
+
+        const participants: string[] = [];
+        expandParticipantNames(event.supervisor).forEach(n => participants.push(n));
+        expandParticipantNames(event.coSupervisor).forEach(n => participants.push(n));
+        if (event.assessors) participants.push(...event.assessors.filter(Boolean));
+        if (event.mentors) participants.push(...event.mentors.filter(Boolean));
+        const normalizedParticipants = participants.map(normalizeName).filter(Boolean);
+
+        const personLookup = new Map<string, typeof personAvail[0]>();
+        personAvail.forEach(p => {
+          const key = normalizeName(p.name);
+          if (key && normalizedParticipants.includes(key)) personLookup.set(key, p);
+        });
+
+        const bookedBySlot = new Map<string, Set<string>>();
+        eventsSnapshot.forEach(e => {
+          if (!e.day || !e.startTime || e.id === eventId) return;
+          const slotKey = `${e.day}_${e.startTime}`;
+          const names: string[] = [];
+          expandParticipantNames(e.supervisor).forEach(n => names.push(n));
+          expandParticipantNames(e.coSupervisor).forEach(n => names.push(n));
+          if (e.assessors) names.push(...e.assessors.filter(Boolean));
+          if (e.mentors) names.push(...e.mentors.filter(Boolean));
+          names.forEach(name => {
+            const norm = normalizeName(name);
+            if (!norm || !normalizedParticipants.includes(norm)) return;
+            if (!bookedBySlot.has(slotKey)) bookedBySlot.set(slotKey, new Set());
+            bookedBySlot.get(slotKey)!.add(norm);
+          });
+        });
+
+        const roomLabels = roomAvail.map(r => r.label);
+        const roomSlotLookup: Record<string, Record<string, Record<string, string>>> = {};
+        roomAvail.forEach(r => { roomSlotLookup[r.label] = r.slots; });
+
+        const highlights: Record<string, Record<string, Record<string, 'match'>>> = {};
+
+        allDays.forEach(day => {
+          allSlots.forEach(slot => {
+            const slotKey = `${day}_${slot}`;
+            const bookedNames = bookedBySlot.get(slotKey);
+            const participantsBlocked = normalizedParticipants.some(np =>
+              bookedNames?.has(np)
+            );
+            if (participantsBlocked) return;
+
+            const allParticipantsAvailable = normalizedParticipants.every(np => {
+              const person = personLookup.get(np);
+              if (!person) return true;
+              const slotValue = person.availability?.[day]?.[slot];
+              const status = typeof slotValue === 'string' ? slotValue : slotValue?.status;
+              return status === 'available' || status === undefined;
+            });
+            if (!allParticipantsAvailable) return;
+
+            roomLabels.forEach(room => {
+              const roomDaySlots = roomSlotLookup[room]?.[day];
+              if (roomDaySlots && roomDaySlots[slot] === 'unavailable') return;
+
+              if (!highlights[day]) highlights[day] = {};
+              if (!highlights[day][room]) highlights[day][room] = {};
+              highlights[day][room][slot] = 'match';
+            });
+          });
+        });
+
+        setDragHighlights(Object.keys(highlights).length > 0 ? highlights : null);
+      },
       onDrop({ source, location }) {
+        setDragHighlights(null);
+
         const dropTarget = location.current.dropTargets[0];
         if (!dropTarget) return;
 
@@ -1317,7 +1458,8 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
         if (targetData.type === 'time-slot') {
           invariant(typeof targetData.day === 'string');
           invariant(typeof targetData.timeSlot === 'string');
-          handleDrop(sourceData.eventId, targetData.day, targetData.timeSlot);
+          const room = typeof targetData.room === 'string' ? targetData.room : undefined;
+          handleDrop(sourceData.eventId, targetData.day, targetData.timeSlot, room);
         }
       },
     });
@@ -1383,6 +1525,7 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     setSelectedEvents(new Set());
     setHighlightedPersons([]);
     setHighlightedSlot(null);
+    setAvailabilityRequests([]);
     setActiveTab('schedule');
     setCurrentDatasetId(data.datasetId);
     setCurrentDatasetVersion(data.datasetVersion || null);
@@ -1414,6 +1557,18 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     try {
       const data = await loadDatasetFromAPI(datasetId);
       applyDatasetData(data, label);
+      // Dismiss solver panel and clear stale results
+      setSolverPanelOpen(false);
+      setStreamedSolveAlternatives([]);
+      setPendingStreamAlternatives([]);
+      setSelectedStreamSolutionId(null);
+      selectedStreamSolutionIdRef.current = null;
+      setManualStreamPreview(false);
+      streamSolutionIdsRef.current = new Set();
+      streamGateOpenRef.current = false;
+      pendingSolutionsRef.current = [];
+      plannedAdjacencyRef.current = new Map();
+      setBestLiveAdjacency(null);
       showToast.success(`Loaded dataset "${datasetId}"`);
     } catch (error) {
       logger.error('Failed to load dataset', error);
@@ -1462,6 +1617,7 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
       resetHistory(activeRoster.state, 'Snapshot restored');
       updateAvailabilities(activeRoster.availabilities);
     }
+    setAvailabilityRequests(state.availabilityRequests || []);
     setCurrentDatasetId(state.datasetId || currentDatasetId);
     setActiveTab('schedule');
   };
@@ -1578,10 +1734,8 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     setStreamGateOpen(true);
     setStreamedSolveAlternatives(pending);
     setSolverPanelOpen(true);
-    if (!selectedStreamSolutionIdRef.current) {
-      selectedStreamSolutionIdRef.current = pending[0].id;
-      setSelectedStreamSolutionId(pending[0].id);
-    }
+    // No auto-select during solving — grid stays unchanged until solve completes.
+    // Post-solve auto-select is handled after the solve() call returns.
   }, []);
   const getPlannedCount = useCallback((result: SolveResult) => {
     const summary = (result.summary || {}) as Record<string, unknown>;
@@ -1594,6 +1748,178 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     const adjacency = result.objectives?.adjacency;
     return typeof adjacency?.score === 'number' ? adjacency.score : null;
   }, []);
+
+  const handleDismissSolverPanel = useCallback(() => {
+    setSolverPanelOpen(false);
+    setStreamedSolveAlternatives([]);
+    setSelectedStreamSolutionId(null);
+    selectedStreamSolutionIdRef.current = null;
+    setManualStreamPreview(false);
+    setStreamGateOpen(false);
+    setPendingStreamAlternatives([]);
+    setBestLiveAdjacency(null);
+    streamGateOpenRef.current = false;
+    pendingSolutionsRef.current = [];
+    plannedAdjacencyRef.current = new Map();
+  }, []);
+
+  const handleShowSolutionsAnyway = useCallback(() => {
+    streamGateOpenRef.current = true;
+    setStreamGateOpen(true);
+    setStreamedSolveAlternatives(pendingSolutionsRef.current);
+    if (!selectedStreamSolutionIdRef.current && pendingSolutionsRef.current.length > 0) {
+      selectedStreamSolutionIdRef.current = pendingSolutionsRef.current[0].id;
+      setSelectedStreamSolutionId(pendingSolutionsRef.current[0].id);
+    }
+  }, []);
+
+  const handlePinSchedule = useCallback((alternative: StreamedAlternative) => {
+    if (!alternative.result.assignments) return;
+    const newEvents = mapAssignmentsToEvents(baseEvents, alternative.result.assignments);
+    const now = Date.now();
+    setRosters(prev => {
+      const currentActiveRoster = prev.find(r => r.id === activeRosterId);
+      const solverMetadata: SolverRunInfo | null = alternative.result.solver_name ? {
+        timestamp: now,
+        mode: 'solve-from-scratch',
+        runtime: alternative.result.solve_time_ms ?? 0,
+        objectiveValue: alternative.result.objective_value,
+        adjacencyScore: alternative.result.objectives?.adjacency?.score ?? null,
+        adjacencyPossible: alternative.result.objectives?.adjacency?.possible ?? null,
+        lockCount: 0,
+      } : null;
+      const newRoster: Roster = {
+        id: `pinned-${now}`,
+        label: `Pinned ${new Date(now).toLocaleTimeString()}`,
+        state: {
+          events: newEvents,
+          locks: new Map(),
+          conflicts: [],
+          solverMetadata,
+        },
+        availabilities: currentActiveRoster?.availabilities ?? [],
+        objectives: currentActiveRoster?.objectives ?? { global: [], local: [] },
+        createdAt: now,
+        source: 'solver',
+        gridData: currentActiveRoster?.gridData,
+      };
+      return [...prev, newRoster];
+    });
+    showToast.success('Schedule pinned as new roster');
+  }, [mapAssignmentsToEvents, baseEvents, activeRosterId]);
+
+  const handleResolveConflicts = useCallback(async (relaxations: StagedRelaxation[]): Promise<ResolveResult> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/schedule/apply-repair`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dataset_id: currentDatasetId,
+          relaxations: relaxations.map(r => ({
+            type: r.relaxation.type,
+            target: r.relaxation.target,
+          })),
+        }),
+      });
+      const result = await response.json();
+
+      if (result.status === 'satisfiable') {
+        setShowResolutionView(false);
+        setCurrentBlocking([]);
+        setRelaxCandidates([]);
+        showToast.success('Conflicts resolved! Schedule updated.');
+      } else {
+        setCurrentBlocking(result.blocking || []);
+        setRelaxCandidates(result.relax_candidates || []);
+      }
+
+      return result;
+    } catch (error) {
+      logger.error('Failed to resolve conflicts:', error);
+      showToast.error('Failed to apply relaxations');
+      return { status: 'unsatisfiable' };
+    }
+  }, [currentDatasetId]);
+
+  const handleRequestAvailability = useCallback((day: string, slot: string, missingPersonIds: string[]) => {
+    if (missingPersonIds.length === 0) {
+      showToast.info('No missing participants to request availability from');
+      return;
+    }
+    const currentActiveRoster = rosters.find(r => r.id === activeRosterId);
+    const newRequests: AvailabilityRequest[] = missingPersonIds.map(personId => {
+      const person = currentActiveRoster?.availabilities.find((p: PersonAvailability) => p.id === personId);
+      const personName = person?.name || personId;
+      return {
+        id: `req_${Date.now()}_${personId}`,
+        personName,
+        personRole: (person?.role || 'participant') as AvailabilityRequest['personRole'],
+        requestedSlots: [{ day, timeSlot: slot }],
+        reason: 'Scheduling conflict - availability needed',
+        status: 'pending' as const,
+        createdAt: new Date().toISOString(),
+        defenseIds: [],
+      };
+    });
+
+    setAvailabilityRequests(prev => [...prev, ...newRequests]);
+
+    // Mark the slots as 'requested' in the availability grid
+    for (const personId of missingPersonIds) {
+      handleAvailabilitySlotEdit(personId, day, slot, 'requested', false);
+    }
+
+    const names = newRequests.map(r => r.personName).join(', ');
+    showToast.success(`Availability requested from ${names} on ${day} at ${slot}`);
+    logger.info('Availability requests created', { day, slot, count: newRequests.length });
+    // Flush save after React commits the batched state updates
+    setTimeout(() => {
+      const result = persistNowRef.current();
+      if (result) result.then(v => { if (v) setCurrentDatasetVersion(v); });
+    }, 50);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rosters, activeRosterId]);
+
+  const handleAcceptRequest = useCallback((requestId: string) => {
+    setAvailabilityRequests(prev => prev.map(req => {
+      if (req.id !== requestId) return req;
+      // Mark the requested slots as available
+      for (const { day, timeSlot } of req.requestedSlots) {
+        const person = availabilities.find(p => p.name === req.personName);
+        if (person) {
+          handleAvailabilitySlotEdit(person.id, day, timeSlot, 'available', false);
+        }
+      }
+      return { ...req, status: 'fulfilled' as const, fulfilledAt: new Date().toISOString() };
+    }));
+    showToast.success('Availability request accepted');
+    setTimeout(() => {
+      const result = persistNowRef.current();
+      if (result) result.then(v => { if (v) setCurrentDatasetVersion(v); });
+    }, 50);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [availabilities]);
+
+  const handleDenyRequest = useCallback((requestId: string) => {
+    setAvailabilityRequests(prev => prev.map(req => {
+      if (req.id !== requestId) return req;
+      // Revert the requested slots back to unavailable
+      for (const { day, timeSlot } of req.requestedSlots) {
+        const person = availabilities.find(p => p.name === req.personName);
+        if (person) {
+          handleAvailabilitySlotEdit(person.id, day, timeSlot, 'unavailable', false);
+        }
+      }
+      return { ...req, status: 'denied' as const };
+    }));
+    showToast.info('Availability request denied');
+    setTimeout(() => {
+      const result = persistNowRef.current();
+      if (result) result.then(v => { if (v) setCurrentDatasetVersion(v); });
+    }, 50);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [availabilities]);
+
   const streamedSolutionsSummary = useMemo(() => {
     if (streamedSolveAlternatives.length === 0) return null;
     const latest = streamedSolveAlternatives[streamedSolveAlternatives.length - 1];
@@ -1626,35 +1952,20 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     };
   }, [streamedSolveAlternatives, summarizeSolveResult]);
 
-  const bestStreamedSolutionId = useMemo(() => {
-    if (streamedSolveAlternatives.length === 0) return null;
-    let best = streamedSolveAlternatives[0];
-    for (const entry of streamedSolveAlternatives) {
-      const entryAdj = getAdjacencyScore(entry.result);
-      const bestAdj = getAdjacencyScore(best.result);
-      if ((entryAdj ?? -1) > (bestAdj ?? -1)) {
-        best = entry;
-        continue;
-      }
-      if ((entryAdj ?? -1) < (bestAdj ?? -1)) {
-        continue;
-      }
-      const entrySummary = summarizeSolveResult(entry.result);
-      const bestSummary = summarizeSolveResult(best.result);
-      if (entrySummary.scheduled > bestSummary.scheduled) {
-        best = entry;
-      }
-    }
-    return best.id;
-  }, [getAdjacencyScore, streamedSolveAlternatives, summarizeSolveResult]);
-
+  // Auto-select only the first complete schedule (phase 1 done), then stop.
+  // Phase 2 adjacency solutions accumulate in the panel but don't auto-render.
   useEffect(() => {
-    if (!bestStreamedSolutionId) return;
-    if (selectedStreamSolutionIdRef.current !== bestStreamedSolutionId) {
-      selectedStreamSolutionIdRef.current = bestStreamedSolutionId;
-      setSelectedStreamSolutionId(bestStreamedSolutionId);
-    }
-  }, [bestStreamedSolutionId]);
+    if (hasAutoSelectedFullScheduleRef.current) return;
+    if (streamedSolveAlternatives.length === 0) return;
+    const fullEntry = streamedSolveAlternatives.find(entry => {
+      const summary = summarizeSolveResult(entry.result);
+      return summary.total > 0 && summary.scheduled === summary.total;
+    });
+    if (!fullEntry) return;
+    hasAutoSelectedFullScheduleRef.current = true;
+    selectedStreamSolutionIdRef.current = fullEntry.id;
+    setSelectedStreamSolutionId(fullEntry.id);
+  }, [streamedSolveAlternatives, summarizeSolveResult]);
 
   const handleSolverMetrics = useCallback(
     (result: SolveResult, summary: SolverExecutionSummary) => {
@@ -1692,11 +2003,13 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
       setSolverStreamStatus(null);
       setActiveSolverRunId(null);
       setCancellingSolverRun(false);
+      setCancelledPhase(null);
       streamSolutionIdsRef.current = new Set();
       selectedStreamSolutionIdRef.current = null;
       streamGateOpenRef.current = false;
       pendingSolutionsRef.current = [];
       plannedAdjacencyRef.current = new Map();
+      hasAutoSelectedFullScheduleRef.current = false;
       setSelectedStreamSolutionId(null);
       setManualStreamPreview(false);
       setSolverPanelOpen(true);
@@ -1704,6 +2017,7 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
       setPendingStreamAlternatives([]);
       setStreamSnapshotCount(0);
       setStreamGateHintVisible(false);
+      setBestLiveAdjacency(null);
       const runStartedAt = Date.now();
       const mode = options?.mode || 'solve';
       const mustPlanAll = options?.mustScheduleAll ?? mustPlanAllDefenses;
@@ -1761,14 +2075,18 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
             const entry = { id: solutionId, result: snapshot, receivedAt: now };
             const plannedCount = getPlannedCount(snapshot);
             const adjacencyScore = getAdjacencyScore(snapshot);
-            let gateTriggered = false;
             if (adjacencyScore !== null) {
               const scoreSet = plannedAdjacencyRef.current.get(plannedCount) ?? new Set<number>();
-              if (scoreSet.size > 0 && !scoreSet.has(adjacencyScore)) {
-                gateTriggered = true;
-              }
               scoreSet.add(adjacencyScore);
               plannedAdjacencyRef.current.set(plannedCount, scoreSet);
+              const snapshotPossible = snapshot.objectives?.adjacency?.possible;
+              if (snapshotPossible != null) {
+                setBestLiveAdjacency(prev =>
+                  !prev || adjacencyScore > prev.score
+                    ? { score: adjacencyScore, possible: snapshotPossible }
+                    : prev
+                );
+              }
             }
             if (!streamGateOpenRef.current) {
               const nextPending = clampStreamedAlternatives([...pendingSolutionsRef.current, entry]);
@@ -1777,10 +2095,7 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
               if (nextPending.length >= 4 && !streamGateHintVisible) {
                 setStreamGateHintVisible(true);
               }
-              if (gateTriggered) {
-                openStreamGateWithPending();
-              }
-              if (!streamGateOpenRef.current && nextPending.length >= 2) {
+              if (nextPending.length >= 2) {
                 openStreamGateWithPending();
               }
               return;
@@ -1805,14 +2120,18 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
           setStreamSnapshotCount(prev => prev + 1);
           const plannedCount = getPlannedCount(result);
           const adjacencyScore = getAdjacencyScore(result);
-          let gateTriggered = false;
           if (adjacencyScore !== null) {
             const scoreSet = plannedAdjacencyRef.current.get(plannedCount) ?? new Set<number>();
-            if (scoreSet.size > 0 && !scoreSet.has(adjacencyScore)) {
-              gateTriggered = true;
-            }
             scoreSet.add(adjacencyScore);
             plannedAdjacencyRef.current.set(plannedCount, scoreSet);
+            const finalPossible = result.objectives?.adjacency?.possible;
+            if (finalPossible != null) {
+              setBestLiveAdjacency(prev =>
+                !prev || adjacencyScore > prev.score
+                  ? { score: adjacencyScore, possible: finalPossible }
+                  : prev
+              );
+            }
           }
           if (!streamGateOpenRef.current) {
             const nextPending = clampStreamedAlternatives([...pendingSolutionsRef.current, entry]);
@@ -1821,15 +2140,25 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
             if (nextPending.length >= 4 && !streamGateHintVisible) {
               setStreamGateHintVisible(true);
             }
-            if (gateTriggered) {
-              openStreamGateWithPending();
-            }
-            if (!streamGateOpenRef.current && nextPending.length >= 2) {
+            if (nextPending.length >= 2) {
               openStreamGateWithPending();
             }
           } else {
             setStreamedSolveAlternatives(prev => clampStreamedAlternatives([...prev, entry]));
             setSolverPanelOpen(true);
+          }
+        } else if (result.status === 'optimal') {
+          // Final result was deduplicated but has optimal status — update existing entry
+          const updateStatus = (items: StreamedAlternative[]) =>
+            items.map(item => item.id === finalSolutionId
+              ? { ...item, result: { ...item.result, status: 'optimal' as const } }
+              : item
+            );
+          if (streamGateOpenRef.current) {
+            setStreamedSolveAlternatives(prev => updateStatus(prev));
+          } else {
+            pendingSolutionsRef.current = updateStatus(pendingSolutionsRef.current);
+            setPendingStreamAlternatives(updateStatus(pendingSolutionsRef.current));
           }
         }
         if (streamGateOpenRef.current && !selectedStreamSolutionIdRef.current) {
@@ -1837,6 +2166,13 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
           setSelectedStreamSolutionId(finalSolutionId);
         }
         if (summaryStats.unscheduled > 0) {
+          // Extract blocking data for conflict resolution
+          if (result.blocking && Array.isArray(result.blocking)) {
+            setCurrentBlocking(result.blocking as unknown as DefenseBlocking[]);
+          }
+          if (result.relax_candidates && Array.isArray(result.relax_candidates)) {
+            setRelaxCandidates(result.relax_candidates as unknown as RelaxCandidate[]);
+          }
           if (summaryStats.scheduled > 0) {
             applySolveResult(result, mode);
             handleSolverMetrics(result, summaryStats);
@@ -1904,13 +2240,23 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     }
     try {
       setCancellingSolverRun(true);
+      // Infer phase: if latest solution has all defenses scheduled, we're optimizing
+      const latest = streamedSolveAlternatives.length > 0
+        ? streamedSolveAlternatives[streamedSolveAlternatives.length - 1]
+        : null;
+      if (latest) {
+        const summary = summarizeSolveResult(latest.result);
+        setCancelledPhase(summary.unscheduled === 0 ? 'optimizing' : 'solving');
+      } else {
+        setCancelledPhase('solving');
+      }
       await schedulingAPI.cancelSolverRun(runId);
     } catch (err) {
       logger.error('Failed to cancel solver run', err);
       setCancellingSolverRun(false);
       showToast.error('Unable to cancel solver run. Please try again.');
     }
-  }, [activeSolverRunId, cancellingSolverRun, solverLogRunId]);
+  }, [activeSolverRunId, cancellingSolverRun, solverLogRunId, streamedSolveAlternatives, summarizeSolveResult]);
 
   // Solver preset configurations (reserved for future quick-solve feature)
   // const quickSolvePresets: Record<'fast' | 'optimal' | 'enumerate', { timeout: number; label: string }> = {
@@ -2733,18 +3079,26 @@ const prevRosterSyncRef = useRef<{
   const selectedEventsRef = useRef(selectedEvents);
   const currentStateRef = useRef(currentState);
   const pushRef = useRef(push);
+  const availabilitiesRef = useRef(availabilities);
+  const roomAvailabilityStateRef = useRef(roomAvailabilityState);
+  const daysRef = useRef(days);
+  const timeSlotsRef = useRef(timeSlots);
 
   useEffect(() => {
     eventsRef.current = events;
     selectedEventsRef.current = selectedEvents;
     currentStateRef.current = currentState;
     pushRef.current = push;
-  }, [events, selectedEvents, currentState, push]);
+    availabilitiesRef.current = availabilities;
+    roomAvailabilityStateRef.current = roomAvailabilityState;
+    daysRef.current = days;
+    timeSlotsRef.current = timeSlots;
+  }, [events, selectedEvents, currentState, push, availabilities, roomAvailabilityState, days, timeSlots]);
 
   // Dedicated controller to cancel stale validation requests
   const validationControllerRef = useRef<AbortController | null>(null);
 
-  const handleDrop = async (eventId: string, day: string, timeSlot: string) => {
+  const handleDrop = async (eventId: string, day: string, timeSlot: string, room?: string) => {
     if (!currentStateRef.current) return;
 
     // Clear slot highlights once a drop action is committed
@@ -2755,16 +3109,71 @@ const prevRosterSyncRef = useRef<{
       ? Array.from(selectedEventsRef.current)
       : [eventId];
 
-    // Pre-validation: check for room-timeslot collision before optimistic update
+    // Pre-validation: check room-timeslot collision (use target room if specified)
     const collision = checkRoomTimeslotCollision(
       currentStateRef.current.events,
       day,
       timeSlot,
-      eventsToMove
+      eventsToMove,
+      room
     );
     if (collision.hasCollision) {
       showToast.error(`Room ${collision.collidingRoom} already occupied at ${day} ${timeSlot}`);
       return;
+    }
+
+    // Check room availability at the target slot
+    if (room) {
+      const roomAvail = roomAvailabilityStateRef.current;
+      const roomEntry = roomAvail.find(r => r.label === room);
+      if (roomEntry?.slots?.[day]?.[timeSlot] === 'unavailable') {
+        showToast.error(`Room ${room} is unavailable at ${day} ${timeSlot}`);
+        return;
+      }
+    }
+
+    // Check participant availability and double-booking at the target slot
+    const movingEvents = currentStateRef.current.events.filter(e => eventsToMove.includes(e.id));
+    const participants: string[] = [];
+    movingEvents.forEach(e => {
+      expandParticipantNames(e.supervisor).forEach(n => participants.push(n));
+      expandParticipantNames(e.coSupervisor).forEach(n => participants.push(n));
+      if (e.assessors) participants.push(...e.assessors.filter(Boolean));
+      if (e.mentors) participants.push(...e.mentors.filter(Boolean));
+    });
+    const normalizedParticipants = participants.map(normalizeName).filter(Boolean);
+
+    if (normalizedParticipants.length > 0) {
+      const personAvail = availabilitiesRef.current;
+
+      // Check participant availability status
+      for (const person of personAvail) {
+        const np = normalizeName(person.name);
+        if (!normalizedParticipants.includes(np)) continue;
+        const slotValue = person.availability?.[day]?.[timeSlot];
+        const status = typeof slotValue === 'string' ? slotValue : slotValue?.status;
+        if (status === 'unavailable') {
+          showToast.error(`${person.name} is unavailable at ${day} ${timeSlot}`);
+          return;
+        }
+      }
+
+      // Check participant double-booking (another event at same day/time with shared participant)
+      const otherEvents = currentStateRef.current.events.filter(
+        e => e.day === day && e.startTime === timeSlot && !eventsToMove.includes(e.id)
+      );
+      for (const other of otherEvents) {
+        const otherNames: string[] = [];
+        expandParticipantNames(other.supervisor).forEach(n => otherNames.push(n));
+        expandParticipantNames(other.coSupervisor).forEach(n => otherNames.push(n));
+        if (other.assessors) otherNames.push(...other.assessors.filter(Boolean));
+        if (other.mentors) otherNames.push(...other.mentors.filter(Boolean));
+        const conflict = otherNames.find(n => normalizedParticipants.includes(normalizeName(n)));
+        if (conflict) {
+          showToast.error(`${conflict} is already scheduled at ${day} ${timeSlot}`);
+          return;
+        }
+      }
     }
 
     const updatedEvents = currentStateRef.current.events.map(e => {
@@ -2773,6 +3182,7 @@ const prevRosterSyncRef = useRef<{
           ...e,
           day: day,
           startTime: timeSlot,
+          ...(room && { room }),
         };
       }
       return e;
@@ -2976,36 +3386,29 @@ const prevRosterSyncRef = useRef<{
   ) => {
     logger.debug('handleAvailabilitySlotEdit called:', { personId, day, slot, status, locked });
 
-    const updatedAvailabilities = availabilities.map(person => {
-      if (person.id === personId) {
-        // Always use object format for consistency
-        const slotValue: SlotAvailability = {
-          status,
-          locked,
-        };
+    const slotValue: SlotAvailability = { status, locked };
 
-        logger.debug('Updating slot with value:', slotValue);
-
-        // Create a new day object to ensure React detects the change
-        const updatedDayAvailability = {
-          ...(person.availability[day] || {}),
-          [slot]: slotValue,
-        };
-
+    updateAvailabilities((prev: PersonAvailability[]) =>
+      prev.map(person => {
+        if (person.id !== personId) return person;
         return {
           ...person,
           availability: {
             ...person.availability,
-            [day]: updatedDayAvailability,
+            [day]: {
+              ...(person.availability[day] || {}),
+              [slot]: slotValue,
+            },
           },
         };
-      }
-      return person;
-    });
-
-    logger.debug('Setting new availabilities:', updatedAvailabilities);
-    updateAvailabilities(updatedAvailabilities);
+      })
+    );
     onAvailabilityEdit?.(personId, day, slot, status, locked);
+    // Flush save after React commits (ensures slot edits persist across reload)
+    setTimeout(() => {
+      const result = persistNowRef.current();
+      if (result) result.then(v => { if (v) setCurrentDatasetVersion(v); });
+    }, 50);
   };
 
   const handleAvailabilityDayToggle = (personId: string, day: string, locked: boolean) => {
@@ -3298,6 +3701,21 @@ const prevRosterSyncRef = useRef<{
     if (!currentState) return;
     setEventActionPrompt({ eventId: defenceId });
   };
+
+  const handleSlotClick = useCallback((day: string, timeSlot: string) => {
+    const slotEvents = events.filter(e => e.day === day && e.startTime === timeSlot);
+    if (slotEvents.length === 1) {
+      // Single event: open detail view directly
+      handleEventDoubleClick(slotEvents[0].id);
+    } else if (slotEvents.length > 1) {
+      // Multiple events: open list mode filtered to this slot
+      setPriorityEventIds(new Set(slotEvents.map(e => e.id)));
+      setDetailPanelMode('list');
+      setDetailPanelOpen(true);
+      setHighlightedSlot({ day, timeSlot });
+    }
+    // Empty slots: do nothing (drops still work)
+  }, [events, handleEventDoubleClick]);
 
   const handleAddDefence = (prefilledDay?: string, prefilledTimeSlot?: string) => {
     // Create a new empty defence with optional prefilled slot
@@ -3807,6 +4225,7 @@ const prevRosterSyncRef = useRef<{
         cardViewMode,
         filterPanelCollapsed,
       },
+      availabilityRequests,
     });
     showToast.info(`Exporting ${activeRoster.label}…`);
     startTransition(() => {
@@ -3968,6 +4387,149 @@ const prevRosterSyncRef = useRef<{
       );
     }
 
+    // Conflict resolution view - replaces grid when UNSAT
+    if (showResolutionView) {
+      const firstHour = timeSlots.length > 0 ? parseInt(timeSlots[0].split(':')[0], 10) : 9;
+      const lastHour = timeSlots.length > 0 ? parseInt(timeSlots[timeSlots.length - 1].split(':')[0], 10) + 1 : 18;
+      const timeslotInfo = {
+        firstDay: days[0] || '',
+        numberOfDays: days.length,
+        startHour: firstHour,
+        endHour: lastHour,
+        slotsPerDay: timeSlots.length,
+      };
+      const unscheduledIds = new Set(
+        events
+          .filter(e => !e.day || !e.startTime)
+          .map(e => typeof e.id === 'number' ? e.id : parseInt(String(e.id), 10))
+          .filter(id => !isNaN(id))
+      );
+
+      // Show empty state if no blocking data available
+      if (currentBlocking.length === 0) {
+        const scheduledCount = events.filter(e => e.day && e.startTime).length;
+        const isPartialResult = scheduledCount > 0 && unscheduledIds.size > 0;
+        return (
+          <div className="flex-1 overflow-auto bg-slate-50 p-4">
+            <div className="bg-white rounded-lg border border-slate-200 p-8 text-center max-w-lg mx-auto">
+              <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                Conflict Analysis Unavailable
+              </h3>
+              <p className="text-sm text-slate-600 mb-4">
+                {unscheduledIds.size} defense{unscheduledIds.size === 1 ? '' : 's'} could not be scheduled
+                {isPartialResult ? ` (${scheduledCount} were scheduled successfully)` : ''}.
+              </p>
+              <div className="text-left text-sm text-slate-500 mb-6 space-y-2">
+                <p className="font-medium text-slate-700">Possible reasons:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Solver timed out before computing conflict details</li>
+                  <li>Complex constraint conflicts that couldn't be analyzed</li>
+                  <li>Blocking analysis encountered an error</li>
+                </ul>
+                <p className="mt-3 font-medium text-slate-700">Suggestions:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Increase participant availability windows</li>
+                  <li>Add more rooms or extend the scheduling period</li>
+                  <li>Re-run the solver to retry conflict analysis</li>
+                </ul>
+              </div>
+              <button
+                onClick={() => setShowResolutionView(false)}
+                className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
+              >
+                Return to Schedule
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="flex-1 overflow-auto bg-slate-50 p-4">
+          <ConflictResolutionView
+            open={true}
+            onClose={() => setShowResolutionView(false)}
+            blocking={currentBlocking}
+            relaxCandidates={relaxCandidates}
+            timeslotInfo={timeslotInfo}
+            unscheduledDefenseIds={unscheduledIds}
+            onResolve={handleResolveConflicts}
+            onHighlightDefense={(defenseId, student) => {
+              setHighlightedEventId(String(defenseId));
+              logger.debug('Highlighting defense', { defenseId, student });
+            }}
+          />
+        </div>
+      );
+    }
+
+    // Gantt view
+    if (cardViewMode === 'gantt') {
+      const GANTT_SLOT_HEIGHT = 100;
+      const GANTT_ROOM_COL_WIDTH = 220;
+      const GANTT_TIME_LABEL_WIDTH = 80;
+      const GANTT_DAY_HEADER = 52;
+      const GANTT_ROOM_HEADER = 36;
+      const dayHeight = GANTT_DAY_HEADER + GANTT_ROOM_HEADER + timeSlots.length * GANTT_SLOT_HEIGHT + 1;
+
+      const highlightPositions: Array<{ top: number; left: number }> = [];
+      if (dragHighlights) {
+        const scheduledEvents = events.filter(e => e.day && e.startTime);
+        days.forEach((day, dayIdx) => {
+          const dayRooms = dragHighlights[day];
+          if (!dayRooms) return;
+          const dayEvents = scheduledEvents.filter(e => e.day === day);
+          const usedRooms = Array.from(new Set(dayEvents.map(e => e.room).filter(Boolean) as string[])).sort();
+          const dayTop = dayIdx * dayHeight;
+
+          Object.keys(dayRooms).forEach(room => {
+            const roomIdx = usedRooms.indexOf(room);
+            if (roomIdx === -1) return;
+            const roomSlots = dayRooms[room];
+            Object.keys(roomSlots).forEach(slot => {
+              const slotIdx = timeSlots.indexOf(slot);
+              if (slotIdx === -1) return;
+              highlightPositions.push({
+                top: dayTop + GANTT_DAY_HEADER + GANTT_ROOM_HEADER + slotIdx * GANTT_SLOT_HEIGHT,
+                left: GANTT_TIME_LABEL_WIDTH + roomIdx * GANTT_ROOM_COL_WIDTH,
+              });
+            });
+          });
+        });
+      }
+
+      return (
+        <div className="flex-1 overflow-auto relative" ref={scheduleGridRef}>
+          <GanttScheduleView
+            events={events}
+            days={days}
+            dayLabels={dayLabels}
+            timeSlots={timeSlots}
+            colorScheme={colorScheme}
+            selectedEvent={selectedEvent}
+            selectedEvents={selectedEvents}
+            onEventClick={handleEventClick}
+            onEventDoubleClick={handleEventDoubleClick}
+            onLockToggle={handleLockToggle}
+            onParticipantClick={handleParticipantNameClick}
+            onRoomClick={handleRoomTagClick}
+            getEventConflictMeta={getEventConflictMeta}
+            highlightedEventId={highlightedEventId}
+            roomAvailability={roomAvailabilityState}
+            columnHighlights={scheduleColumnHighlights}
+            dragHighlights={dragHighlights || undefined}
+            onSlotClick={handleSlotClick}
+          />
+          <ScrollHint
+            containerRef={scheduleGridRef}
+            active={!!dragHighlights}
+            highlightPositions={highlightPositions}
+          />
+        </div>
+      );
+    }
+
     return (
       <>
         <div className="flex-1 overflow-auto" ref={scheduleGridRef}>
@@ -4071,7 +4633,7 @@ const prevRosterSyncRef = useRef<{
                                   shouldDimColumn && 'opacity-40'
                                 )}
                                 columnWidth={SCHEDULE_COLUMN_WIDTH}
-                                onAddEvent={handleAddDefence}
+                                onSlotClick={handleSlotClick}
                               >
                             {cellEvents.length > 0 && cardViewMode === 'individual' && (
                               <div className="relative min-h-[100px]">
@@ -4241,34 +4803,114 @@ const prevRosterSyncRef = useRef<{
           </div>
         );
 
-      case 'participants':
+      case 'participants': {
+        const nonStudentParticipants = availabilities.filter(p => !isStudentRole(p.role));
+        const participantSearch = searchQuery.toLowerCase();
+        const filteredParticipants = participantSearch
+          ? nonStudentParticipants.filter(p =>
+              p.name.toLowerCase().includes(participantSearch)
+            )
+          : nonStudentParticipants;
+
+        // Compute available slots per person and flag insufficient
+        const insufficientParticipants: string[] = [];
+        for (const person of nonStudentParticipants) {
+          let availableCount = 0;
+          for (const day of days) {
+            for (const slot of timeSlots) {
+              const slotData = person.availability?.[day]?.[slot];
+              const status = typeof slotData === 'object' ? slotData?.status : slotData;
+              if (status !== 'unavailable') {
+                availableCount++;
+              }
+            }
+          }
+          const stats = participantWorkload.get(normalizeName(person.name));
+          if (stats && stats.required > 0 && availableCount < stats.required) {
+            insufficientParticipants.push(person.name);
+          }
+        }
+
         return (
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="flex-1 p-6 overflow-auto">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Participants</h2>
-              <p className="text-gray-600 mb-4">Participant list and availability management.</p>
-              <div className="grid grid-cols-1 gap-4">
-                {availabilities.map(person => (
-                  <div
-                    key={person.id}
-                    className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 cursor-pointer transition-colors"
-                    onClick={() => handleParticipantClick(person.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium text-gray-900">{person.name}</h3>
-                        <p className="text-sm text-gray-600 capitalize">{person.role}</p>
-                      </div>
-                      <button className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded">
-                        View Details
-                      </button>
-                    </div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Participants <span className="text-gray-400 font-normal">({nonStudentParticipants.length})</span>
+                  </h2>
+                  <input
+                    type="text"
+                    placeholder="Name..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  />
+                </div>
+                {insufficientParticipants.length > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xl font-bold text-red-500">{insufficientParticipants.length}</span>
+                    <AlertCircle className="h-5 w-5 text-red-500" />
                   </div>
-                ))}
+                )}
+              </div>
+              <div className="divide-y divide-gray-100">
+                {filteredParticipants.map(person => {
+                  const stats = participantWorkload.get(normalizeName(person.name));
+                  const required = stats?.required ?? 0;
+                  const scheduled = stats?.scheduled ?? 0;
+                  const pending = Math.max(required - scheduled, 0);
+                  const isInsufficient = insufficientParticipants.includes(person.name);
+                  const matchedScheduled = Math.min(scheduled, required);
+                  const totalUnits = matchedScheduled + pending || 1;
+                  const scheduledPct = (matchedScheduled / totalUnits) * 100;
+
+                  return (
+                    <div
+                      key={person.id}
+                      className="flex items-center gap-4 py-4 px-2 hover:bg-gray-50 cursor-pointer transition-colors"
+                      onClick={() => handleParticipantClick(person.id)}
+                    >
+                      <div className="min-w-[180px]">
+                        <div className="font-medium text-gray-900">{person.name}</div>
+                        <div className="text-sm text-gray-500 capitalize">{person.role}</div>
+                      </div>
+                      {isInsufficient && (
+                        <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                      )}
+                      {required > 0 && (
+                        <>
+                          <div className="text-sm font-semibold text-gray-900 whitespace-nowrap min-w-[90px] text-right">
+                            {required} defense{required === 1 ? '' : 's'}
+                          </div>
+                          <div className="flex flex-col gap-1 flex-1 min-w-[200px]">
+                            <div className="relative flex h-7 w-full overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                              {scheduledPct > 0 && (
+                                <div
+                                  className="h-full bg-blue-300 transition-[width] duration-300"
+                                  style={{ width: `${scheduledPct}%` }}
+                                />
+                              )}
+                              <div className="absolute inset-0 flex items-center justify-between px-2 text-xs font-semibold text-gray-700 pointer-events-none">
+                                <span className="text-blue-900">{matchedScheduled}</span>
+                                <span className="text-gray-600">{pending}</span>
+                              </div>
+                            </div>
+                            <div className="flex justify-between text-[10px] font-semibold">
+                              <span className="text-sky-700">scheduled</span>
+                              <span className="text-gray-600">pending</span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
         );
+      }
 
       case 'schedule':
         return (
@@ -4442,188 +5084,42 @@ const prevRosterSyncRef = useRef<{
                   )}
 
                   {(solverRunning || (solverPanelOpen && streamedSolveAlternatives.length > 0)) && (
-                    <div className="mx-6 mt-3 mb-2 rounded-xl border border-slate-200 bg-white px-6 py-4 shadow-sm">
-                      <div className="flex flex-wrap items-center justify-between gap-4">
-                        <span className="text-sm text-slate-500">
-                          {solverRunning
-                            ? `${solverElapsedSeconds.toFixed(1)}s elapsed`
-                            : 'Solver results'}
-                        </span>
-                        <div className="flex items-center gap-4">
-                          {solverStreamStatus === 'error' && (
-                            <span className="text-xs font-semibold uppercase tracking-wide text-amber-600">
-                              Stream fallback
-                            </span>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSolverLogOpen(true);
-                              openSolverLogStreamFor(solverLogRunId);
-                            }}
-                            disabled={!solverLogRunId}
-                            className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-100/60 disabled:text-slate-400"
-                          >
-                            <Terminal className="h-3.5 w-3.5" />
-                            Logs
-                          </button>
-                          {solverRunning ? (
-                            <button
-                              type="button"
-                              onClick={handleCancelSolverRun}
-                              disabled={!activeSolverRunId || cancellingSolverRun}
-                              className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:text-gray-500 transition-colors"
-                            >
-                              {cancellingSolverRun ? 'Cancelling…' : 'Cancel'}
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSolverPanelOpen(false);
-                                setStreamedSolveAlternatives([]);
-                                setSelectedStreamSolutionId(null);
-                                selectedStreamSolutionIdRef.current = null;
-                                setManualStreamPreview(false);
-                                setStreamGateOpen(false);
-                                setPendingStreamAlternatives([]);
-                                streamGateOpenRef.current = false;
-                                pendingSolutionsRef.current = [];
-                                plannedAdjacencyRef.current = new Map();
-                              }}
-                              className="px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
-                            >
-                              Dismiss
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                      {liveScheduleProgress !== null && (
-                        <div className="mt-3 h-4 w-full overflow-hidden rounded-full bg-slate-100">
-                          <div
-                            className="h-full rounded-full bg-blue-500 transition-all duration-300"
-                            style={{ width: `${Math.round(liveScheduleProgress * 100)}%` }}
-                          />
-                        </div>
-                      )}
-                      {streamGateOpen && streamedSolveAlternatives.length > 0 && (
-                        <div className="mt-3">
-                          {streamedSolutionsSummary && (
-                            <div className="mb-2 text-xs text-slate-600 flex flex-wrap gap-2">
-                              <span className="font-semibold text-slate-700">
-                                Solutions: {streamedSolutionsSummary.count}
-                              </span>
-                              <span>
-                                Latest {streamedSolutionsSummary.latestSummary.scheduled}/
-                                {streamedSolutionsSummary.latestSummary.total}
-                              </span>
-                              {streamedSolutionsSummary.latestAdjacency && (
-                                <span>
-                                  Adj {streamedSolutionsSummary.latestAdjacency.score ?? '–'} /
-                                  {streamedSolutionsSummary.latestAdjacency.possible ?? '–'}
-                                </span>
-                              )}
-                              <span>
-                                Best {streamedSolutionsSummary.bestSummary.scheduled}/
-                                {streamedSolutionsSummary.bestSummary.total}
-                              </span>
-                              {streamedSolutionsSummary.bestAdjacency && (
-                                <span>
-                                  Adj {streamedSolutionsSummary.bestAdjacency.score ?? '–'} /
-                                  {streamedSolutionsSummary.bestAdjacency.possible ?? '–'}
-                                </span>
-                              )}
-                              {typeof streamedSolutionsSummary.latestTimeMs === 'number' && (
-                                <span>{(streamedSolutionsSummary.latestTimeMs / 1000).toFixed(1)}s</span>
-                              )}
-                            </div>
-                          )}
-                          <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                            {[...streamedSolveAlternatives]
-                              .sort((a, b) => {
-                                const adjA = getAdjacencyScore(a.result) ?? -1;
-                                const adjB = getAdjacencyScore(b.result) ?? -1;
-                                if (adjA !== adjB) return adjB - adjA;
-                                const sumA = summarizeSolveResult(a.result);
-                                const sumB = summarizeSolveResult(b.result);
-                                if (sumA.scheduled !== sumB.scheduled) {
-                                  return sumB.scheduled - sumA.scheduled;
-                                }
-                                const idxA = a.result.solution_index ?? 0;
-                                const idxB = b.result.solution_index ?? 0;
-                                return idxB - idxA;
-                              })
-                              .map((entry, index) => {
-                              const summary = summarizeSolveResult(entry.result);
-                              const adjacency = entry.result.objectives?.adjacency;
-                              const isSelected = entry.id === selectedStreamSolutionId;
-                              return (
-                                <button
-                                  key={entry.id}
-                                  type="button"
-                                  onClick={() => handleSelectStreamedAlternative(entry)}
-                                  aria-pressed={isSelected}
-                                  className={`min-w-[140px] rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
-                                    isSelected
-                                      ? 'border-blue-300 bg-white shadow-sm'
-                                      : 'border-slate-200 bg-white/80 hover:border-slate-300 hover:bg-white'
-                                  }`}
-                                >
-                                  <div className="flex items-center justify-between text-slate-800">
-                                    <span className="font-semibold">
-                                      Solution {entry.result.solution_index ?? index + 1}
-                                    </span>
-                                    {isSelected && (
-                                      <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
-                                        Preview
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="mt-1 text-[11px] text-slate-600">
-                                    Scheduled {summary.scheduled}/{summary.total}
-                                  </div>
-                                  {adjacency && (
-                                    <div className="text-[11px] text-slate-600">
-                                      Adjacency {adjacency.score ?? '–'} / {adjacency.possible ?? '–'}
-                                    </div>
-                                  )}
-                                </button>
-                              );
-                            })}
-                          </div>
-                          <p className="mt-1 text-[11px] text-slate-500">
-                            Preview stays on the first solution unless you click another.
-                          </p>
-                        </div>
-                      )}
-                      {solverRunning && !streamGateOpen && pendingStreamAlternatives.length > 0 && (
-                        <div className="mt-2 text-xs text-slate-500 space-y-1">
-                          <p>
-                            Waiting for two solutions with the same scheduled count but different adjacency scores…
-                          </p>
-                          <p>
-                            Snapshots received: {streamSnapshotCount}
-                          </p>
-                          {streamGateHintVisible && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                streamGateOpenRef.current = true;
-                                setStreamGateOpen(true);
-                                setStreamedSolveAlternatives(pendingSolutionsRef.current);
-                                if (!selectedStreamSolutionIdRef.current && pendingSolutionsRef.current.length > 0) {
-                                  selectedStreamSolutionIdRef.current = pendingSolutionsRef.current[0].id;
-                                  setSelectedStreamSolutionId(pendingSolutionsRef.current[0].id);
-                                }
-                              }}
-                              className="text-xs font-semibold text-blue-600 hover:text-blue-700"
-                            >
-                              Show solutions anyway
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                    <SolverResultsPanel
+                      solverRunning={solverRunning}
+                      streamedSolveAlternatives={streamedSolveAlternatives}
+                      selectedStreamSolutionId={selectedStreamSolutionId}
+                      currentBlocking={currentBlocking}
+                      streamGateOpen={streamGateOpen}
+                      pendingStreamAlternatives={pendingStreamAlternatives}
+                      streamSnapshotCount={streamSnapshotCount}
+                      streamGateHintVisible={streamGateHintVisible}
+                      activeSolverRunId={activeSolverRunId}
+                      cancellingSolverRun={cancellingSolverRun}
+                      cancelledPhase={cancelledPhase}
+                      solverLogRunId={solverLogRunId}
+                      liveScheduleProgress={liveScheduleProgress}
+                      solverElapsedSeconds={solverElapsedSeconds}
+                      streamedSolutionsSummary={streamedSolutionsSummary}
+                      bestLiveAdjacency={bestLiveAdjacency}
+                      onDismiss={handleDismissSolverPanel}
+                      onOpenLogs={() => {
+                        if (solverLogOpen) {
+                          setSolverLogOpen(false);
+                          setSolverLogLines([]);
+                          setSolverLogStatus(null);
+                        } else {
+                          setSolverLogOpen(true);
+                          openSolverLogStreamFor(solverLogRunId);
+                        }
+                      }}
+                      onCancelSolverRun={handleCancelSolverRun}
+                      onOpenResolutionView={() => setShowResolutionView(true)}
+                      onSelectAlternative={handleSelectStreamedAlternative}
+                      onShowSolutionsAnyway={handleShowSolutionsAnyway}
+                      onPinSchedule={handlePinSchedule}
+                      summarizeSolveResult={summarizeSolveResult}
+                      getAdjacencyScore={getAdjacencyScore}
+                    />
                   )}
 
 
@@ -4926,6 +5422,10 @@ const prevRosterSyncRef = useRef<{
                 : undefined
             }
             hideInternalHandle={bottomPanelTab === 'availability' && availabilityExpanded}
+            onRequestAvailability={handleRequestAvailability}
+            availabilityRequests={availabilityRequests}
+            onAcceptRequest={handleAcceptRequest}
+            onDenyRequest={handleDenyRequest}
           />
         </div>
 

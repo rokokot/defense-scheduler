@@ -1649,7 +1649,13 @@ def compute_bottleneck_analysis(model):
 
 
 def compute_blocking_reasons(model):
-    """For defenses with no feasible slot (in an UNSAT run), report which resources block them."""
+    """Report blocking resources for unscheduled defenses.
+
+    After solving, includes all defenses where is_planned[d] is False.
+    Defenses with zero feasible slots get full blocking_resources detail.
+    Defenses with some feasible slots (unscheduled due to capacity) get
+    empty blocking_resources to indicate they are schedulable in principle.
+    """
     blocked_rooms, blocked_people, legal_slots = _blocked_sets(model)
     df_def = model.df_def
     evaluator_cols = ['supervisor', 'co_supervisor', 'assessor1', 'assessor2', 'mentor1', 'mentor2', 'mentor3', 'mentor4']
@@ -1659,8 +1665,22 @@ def compute_blocking_reasons(model):
     for r in range(len(model.rooms)):
         room_blocked_union |= blocked_rooms.get(r, set())
 
+    # Determine which defenses are unplanned (after solving)
+    has_solution = False
+    try:
+        val = model.is_planned[0].value() if hasattr(model.is_planned[0], 'value') else None
+        has_solution = val is not None
+    except Exception:
+        pass
+
     results = []
     for d in range(model.no_defenses):
+        # If model has been solved, only report on unplanned defenses
+        if has_solution:
+            planned_val = model.is_planned[d].value() if hasattr(model.is_planned[d], 'value') else None
+            if planned_val is not None and bool(planned_val):
+                continue
+
         row = df_def.loc[d]
 
         # Get evaluators for this defense
@@ -1679,11 +1699,10 @@ def compute_blocking_reasons(model):
         feasible = legal_slots - blocked_union
 
         if not feasible:
-            # Only track resources that actually block
+            # Fully blocked: report all blocking resources
             blocking = []
             legal_blocked = lambda slots: sorted([t for t in slots if t in legal_slots])
 
-            # Add room pool (synthetic)
             if room_blocked_union:
                 blocking.append({
                     "resource": "all_rooms",
@@ -1691,7 +1710,6 @@ def compute_blocking_reasons(model):
                     "blocked_slots": legal_blocked(room_blocked_union)
                 })
 
-            # Add individual rooms (only if they have blocks)
             for r in range(len(model.rooms)):
                 blk = blocked_rooms.get(r, set())
                 if blk:
@@ -1701,7 +1719,6 @@ def compute_blocking_reasons(model):
                         "blocked_slots": legal_blocked(blk)
                     })
 
-            # Add evaluators
             for ev in evaluators:
                 if ev in blocked_people:
                     blocking.append({
@@ -1714,6 +1731,13 @@ def compute_blocking_reasons(model):
                 "defense_id": int(d),
                 "student": row["student"],
                 "blocking_resources": blocking
+            })
+        elif has_solution:
+            # Unplanned but has feasible slots: capacity-limited, not constraint-blocked
+            results.append({
+                "defense_id": int(d),
+                "student": row["student"],
+                "blocking_resources": []
             })
     return results
 

@@ -1,8 +1,62 @@
 import { useEffect, useRef, useState } from 'react';
-import { X, RefreshCw, Database, Calendar, Users, Download, Upload } from 'lucide-react';
+import { X, RefreshCw, Database, Calendar, Users, Download, Upload, Trash2, AlertTriangle } from 'lucide-react';
 import { DatasetMetadata, listDatasets } from '../../services/datasetService';
 import { logger } from '../../utils/logger';
 import { API_BASE_URL } from '../../lib/apiConfig';
+
+interface DeleteConfirmModalProps {
+  datasetName: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  deleting: boolean;
+}
+
+function DeleteConfirmModal({ datasetName, onConfirm, onCancel, deleting }: DeleteConfirmModalProps) {
+  return (
+    <div className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-red-100 rounded-full">
+            <AlertTriangle className="w-6 h-6 text-red-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Delete Dataset</h3>
+        </div>
+        <p className="text-sm text-gray-600 mb-2">
+          Are you sure you want to delete <span className="font-semibold">{datasetName}</span>?
+        </p>
+        <p className="text-sm text-gray-500 mb-6">
+          This will permanently remove all files in this dataset folder. This action cannot be undone.
+        </p>
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onCancel}
+            disabled={deleting}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={deleting}
+            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
+          >
+            {deleting ? (
+              <>
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              <>
+                <Trash2 className="w-4 h-4" />
+                Delete
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export interface DatasetModalProps {
   isOpen: boolean;
@@ -20,6 +74,8 @@ export function DatasetModal({ isOpen, onClose, onSelect, activeDatasetId }: Dat
   const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -39,6 +95,36 @@ export function DatasetModal({ isOpen, onClose, onSelect, activeDatasetId }: Dat
   const handleSelect = (datasetId: string) => {
     onSelect(datasetId);
     onClose();
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/datasets/${encodeURIComponent(deleteTarget)}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        let detail = 'Delete failed';
+        try {
+          const payload = await response.json();
+          if (payload?.detail) {
+            detail = payload.detail;
+          }
+        } catch (err) {
+          logger.warn('Failed to parse dataset delete error payload', err);
+        }
+        throw new Error(detail);
+      }
+      setDeleteTarget(null);
+      await refresh();
+    } catch (err) {
+      logger.error('Dataset delete failed', err);
+      setError(err instanceof Error ? err.message : 'Delete failed');
+      setDeleteTarget(null);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -273,16 +359,25 @@ export function DatasetModal({ isOpen, onClose, onSelect, activeDatasetId }: Dat
 
                   <div className="flex-1" />
 
-                  <button
-                    onClick={() => handleSelect(dataset.name)}
-                    className={`mt-2 inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                      dataset.name === activeDatasetId
-                        ? 'bg-gray-700 text-white hover:bg-gray-800'
-                        : 'bg-gray-500 text-white hover:bg-gray-600'
-                    }`}
-                  >
-                    {dataset.name === activeDatasetId ? 'Reload dataset' : 'Load dataset'}
-                  </button>
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      onClick={() => handleSelect(dataset.name)}
+                      className={`flex-1 inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                        dataset.name === activeDatasetId
+                          ? 'bg-gray-700 text-white hover:bg-gray-800'
+                          : 'bg-gray-500 text-white hover:bg-gray-600'
+                      }`}
+                    >
+                      {dataset.name === activeDatasetId ? 'Reload dataset' : 'Load dataset'}
+                    </button>
+                    <button
+                      onClick={() => setDeleteTarget(dataset.name)}
+                      className="p-2 rounded-md border border-gray-300 text-gray-500 hover:text-red-600 hover:border-red-300 hover:bg-red-50 transition-colors"
+                      title="Delete dataset"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
 
                   {dataset.error && (
                     <p className="text-xs text-red-500">
@@ -295,6 +390,16 @@ export function DatasetModal({ isOpen, onClose, onSelect, activeDatasetId }: Dat
           )}
         </div>
       </div>
+
+      {/* Delete confirmation modal */}
+      {deleteTarget && (
+        <DeleteConfirmModal
+          datasetName={deleteTarget}
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => setDeleteTarget(null)}
+          deleting={deleting}
+        />
+      )}
     </div>
   );
 }

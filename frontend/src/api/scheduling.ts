@@ -578,14 +578,15 @@ export class SchedulingAPI {
     name: string,
     day: string,
     startTime: string,
-    endTime: string
+    endTime: string,
+    type: 'person' | 'room' = 'person'
   ): Promise<{ added: boolean }> {
     const response = await fetch(
       `${this.baseUrl}/api/datasets/${encodeURIComponent(datasetId)}/unavailability`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, type: 'person', day, start_time: startTime, end_time: endTime, status: 'unavailable' }),
+        body: JSON.stringify({ name, type, day, start_time: startTime, end_time: endTime, status: 'unavailable' }),
       }
     );
     if (!response.ok) {

@@ -346,35 +346,73 @@ def toggle_room_in_dataset(dataset_id: str, room_name: str, payload: Dict[str, A
 
 @app.delete("/api/datasets/{dataset_id}/rooms/{room_name:path}")
 def remove_room_from_dataset(dataset_id: str, room_name: str):
-    """Remove a room from a dataset's rooms.json (used to unstage pool room repairs)."""
+    """Remove a room from a dataset's rooms.json and its unavailabilities from unavailabilities.csv."""
+    import csv
+    import io
+
     safe_name = _validate_dataset_name(dataset_id)
     dataset_dir = DATA_INPUT_DIR / safe_name
     if not dataset_dir.is_dir():
         raise HTTPException(status_code=404, detail=f"Dataset '{safe_name}' not found")
 
+    removed_from_rooms = False
+    removed_unavailabilities = 0
+
+    # 1. Remove from rooms.json (if present)
     rooms_path = dataset_dir / "rooms.json"
-    if not rooms_path.exists():
-        raise HTTPException(status_code=400, detail="Dataset has no rooms.json")
+    if rooms_path.exists():
+        with open(rooms_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
 
-    with open(rooms_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+        rooms_list = data.get("rooms", [])
+        original_len = len(rooms_list)
+        rooms_list = [
+            r for r in rooms_list
+            if not (isinstance(r, dict) and str(r.get("name", "")).strip().lower() == room_name.strip().lower())
+        ]
 
-    rooms_list = data.get("rooms", [])
-    original_len = len(rooms_list)
-    rooms_list = [
-        r for r in rooms_list
-        if not (isinstance(r, dict) and str(r.get("name", "")).strip().lower() == room_name.strip().lower())
-    ]
+        if len(rooms_list) < original_len:
+            removed_from_rooms = True
+            data["rooms"] = rooms_list
+            with open(rooms_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
 
-    if len(rooms_list) == original_len:
+    # 2. Remove all room-type unavailabilities for this room from unavailabilities.csv
+    csv_path = dataset_dir / "unavailabilities.csv"
+    if csv_path.exists():
+        with open(csv_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        reader = csv.DictReader(io.StringIO(content))
+        fieldnames = reader.fieldnames or ["name", "type", "day", "start_time", "end_time", "status"]
+        rows = list(reader)
+        original_count = len(rows)
+
+        filtered = [
+            row for row in rows
+            if not (
+                row.get("type", "").strip().lower() == "room"
+                and row.get("name", "").strip().lower() == room_name.strip().lower()
+            )
+        ]
+
+        removed_unavailabilities = original_count - len(filtered)
+        if removed_unavailabilities > 0:
+            output = io.StringIO()
+            writer = csv.DictWriter(output, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(filtered)
+            with open(csv_path, "w", encoding="utf-8", newline="") as f:
+                f.write(output.getvalue())
+
+    if not removed_from_rooms and removed_unavailabilities == 0:
         raise HTTPException(status_code=404, detail=f"Room '{room_name}' not found in dataset")
 
-    data["rooms"] = rooms_list
-    with open(rooms_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
-
-    logger.info("Removed room '%s' from dataset '%s'", room_name, safe_name)
-    return {"removed": room_name}
+    logger.info(
+        "Removed room '%s' from dataset '%s' (rooms.json: %s, unavailabilities removed: %d)",
+        room_name, safe_name, removed_from_rooms, removed_unavailabilities,
+    )
+    return {"removed": room_name, "removed_from_rooms": removed_from_rooms, "unavailabilities_removed": removed_unavailabilities}
 
 
 @app.delete("/api/datasets/{dataset_id}/unavailability")

@@ -4740,21 +4740,29 @@ const prevRosterSyncRef = useRef<{
         };
       });
       setRoomAvailabilityState(prev => prev.filter(room => room.id !== roomId));
+      // Persist deletion to backend (rooms.json + unavailabilities.csv)
+      schedulingAPI.removeRoomFromDataset(currentDatasetId, label).catch(err => {
+        if (!String(err).includes('404')) {
+          logger.warn('Failed to remove room from dataset', err);
+        }
+      });
       showToast.success(`Deleted room "${label}".`);
     },
-    [resolvedRoomOptions, datasetRoomOptions, setSchedulingContext]
+    [resolvedRoomOptions, datasetRoomOptions, setSchedulingContext, currentDatasetId, logger]
   );
 
   const handleRoomSlotToggle = useCallback(
     (roomId: string, day: string, slot: string, desiredStatus?: 'available' | 'unavailable') => {
+      let resolvedNextStatus: 'available' | 'unavailable' | undefined;
       setRoomAvailabilityState(prev => {
         const stabilized = stabilizeRoomAvailabilityState(prev, resolvedRoomOptions, days, timeSlots);
         const index = stabilized.findIndex(room => room.id === roomId);
         let updatedRooms = stabilized;
         if (index === -1) {
           const slots = createRoomAvailabilitySlots(days, timeSlots);
+          resolvedNextStatus = desiredStatus ?? 'unavailable';
           if (slots[day]) {
-            slots[day][slot] = desiredStatus ?? 'unavailable';
+            slots[day][slot] = resolvedNextStatus;
           }
           updatedRooms = [
             ...stabilized,
@@ -4768,9 +4776,9 @@ const prevRosterSyncRef = useRef<{
           const target = stabilized[index];
           const normalizedSlots = normalizeRoomSlots(target.slots, days, timeSlots);
           const current = normalizedSlots[day]?.[slot] === 'unavailable';
+          resolvedNextStatus = desiredStatus ?? (current ? 'available' : 'unavailable');
           if (normalizedSlots[day]) {
-            const nextStatus = desiredStatus ?? (current ? 'available' : 'unavailable');
-            normalizedSlots[day][slot] = nextStatus;
+            normalizedSlots[day][slot] = resolvedNextStatus;
           }
           updatedRooms = stabilized.map((room, idx) =>
             idx === index ? { ...room, slots: normalizedSlots } : room
@@ -4778,8 +4786,28 @@ const prevRosterSyncRef = useRef<{
         }
         return stabilizeRoomAvailabilityState(updatedRooms, resolvedRoomOptions, days, timeSlots);
       });
+
+      // Persist room unavailability change to unavailabilities.csv
+      if (currentDatasetId) {
+        const roomOption = resolvedRoomOptions.find(r => r.id === roomId);
+        const roomName = roomOption?.name || roomId;
+        const [h, m] = slot.split(':').map(Number);
+        const endTime = `${String(h + 1).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        const status = resolvedNextStatus;
+        if (status === 'unavailable') {
+          schedulingAPI.addUnavailability(currentDatasetId, roomName, day, slot, endTime, 'room').catch(err => {
+            logger.warn('Failed to persist room unavailability to CSV', err);
+          });
+        } else if (status === 'available') {
+          schedulingAPI.removeUnavailability(currentDatasetId, roomName, day, slot).catch(err => {
+            if (!String(err).includes('404')) {
+              logger.warn('Failed to remove room unavailability from CSV', err);
+            }
+          });
+        }
+      }
     },
-    [days, timeSlots, resolvedRoomOptions]
+    [days, timeSlots, resolvedRoomOptions, currentDatasetId, logger]
   );
 
 

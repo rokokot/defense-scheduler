@@ -1,6 +1,5 @@
 name,type,day,start_time,end_time,status
 Hendrik Blockeel,person,2026-01-01,10:00,11:00,unavailable
-01,room,2026-01-01,10:00,11:00,unavailable
 200C 00.01,room,2026-01-01,11:00,12:00,unavailable
 200C 00.01,room,2026-01-01,12:00,13:00,unavailable
 200C 00.01,room,2026-01-01,13:00,14:00,unavailable

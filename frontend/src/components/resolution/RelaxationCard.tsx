@@ -29,6 +29,12 @@ const typeConfig: Record<
     borderColor: 'border-l-amber-500',
     icon: Building2,
   },
+  enable_room: {
+    color: 'text-amber-700',
+    bgColor: 'bg-amber-50',
+    borderColor: 'border-l-amber-500',
+    icon: Building2,
+  },
   add_day: {
     color: 'text-purple-700',
     bgColor: 'bg-purple-50',

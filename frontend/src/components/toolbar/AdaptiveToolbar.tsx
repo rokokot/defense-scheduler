@@ -74,6 +74,8 @@ export interface AdaptiveToolbarProps {
   onCompareToggle?: () => void;
   compareMode?: boolean;
   isSolving?: boolean;
+  mustFixDefenses?: boolean;
+  onMustFixDefensesChange?: (value: boolean) => void;
 }
 
 export function AdaptiveToolbar({
@@ -115,6 +117,8 @@ export function AdaptiveToolbar({
   onCompareToggle,
   compareMode = false,
   isSolving = false,
+  mustFixDefenses = true,
+  onMustFixDefensesChange,
 }: AdaptiveToolbarProps) {
   const [solveMenuOpen, setSolveMenuOpen] = useState(false);
   const [dataMenuOpen, setDataMenuOpen] = useState(false);
@@ -158,7 +162,7 @@ export function AdaptiveToolbar({
   if (position === 'right') {
     return (
       <div
-        className="w-16 bg-white border-r border-gray-200 flex flex-col items-center py-4 gap-3 overflow-y-auto"
+        className="w-16 bg-white border-r border-gray-200 flex flex-col items-center py-4 gap-3 overflow-y-auto relative z-50"
         data-prevent-clear="true"
       >
         {/* Position Toggle */}
@@ -416,7 +420,7 @@ export function AdaptiveToolbar({
   // Horizontal (top) layout
   return (
     <div
-      className="bg-white border-b border-gray-200 px-2 sm:px-4 py-1.5 sm:py-2"
+      className="bg-white border-b border-gray-200 px-2 sm:px-4 py-1.5 sm:py-2 relative z-50"
       data-prevent-clear="true"
     >
       <div className="flex items-center gap-2 sm:gap-4">
@@ -554,6 +558,22 @@ export function AdaptiveToolbar({
                           {allowPartialScheduling
                             ? 'Schedule as many defenses as possible'
                             : 'Must schedule every defense'}
+                        </div>
+                      </div>
+                    </label>
+                    <label className="flex items-start gap-3 cursor-pointer select-none mt-3">
+                      <input
+                        type="checkbox"
+                        checked={mustFixDefenses}
+                        onChange={(e) => onMustFixDefensesChange?.(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 rounded border-gray-300"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-sm text-gray-900">Keep defenses fixed</div>
+                        <div className="text-xs text-gray-500 mt-0.5">
+                          {mustFixDefenses
+                            ? 'Planned defenses stay in their slots'
+                            : 'Solver may move planned defenses'}
                         </div>
                       </div>
                     </label>

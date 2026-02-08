@@ -46,6 +46,10 @@ export interface AvailabilityPanelProps {
   availabilityRequests?: AvailabilityRequest[];
   onAcceptRequest?: (requestId: string) => void;
   onDenyRequest?: (requestId: string) => void;
+  onClearDeniedRequests?: () => void;
+  onClearFulfilledRequests?: () => void;
+  // Bottleneck warnings for persons with insufficient availability
+  bottleneckWarnings?: Map<string, { deficit: number; suggestion: string }>;
 }
 
 export function AvailabilityPanel({
@@ -80,6 +84,9 @@ export function AvailabilityPanel({
   availabilityRequests = [],
   onAcceptRequest,
   onDenyRequest,
+  onClearDeniedRequests,
+  onClearFulfilledRequests,
+  bottleneckWarnings,
 }: AvailabilityPanelProps) {
   const [granularity, setGranularity] = useState<ViewGranularity>('day');
   const [roleFilter, setRoleFilter] = useState<PersonRole | 'all'>('all');
@@ -252,6 +259,9 @@ export function AvailabilityPanel({
               availabilityRequests={availabilityRequests}
               onAcceptRequest={onAcceptRequest}
               onDenyRequest={onDenyRequest}
+              onClearDeniedRequests={onClearDeniedRequests}
+              onClearFulfilledRequests={onClearFulfilledRequests}
+              bottleneckWarnings={bottleneckWarnings}
             />
           </div>
           <div className="shrink-0 sticky bottom-0 left-0 right-0 px-4 py-3 bg-gray-50 border-t border-gray-100 z-10">
@@ -307,7 +317,7 @@ export function AvailabilityPanel({
               </div>
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-6 w-6 text-red-500" />
-                <span>Conflict</span>
+                <span>Conflict / Insufficient</span>
               </div>
             </div>
           </div>

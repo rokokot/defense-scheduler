@@ -70,11 +70,21 @@ DEFAULT_SOLVER_SETTINGS = {
     "max_days": "NA",
     "stream_stall_seconds": 2.0,
     "stream_min_solutions": 5,
-    "phase2_time_limit_sec": 30.0,
+    "phase2_time_limit_sec": 180.0,
     "explain": False,
     "no_plots": True,
     "must_plan_all_defenses": False,
 }
+
+
+@dataclass
+class AvailabilityOverride:
+    """Override a person's availability for a specific time slot."""
+    name: str
+    day: str
+    start_time: str
+    end_time: str
+    status: str = "available"  # 'available' removes unavailability, 'unavailable' adds it
 
 
 @dataclass
@@ -92,6 +102,10 @@ class SolverOptions:
     include_metrics: bool = True
     config_overrides: Optional[Dict[str, Any]] = None
     config_yaml: Optional[str] = None
+    enabled_room_ids: Optional[List[str]] = None  # Override which rooms are enabled
+    availability_overrides: Optional[List[AvailabilityOverride]] = None  # Override person availability
+    must_fix_defenses: bool = False  # Lock previously scheduled defenses in place during re-solve
+    fixed_assignments: Optional[List[Dict[str, int]]] = None  # Assignments to lock: [{defense_id, slot_index, room_index}]
 
 
 class SolverRunner:
@@ -136,6 +150,18 @@ class SolverRunner:
                 cfg["max_rooms"] = min(cfg.get("max_rooms", enabled_room_count), enabled_room_count)
             else:
                 cfg["max_rooms"] = enabled_room_count
+        # Pass availability overrides to the solver for conflict resolution repairs
+        if opts.availability_overrides:
+            cfg["availability_overrides"] = [
+                {
+                    "name": ao.name,
+                    "day": ao.day,
+                    "start_time": ao.start_time,
+                    "end_time": ao.end_time,
+                    "status": ao.status,
+                }
+                for ao in opts.availability_overrides
+            ]
         return cfg
 
     @staticmethod
@@ -337,12 +363,28 @@ class SolverRunner:
         t_load = time.monotonic()
         defences, unavail, rooms, timeslot_info = load_dataset(opts.dataset)
         load_elapsed = time.monotonic() - t_load
+        # Apply room overrides if provided (e.g., from conflict resolution repairs)
+        rooms = self._apply_room_overrides(rooms, opts.enabled_room_ids)
+        # Apply availability overrides if provided (e.g., from conflict resolution repairs)
+        unavail = self._apply_availability_overrides(unavail, opts.availability_overrides)
+        # Apply active repairs from metadata file (non-destructive, in-memory)
+        from .repair_applicator import load_active_repairs, apply_repairs_to_data
+        active_repairs = load_active_repairs(opts.dataset)
+        unavail_before = len(unavail)
+        if active_repairs:
+            unavail, rooms = apply_repairs_to_data(unavail, rooms, active_repairs)
+            logger.info(
+                "solver.active_repairs.applied dataset=%s count=%d unavail_before=%d unavail_after=%d repairs=%s",
+                opts.dataset, len(active_repairs), unavail_before, len(unavail), active_repairs,
+            )
+        else:
+            logger.info("solver.active_repairs.none dataset=%s", opts.dataset)
         logger.info(
             "solver.run.dataset_loaded dataset=%s defenses=%s unavailabilities=%s rooms=%s",
             opts.dataset,
             len(defences),
             len(unavail),
-            len(rooms),
+            len(rooms.get("rooms", [])) if isinstance(rooms, dict) else rooms,
         )
         run_root = DATA_OUTPUT_DIR / opts.dataset
         run_root.mkdir(parents=True, exist_ok=True)
@@ -369,6 +411,15 @@ class SolverRunner:
         t_model = time.monotonic()
         model = self._module.DefenseRosteringModel(cfg)
         model_elapsed = time.monotonic() - t_model
+        # Apply fixed assignment constraints if requested (for conflict resolution re-solve)
+        logger.info(
+            "solver.run.check_fixed must_fix=%s assignments_count=%d solver_rooms=%s",
+            opts.must_fix_defenses,
+            len(opts.fixed_assignments) if opts.fixed_assignments else 0,
+            model.rooms if hasattr(model, 'rooms') else 'N/A',
+        )
+        if opts.must_fix_defenses and opts.fixed_assignments:
+            self._apply_fixed_assignments(model, opts.fixed_assignments)
         run_folder, run_id = self._module.create_run_folder(base=str(run_root))
         start = time.time()
         assumptions = None
@@ -525,6 +576,9 @@ class SolverRunner:
         t_model_p1 = time.monotonic()
         model_p1 = self._module.DefenseRosteringModel(cfg_p1)
         model_p1_elapsed = time.monotonic() - t_model_p1
+        # Apply fixed assignment constraints if requested (for conflict resolution re-solve)
+        if opts.must_fix_defenses and opts.fixed_assignments:
+            self._apply_fixed_assignments(model_p1, opts.fixed_assignments)
 
         self._write_run_config(run_folder, cfg_p1, opts)
 
@@ -708,6 +762,10 @@ class SolverRunner:
         for d in range(model_p2.no_defenses):
             model_p2.add([model_p2.is_planned[d] == (d in scheduled_indices)])
 
+        # Also lock fixed assignments in Phase 2 (preserves their slot/room)
+        if opts.must_fix_defenses and opts.fixed_assignments:
+            self._apply_fixed_assignments(model_p2, opts.fixed_assignments)
+
         # Rebuild adjacency objective with filtered set (eliminates is_planned products)
         model_p2.adj_obj, model_p2.no_pairs, model_p2.adj_obj_ub = \
             model_p2.adjacency_objectives(scheduled_only=scheduled_indices)
@@ -773,7 +831,7 @@ class SolverRunner:
         self._apply_ortools_parameters(solver_p2, cfg, opts)
         solver_p2.ort_solver.parameters.num_search_workers = 1
         # Phase 2 uses a dedicated time limit (no stall) to allow optimality proofs
-        phase2_limit = cfg.get("phase2_time_limit_sec", 30.0)
+        phase2_limit = cfg.get("phase2_time_limit_sec", 180.0)
         solver_p2.ort_solver.parameters.max_time_in_seconds = float(phase2_limit)
 
         best_obj_p2 = None
@@ -955,12 +1013,28 @@ class SolverRunner:
         t_load = time.monotonic()
         defences, unavail, rooms, timeslot_info = load_dataset(opts.dataset)
         load_elapsed = time.monotonic() - t_load
+        # Apply room overrides if provided (e.g., from conflict resolution repairs)
+        rooms = self._apply_room_overrides(rooms, opts.enabled_room_ids)
+        # Apply availability overrides if provided (e.g., from conflict resolution repairs)
+        unavail = self._apply_availability_overrides(unavail, opts.availability_overrides)
+        # Apply active repairs from metadata file (non-destructive, in-memory)
+        from .repair_applicator import load_active_repairs, apply_repairs_to_data
+        active_repairs = load_active_repairs(opts.dataset)
+        unavail_before = len(unavail)
+        if active_repairs:
+            unavail, rooms = apply_repairs_to_data(unavail, rooms, active_repairs)
+            logger.info(
+                "solver_progress.active_repairs.applied dataset=%s count=%d unavail_before=%d unavail_after=%d repairs=%s",
+                opts.dataset, len(active_repairs), unavail_before, len(unavail), active_repairs,
+            )
+        else:
+            logger.info("solver_progress.active_repairs.none dataset=%s", opts.dataset)
         logger.info(
             "solver.run.dataset_loaded dataset=%s defenses=%s unavailabilities=%s rooms=%s",
             opts.dataset,
             len(defences),
             len(unavail),
-            len(rooms),
+            len(rooms.get("rooms", [])) if isinstance(rooms, dict) else rooms,
         )
         run_root = DATA_OUTPUT_DIR / opts.dataset
         run_root.mkdir(parents=True, exist_ok=True)
@@ -1002,6 +1076,9 @@ class SolverRunner:
         t_model = time.monotonic()
         model = self._module.DefenseRosteringModel(cfg)
         model_elapsed = time.monotonic() - t_model
+        # Apply fixed assignment constraints if requested (for conflict resolution re-solve)
+        if opts.must_fix_defenses and opts.fixed_assignments:
+            self._apply_fixed_assignments(model, opts.fixed_assignments)
         run_folder, run_id = self._module.create_run_folder(base=str(run_root))
         self._write_run_config(run_folder, cfg, opts)
         start = time.time()
@@ -1354,6 +1431,176 @@ class SolverRunner:
                 continue
             count += 1
         return count
+
+    @staticmethod
+    def _apply_room_overrides(
+        rooms_payload: Dict[str, Any], enabled_room_ids: Optional[List[str]]
+    ) -> Dict[str, Any]:
+        """Override room enabled status based on provided list of enabled room IDs."""
+        if enabled_room_ids is None:
+            logger.info("solver.room_overrides enabled_room_ids=None (using dataset defaults)")
+            return rooms_payload
+        rooms_list = rooms_payload.get("rooms") if isinstance(rooms_payload, dict) else []
+        if not rooms_list:
+            logger.info("solver.room_overrides no rooms in payload")
+            return rooms_payload
+        enabled_set = set(enabled_room_ids)
+        logger.info(
+            "solver.room_overrides applying enabled_room_ids=%s to %d rooms",
+            enabled_room_ids, len(rooms_list)
+        )
+        for room in rooms_list:
+            if isinstance(room, dict):
+                room_id = room.get("id", room.get("name", ""))
+                room_name = room.get("name", "")
+                was_enabled = room.get("enabled", True)
+                # Match on id or name for robustness
+                room["enabled"] = room_id in enabled_set or room_name in enabled_set
+                if was_enabled != room["enabled"]:
+                    logger.info(
+                        "solver.room_overrides room=%s (name=%s) changed enabled %s -> %s",
+                        room_id, room_name, was_enabled, room["enabled"]
+                    )
+        return rooms_payload
+
+    @staticmethod
+    def _apply_availability_overrides(
+        unavailabilities: List[Dict[str, str]],
+        overrides: Optional[List[AvailabilityOverride]]
+    ) -> List[Dict[str, str]]:
+        """
+        Apply availability overrides to the unavailability list.
+
+        - If status='available': removes matching unavailability entries (person becomes available)
+        - If status='unavailable': adds new unavailability entries (person becomes unavailable)
+
+        Matching is done by name, day, and time overlap.
+        """
+        if not overrides:
+            return unavailabilities
+
+        # Build a set of (name, day, start_time, end_time) tuples to remove
+        slots_to_make_available: set = set()
+        slots_to_make_unavailable: List[Dict[str, str]] = []
+
+        for override in overrides:
+            if override.status == "available":
+                # Mark this slot to be removed from unavailabilities
+                slots_to_make_available.add((
+                    override.name.lower().strip(),
+                    override.day,
+                    override.start_time,
+                    override.end_time,
+                ))
+            else:
+                # Add a new unavailability entry
+                slots_to_make_unavailable.append({
+                    "name": override.name,
+                    "type": "participant",
+                    "day": override.day,
+                    "start_time": override.start_time,
+                    "end_time": override.end_time,
+                    "status": "",
+                })
+
+        if slots_to_make_available:
+            logger.info(
+                "solver.availability_overrides.removing count=%d",
+                len(slots_to_make_available),
+            )
+
+        # Filter out unavailabilities that match the "make available" overrides
+        filtered = []
+        removed_count = 0
+        for entry in unavailabilities:
+            name = entry.get("name", "").lower().strip()
+            day = entry.get("day", "")
+            start = entry.get("start_time", "")
+            end = entry.get("end_time", "")
+
+            key = (name, day, start, end)
+            if key in slots_to_make_available:
+                removed_count += 1
+                continue
+            filtered.append(entry)
+
+        if removed_count > 0:
+            logger.info(
+                "solver.availability_overrides.removed count=%d",
+                removed_count,
+            )
+
+        # Add new unavailabilities
+        if slots_to_make_unavailable:
+            filtered.extend(slots_to_make_unavailable)
+            logger.info(
+                "solver.availability_overrides.added count=%d",
+                len(slots_to_make_unavailable),
+            )
+
+        return filtered
+
+    @staticmethod
+    def _apply_fixed_assignments(model, fixed_assignments: Optional[List[Dict[str, Any]]]) -> int:
+        """
+        Add constraints to lock specified defenses to their assigned slots/rooms.
+
+        Args:
+            model: The DefenseRosteringModel instance
+            fixed_assignments: List of dicts with keys: defense_id, slot_index, room_name
+
+        Returns:
+            Number of defenses fixed in place
+        """
+        if not fixed_assignments:
+            return 0
+
+        fixed_count = 0
+        for fa in fixed_assignments:
+            d = fa.get("defense_id")
+            slot_idx = fa.get("slot_index")
+            room_name = fa.get("room_name")
+
+            if d is None or slot_idx is None or room_name is None:
+                logger.warning(
+                    "solver.fixed_assignments.invalid entry=%s (missing fields)",
+                    fa,
+                )
+                continue
+
+            if d < 0 or d >= model.no_defenses:
+                logger.warning(
+                    "solver.fixed_assignments.invalid defense_id=%d out of range [0, %d)",
+                    d, model.no_defenses,
+                )
+                continue
+
+            # Resolve room name to index using solver's room list
+            try:
+                room_idx = model.rooms.index(room_name)
+            except ValueError:
+                logger.warning(
+                    "solver.fixed_assignments.room_not_found room='%s' not in solver rooms=%s",
+                    room_name, model.rooms,
+                )
+                continue
+
+            # Lock this defense as planned with specific slot and room
+            model.add([model.is_planned[d] == True])
+            model.add([model.start_times[d] == slot_idx])
+            model.add([model.in_room[d] == room_idx])
+            fixed_count += 1
+
+            logger.info(
+                "solver.fixed_assignments.locked defense_id=%d slot=%d room=%d (%s)",
+                d, slot_idx, room_idx, room_name
+            )
+
+        logger.info(
+            "solver.fixed_assignments.complete fixed=%d of %d requested",
+            fixed_count, len(fixed_assignments),
+        )
+        return fixed_count
 
 
 runner = SolverRunner()

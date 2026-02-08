@@ -101,6 +101,7 @@ export type AggregationLevel = 'type' | 'resource';
 export type RelaxationType =
   | 'person_availability'
   | 'add_room'
+  | 'enable_room'
   | 'add_day'
   | 'drop_defense';
 
@@ -137,6 +138,7 @@ export type RelaxationTarget =
 
 export interface RelaxationAction {
   id: string;
+  forDefenseId?: number;  // Which defense this MCS repairs (undefined for generic suggestions)
   type: RelaxationType;
   target: RelaxationTarget;
   label: string;
@@ -156,6 +158,8 @@ export interface StagedRelaxation {
   relaxation: RelaxationAction;
   status: StagedStatus;
   stagedAt: number;
+  /** Room name selected from pool (for extra-room repairs) */
+  selectedPoolRoom?: string;
 }
 
 export interface AppliedRelaxation extends StagedRelaxation {
@@ -192,18 +196,57 @@ export interface ResolutionStateSnapshot {
 // Component Props
 // ============================================================================
 
+export interface ExplanationLogEvent {
+  type: 'meta' | 'phase' | 'log' | 'result' | 'error' | 'close' | 'heartbeat';
+  data: Record<string, unknown>;
+  timestamp: number;
+}
+
 export interface ConflictResolutionViewProps {
   open: boolean;
   onClose: () => void;
   blocking: DefenseBlocking[];
   relaxCandidates: RelaxCandidate[];
-  timeslotInfo: TimeslotInfo;
+  timeslotInfo?: TimeslotInfo;
   unscheduledDefenseIds: Set<number>;
-  onResolve: (relaxations: StagedRelaxation[]) => Promise<ResolveResult>;
+  onResolve: (relaxations: StagedRelaxation[], options: ResolveOptions) => Promise<ResolveResult>;
   initialState?: ResolutionStateSnapshot;
   onStateChange?: (state: ResolutionStateSnapshot) => void;
   onHighlightDefense?: (defenseId: number, student: string) => void;
   onHighlightResource?: (resource: string, type: 'person' | 'room' | 'time') => void;
+  /** Enhanced explanation response with causation chains and ripple effects */
+  enhancedExplanation?: {
+    perDefenseRepairs?: Record<number, unknown[]>;
+    globalAnalysis?: {
+      allRepairsRanked: unknown[];
+      totalBlocked: number;
+      estimatedResolvable: number;
+      bottleneckSummary: Record<string, unknown>;
+    };
+    /** Disabled rooms that could be enabled as repairs */
+    disabledRooms?: Array<{ id: string; name: string }>;
+  };
+  /** Override disabled rooms with frontend state (takes precedence over backend explanation) */
+  disabledRooms?: Array<{ id: string; name: string }>;
+  /** Create availability request for a person at specific slot */
+  onRequestPersonAvailability?: (
+    personName: string,
+    day: string,
+    timeSlot: string,
+    forDefenseIds: number[]
+  ) => void;
+  /** Enable a disabled room */
+  onEnableRoom?: (roomId: string, roomName: string) => void;
+  /** Callback to return to schedule with best solution after successful resolve */
+  onReturnToSchedule?: () => void;
+  /** Whether a resolution re-solve is currently running */
+  resolutionResolving?: boolean;
+  /** Callback to refetch explanations after re-solve with remaining conflicts */
+  onRefetchExplanations?: () => void;
+  /** Whether a new explanation analysis is streaming (show "re-analyzing" indicator) */
+  explanationLoading?: boolean;
+  /** Global toggle: keep planned defenses in their assigned slots during re-solve */
+  mustFixDefenses?: boolean;
 }
 
 export interface TimeslotInfo {
@@ -220,6 +263,11 @@ export interface ResolveResult {
   relaxCandidates?: RelaxCandidate[];
   defensesScheduled?: number;
   totalDefenses?: number;
+}
+
+export interface ResolveOptions {
+  mustFixDefenses: boolean;
+  enabledRoomIds: string[];
 }
 
 export interface UpSetVisualizationProps {
@@ -256,6 +304,14 @@ export interface StagedChangesPanelProps {
   onRemove: (id: string) => void;
   onResolve: () => void;
   resolving: boolean;
+  mustFixDefenses?: boolean;
+  onMustFixDefensesChange?: (value: boolean) => void;
+  /** Defense names for grouping staged changes by defense */
+  defenseNames?: Record<number, string>;
+  /** Pool rooms available for extra-room repairs */
+  availablePoolRooms?: string[];
+  /** Callback when user selects a pool room for a staged extra-room repair */
+  onPoolRoomSelect?: (stagedId: string, roomName: string) => void;
 }
 
 // ============================================================================

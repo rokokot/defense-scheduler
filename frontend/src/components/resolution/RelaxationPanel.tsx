@@ -47,6 +47,7 @@ export function RelaxationPanel({
   const typeLabels: Record<RelaxationType, string> = {
     person_availability: 'Person Availability',
     add_room: 'Add Room',
+    enable_room: 'Enable Room',
     add_day: 'Add Day',
     drop_defense: 'Drop Defense',
   };

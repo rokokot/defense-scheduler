@@ -1,9 +1,13 @@
 export { ConflictResolutionView } from './ConflictResolutionView';
+export { SimpleConflictView } from './SimpleConflictView';
+export { SimpleDefenseCard } from './SimpleDefenseCard';
+export { SelectedDefensePanel } from './SelectedDefensePanel';
 export { DefenseDetailPanel } from './DefenseDetailPanel';
 export { RelaxationPanel } from './RelaxationPanel';
 export { RelaxationCard } from './RelaxationCard';
 export { StagedChangesPanel } from './StagedChangesPanel';
 export { UpSetVisualization } from './UpSetPlot';
+export { RepairDependencyGraph } from './RepairDependencyGraph';
 export { useResolutionState } from './useResolutionState';
 export * from './types';
 export * from './transformers';

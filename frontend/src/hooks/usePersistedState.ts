@@ -7,11 +7,30 @@ import { logger } from '../utils/logger';
 import { API_BASE_URL } from '../lib/apiConfig';
 import { PersonAvailability, SlotAvailability, AvailabilityRequest } from '../components/availability/types';
 import { SolveResult } from '../types/scheduling';
+import { DefenseBlocking, RelaxCandidate, StagedRelaxation } from '../components/resolution/types';
 
 export interface PersistedSolverResult {
   id: string;
   result: SolveResult;
   receivedAt: number;
+}
+
+export interface PersistedResolutionState {
+  showResolutionView: boolean;
+  currentBlocking: DefenseBlocking[];
+  relaxCandidates: RelaxCandidate[];
+  hasRichExplanations: boolean;
+  enhancedExplanation?: {
+    perDefenseRepairs?: Record<number, unknown[]>;
+    globalAnalysis?: {
+      allRepairsRanked: unknown[];
+      totalBlocked: number;
+      estimatedResolvable: number;
+      bottleneckSummary: Record<string, unknown>;
+    };
+    disabledRooms?: Array<{ id: string; name: string }>;
+  };
+  stagedChanges?: StagedRelaxation[];
 }
 
 export interface PersistedDashboardState {
@@ -35,6 +54,7 @@ export interface PersistedDashboardState {
   };
   availabilityRequests?: AvailabilityRequest[];
   solverResults?: PersistedSolverResult[];
+  resolutionState?: PersistedResolutionState;
   version: number;
   lastSaved: number;
 }
@@ -60,6 +80,7 @@ export interface PersistedStateInput {
   };
   availabilityRequests?: AvailabilityRequest[];
   solverResults?: PersistedSolverResult[];
+  resolutionState?: PersistedResolutionState;
   lastSaved?: number;
 }
 
@@ -103,6 +124,7 @@ export function createPersistedStateSnapshot(input: PersistedStateInput): Persis
     uiPreferences: input.uiPreferences,
     availabilityRequests: input.availabilityRequests,
     solverResults: input.solverResults,
+    resolutionState: input.resolutionState,
     version: STORAGE_VERSION,
     lastSaved: input.lastSaved ?? Date.now(),
   };
@@ -293,7 +315,8 @@ export function usePersistedState(
   roomAvailability: RoomAvailabilityState[],
   datasetVersion?: string,
   availabilityRequests?: AvailabilityRequest[],
-  solverResults?: PersistedSolverResult[]
+  solverResults?: PersistedSolverResult[],
+  resolutionState?: PersistedResolutionState
 ) {
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
   const lastSavedRef = useRef<string>('');
@@ -337,6 +360,7 @@ export function usePersistedState(
       uiPreferences,
       availabilityRequests,
       solverResults,
+      resolutionState,
     });
 
     // Skip save if state hasn't changed
@@ -397,6 +421,9 @@ export function usePersistedState(
       ).join(',') ?? '',
       solverResultCount: solverResults?.length ?? 0,
       solverResultIds: solverResults?.map(r => r.id).join(',') ?? '',
+      resolutionView: resolutionState?.showResolutionView ?? false,
+      blockingCount: resolutionState?.currentBlocking?.length ?? 0,
+      stagedChangeIds: resolutionState?.stagedChanges?.map(s => s.id).join(',') ?? '',
     });
 
     if (currentHash === lastSavedRef.current) {
@@ -426,7 +453,7 @@ export function usePersistedState(
       });
     }
     return undefined;
-  }, [datasetId, datasetVersion, rosters, activeRosterId, schedulingContext, filters, gridData, roomAvailability, uiPreferences, availabilityRequests, solverResults, syncStateWithBackend]);
+  }, [datasetId, datasetVersion, rosters, activeRosterId, schedulingContext, filters, gridData, roomAvailability, uiPreferences, availabilityRequests, solverResults, resolutionState, syncStateWithBackend]);
 
   // Keep ref in sync so beforeunload always calls the latest version
   persistStateRef.current = persistState;

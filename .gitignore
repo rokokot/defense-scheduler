@@ -71,7 +71,6 @@ data/snapshots/*.json
 
 # Keep data structure but ignore large generated files
 !data/input/
-!data/output/
 data/**/*.db
 data/**/*.sqlite
 
@@ -103,3 +102,12 @@ Thumbs.db
 
 
 Defense-rostering/
+notes/
+clean_datasets_archive/
+
+# Generated solver outputs
+data/output/
+
+# Runtime state files
+**/active_repairs.json
+data/room_pool.json

@@ -1,7 +1,8 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { Pin } from 'lucide-react';
+import { Pin, Loader2, FileSearch, User, Building2, FileCheck2 } from 'lucide-react';
 import { SolveResult } from '../../types/scheduling';
 import { DefenseBlocking } from '../resolution';
+import type { AppliedResolutionChanges } from './AppliedChangesPanel';
 
 export type StreamedAlternative = {
   id: string;
@@ -52,6 +53,19 @@ interface SolverResultsPanelProps {
   onPinSchedule?: (alternative: StreamedAlternative) => void;
   summarizeSolveResult: (result: SolveResult) => SolverExecutionSummary;
   getAdjacencyScore: (result: SolveResult) => number | null;
+  // Explanation card props
+  explanationLoading?: boolean;
+  explanationPhase?: string | null;
+  explanationError?: string | null;
+  explanationElapsedTime?: number;
+  hasRichExplanations?: boolean;
+  /** Whether a schedule has been loaded (not just available to load) */
+  scheduleLoaded?: boolean;
+  onAnalyzeClick?: () => void;
+  // Applied changes card props
+  appliedChanges?: AppliedResolutionChanges | null;
+  appliedChangesOpen?: boolean;
+  onShowAppliedChanges?: () => void;
 }
 
 interface CircularProgressProps {
@@ -61,25 +75,39 @@ interface CircularProgressProps {
 }
 
 function CircularProgress({ scheduled, total, status }: CircularProgressProps) {
-  const percentage = total > 0 ? (scheduled / total) * 100 : 0;
+  const scheduledPercentage = total > 0 ? (scheduled / total) * 100 : 0;
+  const unscheduledPercentage = total > 0 ? ((total - scheduled) / total) * 100 : 0;
   const circumference = 2 * Math.PI * 36;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  const scheduledOffset = circumference - (scheduledPercentage / 100) * circumference;
+  const unscheduledOffset = circumference - (unscheduledPercentage / 100) * circumference;
 
-  const colorClasses = {
-    running: { ring: 'text-blue-500', bg: 'text-slate-200', text: 'text-blue-600' },
-    optimizing: { ring: 'text-emerald-500', bg: 'text-slate-200', text: 'text-emerald-600' },
-    success: { ring: 'text-emerald-500', bg: 'text-slate-200', text: 'text-emerald-600' },
-    partial: { ring: 'text-amber-500', bg: 'text-slate-200', text: 'text-amber-600' },
-    failed: { ring: 'text-red-500', bg: 'text-slate-200', text: 'text-red-600' },
+  // Scheduled portion color based on status
+  const scheduledColorClasses = {
+    running: 'text-blue-500',
+    optimizing: 'text-emerald-500',
+    success: 'text-emerald-500',
+    partial: 'text-blue-500',
+    failed: 'text-red-500',
   };
 
-  const colors = colorClasses[status];
+  const textColorClasses = {
+    running: 'text-blue-600',
+    optimizing: 'text-emerald-600',
+    success: 'text-emerald-600',
+    partial: 'text-slate-700',
+    failed: 'text-red-600',
+  };
+
+  const scheduledColor = scheduledColorClasses[status];
+  const textColor = textColorClasses[status];
+  const hasUnscheduled = total > scheduled;
 
   return (
     <div className="relative h-15 w-15 flex-shrink-0">
       <svg className="h-16 w-16 -rotate-90" viewBox="0 0 80 80">
+        {/* Background circle */}
         <circle
-          className={colors.bg}
+          className="text-slate-200"
           strokeWidth="6"
           stroke="currentColor"
           fill="transparent"
@@ -87,8 +115,28 @@ function CircularProgress({ scheduled, total, status }: CircularProgressProps) {
           cx="40"
           cy="40"
         />
+        {/* Orange: unscheduled portion (rendered first, at the end of the circle) */}
+        {hasUnscheduled && (
+          <circle
+            className="text-orange-400 transition-all duration-500 ease-out"
+            strokeWidth="6"
+            stroke="currentColor"
+            fill="transparent"
+            r="36"
+            cx="40"
+            cy="40"
+            style={{
+              strokeDasharray: circumference,
+              strokeDashoffset: unscheduledOffset,
+              // Rotate to start after the scheduled portion
+              transform: `rotate(${scheduledPercentage * 3.6}deg)`,
+              transformOrigin: '40px 40px',
+            }}
+          />
+        )}
+        {/* Scheduled portion (blue/green based on status) */}
         <circle
-          className={`${colors.ring} transition-all duration-500 ease-out`}
+          className={`${scheduledColor} transition-all duration-500 ease-out`}
           strokeWidth="6"
           strokeLinecap="round"
           stroke="currentColor"
@@ -98,12 +146,12 @@ function CircularProgress({ scheduled, total, status }: CircularProgressProps) {
           cy="40"
           style={{
             strokeDasharray: circumference,
-            strokeDashoffset: strokeDashoffset,
+            strokeDashoffset: scheduledOffset,
           }}
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className={`flex flex-col leading-none ${colors.text}`}>
+        <div className={`flex flex-col leading-none ${textColor}`}>
           <span className="text-sm font-bold">{scheduled}</span>
           <div className="flex items-center gap-0.5 -mt-0.5 ml-2">
             <span className="text-[8px]">/</span>
@@ -158,12 +206,15 @@ function AdjacencyCard({
   const isShowingOptimizedSolution = selectedId != null && alternatives.some(alt => alt.id === selectedId);
 
   // Display priority:
-  // 1. If a solution is selected from this card → show selected score
-  // 2. If optimizing and no selection → show live/latest score
-  // 3. Otherwise → show best score
-  const displayScore = selectedScore ?? (isOptimizing && latestScore != null ? latestScore : bestScore);
-  const displayPossible = selectedPossible ?? (isOptimizing && latestPossible != null ? latestPossible : bestPossible);
+  // 1. If optimizing → show live/latest score
+  // 2. Otherwise → show best score
+  // Note: Always show best/latest, never selected (selected shown separately)
+  const displayScore = isOptimizing && latestScore != null ? latestScore : bestScore;
+  const displayPossible = isOptimizing && latestPossible != null ? latestPossible : bestPossible;
   const percentage = displayPossible > 0 ? (displayScore / displayPossible) * 100 : 0;
+
+  // Track if showing a non-best solution in the roster
+  const showingNonBest = selectedId != null && selectedId !== bestId && selectedScore != null;
 
   const handleCardClick = () => {
     // If already showing best, clicking again does nothing
@@ -247,13 +298,20 @@ function AdjacencyCard({
             <div className="h-full w-full bg-gradient-to-r from-indigo-200 via-indigo-400 to-indigo-200 animate-pulse" />
           )}
         </div>
-        <div className="mt-1.5 flex items-center gap-5">
-          <span className="text-xs text-slate-500">
-            {isOptimal ? 'optimal solution found' : isOptimizing ? 'optimizing adjacency...' : 'current best solution'}
-          </span>
-          {cancelled && (
-            <span className="px-1.5 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded">
-              Cancelled
+        <div className="mt-1.5 flex items-center justify-between">
+          <div className="flex items-center gap-5">
+            <span className="text-xs text-slate-500">
+              {isOptimal ? 'optimal solution found' : isOptimizing ? 'optimizing adjacency...' : 'current best solution'}
+            </span>
+            {cancelled && (
+              <span className="px-1.5 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded">
+                Cancelled
+              </span>
+            )}
+          </div>
+          {showingNonBest && selectedScore != null && selectedPossible != null && (
+            <span className="text-[8px] font-medium text-slate-600 px-1 py-px bg-slate-100 border border-slate-300 rounded">
+              showing {selectedScore}/{selectedPossible}
             </span>
           )}
         </div>
@@ -319,6 +377,117 @@ function AdjacencyCard({
   );
 }
 
+// Explanation Card - matches status card structure
+interface ExplanationCardProps {
+  blockedCount: number;
+  hasRichExplanations: boolean;
+  /** Whether a schedule has been loaded (not just available to load) */
+  scheduleLoaded: boolean;
+  isLoading: boolean;
+  phase: string | null;
+  error: string | null;
+  elapsedTime?: number;
+  onAnalyzeClick?: () => void;
+}
+
+function ExplanationCard({
+  blockedCount,
+  hasRichExplanations,
+  scheduleLoaded,
+  isLoading,
+  phase,
+  error,
+  elapsedTime = 0,
+  onAnalyzeClick,
+}: ExplanationCardProps) {
+  // Only show 'complete' if we have rich explanations AND a schedule is actually loaded
+  const status = error ? 'error' : isLoading ? 'running' : (hasRichExplanations && scheduleLoaded) ? 'complete' : 'idle';
+
+  const statusColors = {
+    idle: { label: 'Conflicts', ring: 'text-amber-500', text: 'text-amber-600', description: 'click to analyze' },
+    running: { label: phase || 'Analyzing', ring: 'text-blue-500', text: 'text-blue-600', description: 'computing explanations...' },
+    complete: { label: 'Analyzed', ring: 'text-emerald-500', text: 'text-emerald-600', description: 'MCS repairs available' },
+    error: { label: 'Failed', ring: 'text-red-500', text: 'text-red-600', description: error?.slice(0, 25) || 'check logs' },
+  };
+
+  const config = statusColors[status];
+  const circumference = 2 * Math.PI * 36;
+  const percentage = status === 'complete' ? 100 : status === 'running' ? 50 : (blockedCount > 0 ? 0 : 100);
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  const handleClick = () => {
+    if (onAnalyzeClick && !isLoading) {
+      onAnalyzeClick();
+    }
+  };
+
+  return (
+    <div
+      role="button"
+      tabIndex={onAnalyzeClick && !isLoading ? 0 : -1}
+      onClick={handleClick}
+      onKeyDown={(e) => {
+        if (onAnalyzeClick && !isLoading && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+      className={`flex w-64 items-center gap-3 rounded-xl bg-white px-4 py-2.5 shadow-sm text-left transition-colors border border-slate-200 ${
+        onAnalyzeClick && !isLoading ? 'hover:border-blue-300 hover:shadow-md cursor-pointer' : ''
+      } ${isLoading ? 'opacity-80' : ''}`}
+    >
+      {/* Circular indicator - same size as status card */}
+      <div className="relative h-15 w-15 flex-shrink-0">
+        <svg className="h-16 w-16 -rotate-90" viewBox="0 0 80 80">
+          <circle
+            className="text-slate-200"
+            strokeWidth="6"
+            stroke="currentColor"
+            fill="transparent"
+            r="36"
+            cx="40"
+            cy="40"
+          />
+          <circle
+            className={`${config.ring} transition-all duration-500 ease-out ${isLoading ? 'animate-pulse' : ''}`}
+            strokeWidth="6"
+            strokeLinecap="round"
+            stroke="currentColor"
+            fill="transparent"
+            r="36"
+            cx="40"
+            cy="40"
+            style={{
+              strokeDasharray: circumference,
+              strokeDashoffset: isLoading ? circumference * 0.6 : strokeDashoffset,
+            }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          {isLoading ? (
+            <Loader2 size={20} className={`animate-spin ${config.text}`} />
+          ) : (
+            <FileSearch size={20} className={config.text} />
+          )}
+        </div>
+      </div>
+
+      {/* Status info */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold text-slate-800">{config.label}</span>
+          {elapsedTime > 0 && (
+            <span className="text-xs text-slate-500 tabular-nums">{elapsedTime.toFixed(1)}s</span>
+          )}
+        </div>
+        <span className="text-xs text-slate-500 truncate block">
+          {config.description}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 const statusConfig: Record<SolverStatus, { label: string; description: string }> = {
   running: { label: 'Solving...', description: 'Finding feasible schedule' },
   optimizing: { label: 'Complete', description: 'Full schedule found' },
@@ -353,6 +522,17 @@ export function SolverResultsPanel({
   onPinSchedule,
   summarizeSolveResult,
   getAdjacencyScore,
+  // Explanation card props
+  explanationLoading = false,
+  explanationPhase = null,
+  explanationError = null,
+  explanationElapsedTime = 0,
+  hasRichExplanations = false,
+  scheduleLoaded = false,
+  onAnalyzeClick,
+  appliedChanges,
+  appliedChangesOpen = false,
+  onShowAppliedChanges,
 }: SolverResultsPanelProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const fullScheduleFoundAtRef = useRef<number | null>(null);
@@ -598,14 +778,20 @@ export function SolverResultsPanel({
           {(() => {
             const isStatusCardSelected = selectedStreamSolutionId === firstFullEntry?.id;
             return (
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={isCardClickable ? 0 : -1}
                 onClick={handleStatusCardClick}
-                disabled={!isCardClickable}
+                onKeyDown={(e) => {
+                  if (isCardClickable && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    handleStatusCardClick();
+                  }
+                }}
                 className={`flex w-64 items-center gap-3 rounded-xl bg-white px-4 py-2.5 shadow-sm text-left transition-colors ${
                   isStatusCardSelected ? 'border-2 border-blue-500' : 'border border-slate-200'
                 } ${
-                  isCardClickable ? 'hover:border-blue-300 hover:shadow-md cursor-pointer' : ''
+                  isCardClickable ? 'hover:border-blue-300 hover:shadow-md cursor-pointer' : 'opacity-60'
                 }`}
               >
                 <CircularProgress scheduled={scheduled} total={total} status={status} />
@@ -638,7 +824,75 @@ export function SolverResultsPanel({
                     <Pin size={14} />
                   </button>
                 )}
-              </button>
+              </div>
+            );
+          })()}
+
+          {/* Applied Repairs Card - shown after successful conflict resolution re-solve */}
+          {appliedChanges && !solverRunning && (() => {
+            const fullyRepaired = !hasConflicts;
+            const totalChanges = appliedChanges.availabilityOverrides.length + appliedChanges.enabledRooms.length;
+            return (
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={onShowAppliedChanges}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onShowAppliedChanges?.(); }}
+                className={`flex w-64 items-center gap-3 rounded-xl bg-white px-4 py-2.5 shadow-sm text-left cursor-pointer hover:border-blue-300 hover:shadow-md transition-colors ${
+                  appliedChangesOpen ? 'border-2 border-blue-500' : 'border border-slate-200'
+                }`}
+              >
+                <div className={`relative h-15 w-15 flex-shrink-0`}>
+                  <svg className="h-16 w-16 -rotate-90" viewBox="0 0 80 80">
+                    <circle
+                      className="text-slate-200"
+                      strokeWidth="6"
+                      stroke="currentColor"
+                      fill="transparent"
+                      r="36"
+                      cx="40"
+                      cy="40"
+                    />
+                    <circle
+                      className={`${fullyRepaired ? 'text-emerald-500' : 'text-amber-500'} transition-all duration-500 ease-out`}
+                      strokeWidth="6"
+                      strokeLinecap="round"
+                      stroke="currentColor"
+                      fill="transparent"
+                      r="36"
+                      cx="40"
+                      cy="40"
+                      style={{
+                        strokeDasharray: 2 * Math.PI * 36,
+                        strokeDashoffset: 0,
+                      }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <FileCheck2 size={20} className={fullyRepaired ? 'text-emerald-600' : 'text-amber-600'} />
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-slate-800">Repairs</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    {appliedChanges.availabilityOverrides.length > 0 && (
+                      <span className="flex items-center gap-0.5">
+                        <User size={12} /> {appliedChanges.availabilityOverrides.length}
+                      </span>
+                    )}
+                    {appliedChanges.enabledRooms.length > 0 && (
+                      <span className="flex items-center gap-0.5">
+                        <Building2 size={12} /> {appliedChanges.enabledRooms.length}
+                      </span>
+                    )}
+                    <span className={fullyRepaired ? 'text-emerald-600' : 'text-amber-600'}>
+                      {totalChanges} {fullyRepaired ? 'applied' : 'partial'}
+                    </span>
+                  </div>
+                </div>
+              </div>
             );
           })()}
 
@@ -664,6 +918,20 @@ export function SolverResultsPanel({
               isOptimal={hasOptimalSolution}
               elapsedSeconds={optimizationTime}
               cancelled={cancelledPhase === 'optimizing' && !solverRunning}
+            />
+          )}
+
+          {/* Explanation Card - shown when there are conflicts */}
+          {hasConflicts && !solverRunning && (
+            <ExplanationCard
+              blockedCount={currentBlocking.length}
+              hasRichExplanations={hasRichExplanations}
+              scheduleLoaded={scheduleLoaded}
+              isLoading={explanationLoading}
+              phase={explanationPhase}
+              error={explanationError}
+              elapsedTime={explanationElapsedTime}
+              onAnalyzeClick={onAnalyzeClick}
             />
           )}
         </div>

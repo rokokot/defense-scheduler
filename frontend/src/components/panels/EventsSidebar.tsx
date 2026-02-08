@@ -9,6 +9,7 @@ interface EventsSidebarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   onCardClick: (event: DefenceEvent) => void;
+  onEditClick?: (event: DefenceEvent) => void;
   onAddNew: () => void;
   onClose?: () => void;
   onDelete?: (event: DefenceEvent) => void;
@@ -24,6 +25,7 @@ export function EventsSidebar({
   searchQuery,
   onSearchChange,
   onCardClick,
+  onEditClick,
   onAddNew,
   onClose,
   onDelete,
@@ -222,7 +224,7 @@ export function EventsSidebar({
                     autoScroll={highlightedEventId === event.id}
                     selected={selectedEventId === event.id}
                     onClick={() => onCardClick(event)}
-                    onEditClick={() => onCardClick(event)}
+                    onEditClick={onEditClick ? () => onEditClick(event) : undefined}
                     onDeleteClick={onDelete ? () => onDelete(event) : undefined}
                     colorScheme={colorScheme}
                     isDraggable={true}
@@ -258,7 +260,7 @@ export function EventsSidebar({
                     autoScroll={highlightedEventId === event.id}
                     selected={selectedEventId === event.id}
                     onClick={() => onCardClick(event)}
-                    onEditClick={() => onCardClick(event)}
+                    onEditClick={onEditClick ? () => onEditClick(event) : undefined}
                     onDeleteClick={onDelete ? () => onDelete(event) : undefined}
                     colorScheme={colorScheme}
                     isDraggable={true}
@@ -294,7 +296,7 @@ export function EventsSidebar({
                     autoScroll={highlightedEventId === event.id}
                     selected={selectedEventId === event.id}
                     onClick={() => onCardClick(event)}
-                    onEditClick={() => onCardClick(event)}
+                    onEditClick={onEditClick ? () => onEditClick(event) : undefined}
                     onDeleteClick={onDelete ? () => onDelete(event) : undefined}
                     colorScheme={colorScheme}
                     isDraggable={false}

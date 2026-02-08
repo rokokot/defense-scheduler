@@ -23,6 +23,8 @@ interface RoomAvailabilityPanelProps {
   programmeColors?: Record<string, string>;
   highlightedRoomId?: string | null;
   highlightedSlot?: { day: string; timeSlot: string } | null;
+  /** Global pool of room names for search suggestions */
+  roomPool?: string[];
 }
 
 export function RoomAvailabilityPanel({
@@ -42,6 +44,7 @@ export function RoomAvailabilityPanel({
   programmeColors,
   highlightedRoomId,
   highlightedSlot,
+  roomPool,
 }: RoomAvailabilityPanelProps) {
   const [panelHeight, setPanelHeight] = useState(sharedHeight ?? 520);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -144,6 +147,7 @@ export function RoomAvailabilityPanel({
               onSlotToggle={onSlotStatusChange}
               onSlotSelect={onSlotSelect}
               programmeColors={programmeColors}
+              roomPool={roomPool}
             />
           </div>
           <div className="sticky bottom-0 left-0 right-0 px-4 py-3 bg-gray-50 border-t border-gray-100 text-xs sm:text-sm text-gray-700 flex flex-wrap items-center gap-3 sm:gap-4 z-10">

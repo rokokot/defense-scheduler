@@ -223,6 +223,13 @@ class DefenseRosteringModel(cp.Model):
 
         self.df_av = _merge_unavailabilities(self.df_av)
 
+        # Apply availability overrides from config (e.g., from conflict resolution repairs)
+        # Overrides with status='available' remove matching unavailability entries
+        # Overrides with status='unavailable' add new unavailability entries
+        availability_overrides = cfg.get('availability_overrides', None)
+        if availability_overrides and len(availability_overrides) > 0:
+            self.df_av = self._apply_availability_overrides(self.df_av, availability_overrides)
+
         with open(f'{input_path}/timeslot_info.json') as f:
             self.timeslot_info = json.load(f)
 
@@ -233,11 +240,17 @@ class DefenseRosteringModel(cp.Model):
 
         raw_rooms = data.get("rooms", [])
         normalized_rooms = []
+        self.disabled_rooms = []  # Track disabled rooms for repair suggestions
         for idx, room in enumerate(raw_rooms):
             if isinstance(room, dict):
-                if not room.get("enabled", True):
-                    continue
                 name = room.get("name") or room.get("id") or f"Room {idx+1}"
+                if not room.get("enabled", True):
+                    # Store disabled room info for potential enable suggestions
+                    self.disabled_rooms.append({
+                        "id": room.get("id", f"room_{idx}"),
+                        "name": name,
+                    })
+                    continue
             else:
                 name = str(room)
             normalized_rooms.append(name)
@@ -411,6 +424,91 @@ class DefenseRosteringModel(cp.Model):
         if cfg.get("explain", False):
             self.add_assumption_constraints()
 
+    @staticmethod
+    def _apply_availability_overrides(df_av, overrides):
+        """
+        Apply availability overrides to the unavailability dataframe.
+
+        - If status='available': removes matching unavailability entries (person becomes available)
+        - If status='unavailable': adds new unavailability entries (person becomes unavailable)
+
+        Matching is done by name (case-insensitive), day, and time.
+
+        Args:
+            df_av: DataFrame with columns [name, type, day, start_time, end_time, ...]
+            overrides: List of dicts with keys [name, day, start_time, end_time, status]
+
+        Returns:
+            Modified DataFrame with overrides applied.
+        """
+        import logging
+        logger = logging.getLogger("uvicorn.error")
+
+        if df_av.empty:
+            return df_av
+
+        # Build a set of (name, day, start_time, end_time) tuples to remove
+        slots_to_make_available = set()
+        slots_to_add = []
+
+        for override in overrides:
+            name = override.get('name', '').lower().strip()
+            day = override.get('day', '')
+            start_time = override.get('start_time', '')
+            end_time = override.get('end_time', '')
+            status = override.get('status', 'available')
+
+            if status == 'available':
+                # Mark this slot to be removed from unavailabilities
+                slots_to_make_available.add((name, day, start_time, end_time))
+            else:
+                # Add a new unavailability entry
+                slots_to_add.append({
+                    'name': override.get('name', ''),
+                    'type': 'participant',
+                    'day': day,
+                    'start_time': start_time,
+                    'end_time': end_time,
+                    'status': '',
+                })
+
+        if slots_to_make_available:
+            logger.info(
+                "solver.availability_overrides.removing count=%d slots=%s",
+                len(slots_to_make_available),
+                list(slots_to_make_available)[:5],  # Log first 5 for brevity
+            )
+
+        # Filter out unavailabilities that match the "make available" overrides
+        def should_keep(row):
+            name = str(row.get('name', '')).lower().strip()
+            day = str(row.get('day', ''))
+            start = str(row.get('start_time', ''))
+            end = str(row.get('end_time', ''))
+            key = (name, day, start, end)
+            return key not in slots_to_make_available
+
+        original_len = len(df_av)
+        df_av = df_av[df_av.apply(should_keep, axis=1)]
+        removed_count = original_len - len(df_av)
+
+        if removed_count > 0:
+            logger.info(
+                "solver.availability_overrides.removed count=%d",
+                removed_count,
+            )
+
+        # Add new unavailabilities
+        if slots_to_add:
+            new_rows = pd.DataFrame(slots_to_add)
+            df_av = pd.concat([df_av, new_rows], ignore_index=True)
+            logger.info(
+                "solver.availability_overrides.added count=%d",
+                len(slots_to_add),
+            )
+
+        return df_av
+
     def add_labeled(self, label, constraints):
         """Add constraints to the model and keep a label for explainability grouping."""
         super().add(constraints)
@@ -476,6 +574,205 @@ class DefenseRosteringModel(cp.Model):
                 self.assumption_constraints.extend((c, f"timeslot_illegal:{t}") for c in cons)
                 super().add(cons)
 
+    # -------------------------------------------------------------------------
+    # Explanation Support Methods
+    # -------------------------------------------------------------------------
+
+    def export_constraint_metadata(self):
+        """
+        Export constraint labels and metadata for the explanation module.
+
+        Returns:
+            Dict containing:
+            - constraint_labels: List of (constraint, label) tuples
+            - groups: Dict mapping label to list of constraints
+            - defense_evaluators: Dict mapping defense_id to list of evaluator names
+            - timeslot_info: Timeslot configuration
+            - rooms: List of room names
+            - first_day: First day datetime
+        """
+        # Build groups from constraint_labels
+        groups = {}
+        for constraint, label in self.constraint_labels:
+            if label not in groups:
+                groups[label] = []
+            groups[label].append(constraint)
+
+        # Build defense_evaluators mapping
+        evaluator_cols = ['supervisor', 'co_supervisor', 'assessor1', 'assessor2',
+                         'mentor1', 'mentor2', 'mentor3', 'mentor4']
+        defense_evaluators = {}
+        for d in range(self.no_defenses):
+            row = self.df_def.loc[d]
+            evaluators = []
+            for col in evaluator_cols:
+                name = row.get(col)
+                if pd.notna(name) and str(name).strip() != '':
+                    evaluators.append(str(name).strip())
+            defense_evaluators[d] = evaluators
+
+        return {
+            "constraint_labels": self.constraint_labels,
+            "groups": groups,
+            "defense_evaluators": defense_evaluators,
+            "evaluator_to_defenses": self.evaluator_to_defenses,
+            "timeslot_info": self.timeslot_info,
+            "rooms": self.rooms,
+            "disabled_rooms": self.disabled_rooms,  # For suggesting room enables
+            "first_day": self.first_day,
+            "no_timeslots": self.no_timeslots,
+            "no_defenses": self.no_defenses,
+        }
+
+    def compute_legal_slots(self, defense_id, planned_defense_ids=None):
+        """
+        Compute legal slots for a specific defense.
+
+        A slot is legal if:
+        - All evaluators for this defense are available
+        - At least one room is available
+        - The timeslot is not illegal (within business hours)
+
+        Args:
+            defense_id: The defense ID to compute legal slots for.
+            planned_defense_ids: Optional list of already-scheduled defense IDs
+                                to consider when checking room availability.
+
+        Returns:
+            List of dicts with slot_index, timestamp, room_ids, blocking_reasons.
+        """
+        blocked_rooms, blocked_people, legal_slots = _blocked_sets(self)
+
+        # Get evaluators for this defense
+        evaluator_cols = ['supervisor', 'co_supervisor', 'assessor1', 'assessor2',
+                         'mentor1', 'mentor2', 'mentor3', 'mentor4']
+        row = self.df_def.loc[defense_id]
+        evaluators = []
+        for col in evaluator_cols:
+            name = row.get(col)
+            if pd.notna(name) and str(name).strip() != '':
+                evaluators.append(str(name).strip())
+
+        # Get slots occupied by planned defenses (for room availability)
+        occupied_slots = {}  # slot -> set of room indices
+        if planned_defense_ids:
+            for d in planned_defense_ids:
+                if d == defense_id:
+                    continue
+                try:
+                    start_val = self.start_times[d].value()
+                    room_val = self.in_room[d].value()
+                    if start_val is not None and room_val is not None:
+                        t = int(start_val)
+                        r = int(room_val)
+                        if t not in occupied_slots:
+                            occupied_slots[t] = set()
+                        occupied_slots[t].add(r)
+                except Exception:
+                    pass
+
+        results = []
+        for t in sorted(legal_slots):
+            blocking_reasons = []
+            available_rooms = []
+
+            # Check evaluator availability
+            for ev in evaluators:
+                if ev in blocked_people and t in blocked_people[ev]:
+                    blocking_reasons.append(f"person:{ev}")
+
+            # Check room availability
+            for r in range(len(self.rooms)):
+                room_blocked = t in blocked_rooms.get(r, set())
+                room_occupied = r in occupied_slots.get(t, set())
+                if not room_blocked and not room_occupied:
+                    available_rooms.append(self.rooms[r])
+                elif room_blocked:
+                    blocking_reasons.append(f"room:{self.rooms[r]}")
+
+            # Compute timestamp
+            timestamp = self.first_day + datetime.timedelta(hours=int(t))
+
+            results.append({
+                "slot_index": int(t),
+                "timestamp": timestamp.isoformat(),
+                "room_ids": available_rooms,
+                "blocking_reasons": blocking_reasons,
+                "is_legal": len(blocking_reasons) == 0 and len(available_rooms) > 0
+            })
+
+        # Filter to only legal slots by default
+        legal_results = [r for r in results if r["is_legal"]]
+        return legal_results
+
+    def get_soft_constraints(self):
+        """
+        Return constraints that can be relaxed.
+
+        Soft constraints are those related to:
+        - Person unavailability (person-unavailable)
+        - Extra rooms (extra-room)
+        - Extra days (extra-day)
+
+        Returns:
+            List of constraint objects that are considered soft/relaxable.
+        """
+        soft_labels = ["evaluator_availability", "evaluator_availability_overlap"]
+        soft = []
+        for constraint, label in self.constraint_labels:
+            if label in soft_labels:
+                soft.append(constraint)
+        return soft
+
+    def get_hard_constraints(self):
+        """
+        Return constraints that cannot be relaxed.
+
+        Hard constraints are those related to:
+        - Person overlap (person-overlap)
+        - Room unavailability (room-unavailable)
+        - Room overlap (room-overlap)
+        - Consistency (exactly one slot per defense)
+        - Must-plan (defense must be scheduled)
+        - Timeslot illegal (outside business hours)
+
+        Returns:
+            List of constraint objects that are considered hard/non-relaxable.
+        """
+        hard_labels = ["evaluator_overlap", "room_availability", "room_overlap",
+                       "room_availability_overlap", "timeslot", "must_plan_all",
+                       "adjacency_bound", "dummy"]
+        hard = []
+        for constraint, label in self.constraint_labels:
+            if label in hard_labels:
+                hard.append(constraint)
+        return hard
+
+    def get_defense_info(self, defense_id):
+        """
+        Get information about a specific defense.
+
+        Args:
+            defense_id: The defense ID.
+
+        Returns:
+            Dict with defense information including student name and evaluators.
+        """
+        row = self.df_def.loc[defense_id]
+        evaluator_cols = ['supervisor', 'co_supervisor', 'assessor1', 'assessor2',
+                         'mentor1', 'mentor2', 'mentor3', 'mentor4']
+        evaluators = []
+        for col in evaluator_cols:
+            name = row.get(col)
+            if pd.notna(name) and str(name).strip() != '':
+                evaluators.append(str(name).strip())
+
+        return {
+            "defense_id": int(defense_id),
+            "student": row.get("student", ""),
+            "supervisor": row.get("supervisor", ""),
+            "evaluators": evaluators
+        }
 
 
 

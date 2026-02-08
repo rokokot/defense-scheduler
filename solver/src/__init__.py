@@ -14,6 +14,7 @@ from .solver import (
     compute_slack,
     compute_capacity_gaps,
     compute_blocking_reasons,
+    compute_bottleneck_analysis,
     aggregate_relax_candidates,
 )
 
@@ -25,5 +26,6 @@ __all__ = [
     "compute_slack",
     "compute_capacity_gaps",
     "compute_blocking_reasons",
+    "compute_bottleneck_analysis",
     "aggregate_relax_candidates",
 ]

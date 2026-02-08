@@ -257,19 +257,93 @@ export function getDefensesForIntersection(
  */
 export function slotIndexToDateTime(
   slotIndex: number,
-  timeslotInfo: TimeslotInfo
+  timeslotInfo: TimeslotInfo | undefined
 ): { day: string; time: string; dayIndex: number; slotInDay: number } {
+  // Handle null/undefined/NaN slot index - default to 0
+  const safeSlotIndex = (slotIndex == null || isNaN(slotIndex)) ? 0 : slotIndex;
+
+  // Handle missing timeslotInfo
+  if (!timeslotInfo) {
+    return {
+      day: 'unknown',
+      time: '09:00',
+      dayIndex: 0,
+      slotInDay: 0,
+    };
+  }
+
   const { firstDay, slotsPerDay, startHour } = timeslotInfo;
-  const dayIndex = Math.floor(slotIndex / slotsPerDay);
-  const slotInDay = slotIndex % slotsPerDay;
-  const hour = startHour + slotInDay;
+  const safeSlotsPerDay = slotsPerDay || 1;
+  const safeStartHour = startHour || 9;
+  const dayIndex = Math.floor(safeSlotIndex / safeSlotsPerDay);
+  const slotInDay = safeSlotIndex % safeSlotsPerDay;
+  const hour = safeStartHour + slotInDay;
+  const timeStr = `${hour.toString().padStart(2, '0')}:00`;
 
-  const baseDate = new Date(firstDay);
-  baseDate.setDate(baseDate.getDate() + dayIndex);
-  const day = baseDate.toISOString().split('T')[0];
-  const time = `${hour.toString().padStart(2, '0')}:00`;
+  // Handle missing or invalid firstDay
+  if (!firstDay) {
+    console.warn('Missing firstDay in timeslotInfo');
+    return {
+      day: 'unknown',
+      time: timeStr,
+      dayIndex,
+      slotInDay,
+    };
+  }
 
-  return { day, time, dayIndex, slotInDay };
+  // Try to parse the date - handle various formats
+  let baseDate: Date;
+
+  // Check if it's already in YYYY-MM-DD format
+  if (/^\d{4}-\d{2}-\d{2}$/.test(firstDay)) {
+    // Parse as local date to avoid timezone issues
+    const [year, month, day] = firstDay.split('-').map(Number);
+    baseDate = new Date(year, month - 1, day);
+  } else {
+    // Try standard Date parsing
+    baseDate = new Date(firstDay);
+  }
+
+  if (isNaN(baseDate.getTime())) {
+    console.warn(`Invalid firstDay in timeslotInfo: "${firstDay}"`);
+    return {
+      day: firstDay,
+      time: timeStr,
+      dayIndex,
+      slotInDay,
+    };
+  }
+
+  // Add days and verify the result is still valid
+  try {
+    baseDate.setDate(baseDate.getDate() + dayIndex);
+
+    if (isNaN(baseDate.getTime())) {
+      console.warn(`Date became invalid after adding ${dayIndex} days to "${firstDay}"`);
+      return {
+        day: firstDay,
+        time: timeStr,
+        dayIndex,
+        slotInDay,
+      };
+    }
+
+    // Format as YYYY-MM-DD manually to avoid timezone issues with toISOString()
+    const year = baseDate.getFullYear();
+    const month = (baseDate.getMonth() + 1).toString().padStart(2, '0');
+    const dayOfMonth = baseDate.getDate().toString().padStart(2, '0');
+    const day = `${year}-${month}-${dayOfMonth}`;
+
+    return { day, time: timeStr, dayIndex, slotInDay };
+  } catch (err) {
+    console.warn(`Error computing date from "${firstDay}" + ${dayIndex} days:`, err);
+    return {
+      day: firstDay,
+      time: timeStr,
+      dayIndex,
+      slotInDay,
+    };
+  }
 }
 
 /**
@@ -278,7 +352,7 @@ export function slotIndexToDateTime(
 export function transformRelaxCandidatesToActions(
   candidates: RelaxCandidate[],
   blocking: DefenseBlocking[],
-  timeslotInfo: TimeslotInfo
+  timeslotInfo: TimeslotInfo | undefined
 ): RelaxationAction[] {
   const actions: RelaxationAction[] = [];
   const personSlotGroups = new Map<string, SlotRelaxCandidate[]>();

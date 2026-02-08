@@ -6,7 +6,7 @@
  */
 import { useState, useRef, useEffect, memo, useMemo, useLayoutEffect, useCallback, Fragment } from 'react';
 import clsx from 'clsx';
-import { AlertCircle, Lock, Check, Clock, ChevronDown, X } from 'lucide-react';
+import { AlertCircle, Lock, Check, Clock, ChevronDown, X, Filter, ArrowUpDown } from 'lucide-react';
 import { PersonAvailability, ViewGranularity, AvailabilityStatus, SlotAvailability, ConflictInfo, AvailabilityRequest } from './types';
 import StatusErrorIcon from '@atlaskit/icon/core/status-error';
 import PersonWarningIcon from '@atlaskit/icon/core/person-warning';
@@ -53,6 +53,10 @@ export interface AvailabilityGridProps {
   availabilityRequests?: AvailabilityRequest[];
   onAcceptRequest?: (requestId: string) => void;
   onDenyRequest?: (requestId: string) => void;
+  onClearDeniedRequests?: () => void;
+  onClearFulfilledRequests?: () => void;
+  // Bottleneck warnings for persons with insufficient availability
+  bottleneckWarnings?: Map<string, { deficit: number; suggestion: string }>;
 }
 
 const editableStatuses: AvailabilityStatus[] = ['available', 'unavailable'];
@@ -110,15 +114,25 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
   availabilityRequests = [],
   onAcceptRequest,
   onDenyRequest,
+  onClearDeniedRequests,
+  onClearFulfilledRequests,
+  bottleneckWarnings,
 }: AvailabilityGridProps) {
   const [editingSlot, setEditingSlot] = useState<{ personId: string; day: string; slot: string } | null>(null);
   const [showRequestsPanel, setShowRequestsPanel] = useState(false);
   const [requestHighlightedIds, setRequestHighlightedIds] = useState<string[]>([]);
   const [requestHighlightedSlots, setRequestHighlightedSlots] = useState<Set<string>>(new Set());
+  const [bottleneckHighlightedIds, setBottleneckHighlightedIds] = useState<string[]>([]);
   const [participantSearch, setParticipantSearch] = useState('');
+  const [sortMode, setSortMode] = useState<'alphabetical' | 'defenses-desc'>('alphabetical');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'student' | 'supervisor' | 'assessor' | 'mentor'>('all');
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+  const filterMenuRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const personRowRefs = useRef<Map<string, HTMLTableRowElement>>(new Map());
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const theadRef = useRef<HTMLTableSectionElement>(null);
+  const getHeaderHeight = () => theadRef.current?.getBoundingClientRect().height ?? 80;
   const scrollMetricsRef = useRef({ scrollTop: 0, containerHeight: 600 });
   const [virtualRange, setVirtualRange] = useState(() => ({
     startIndex: 0,
@@ -139,11 +153,21 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
   const visibleDaysSet = useMemo(() => new Set(days), [days]);
   const visibleSlotsSet = useMemo(() => new Set(timeSlots), [timeSlots]);
 
+  // Compute participants with bottleneck warnings (insufficient availability)
+  const bottleneckParticipants = useMemo(() => {
+    if (!bottleneckWarnings || bottleneckWarnings.size === 0) return [];
+    return availabilities.filter(person => {
+      const normalizedName = (person.name || '').trim().toLowerCase();
+      const info = bottleneckWarnings.get(person.name) || bottleneckWarnings.get(normalizedName);
+      return info && info.deficit > 0;
+    });
+  }, [availabilities, bottleneckWarnings]);
+
   const effectiveHighlightedPersons = useMemo(() => {
-    if (requestHighlightedIds.length === 0) return highlightedPersons;
-    const merged = new Set([...highlightedPersons, ...requestHighlightedIds]);
+    if (requestHighlightedIds.length === 0 && bottleneckHighlightedIds.length === 0) return highlightedPersons;
+    const merged = new Set([...highlightedPersons, ...requestHighlightedIds, ...bottleneckHighlightedIds]);
     return Array.from(merged);
-  }, [highlightedPersons, requestHighlightedIds]);
+  }, [highlightedPersons, requestHighlightedIds, bottleneckHighlightedIds]);
 
   const personHasVisibleConflicts = useCallback(
     (person: PersonAvailability): boolean => {
@@ -253,7 +277,21 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
     setEditingSlot(null);
   }, [granularity]);
 
+  // Close filter menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterMenuRef.current && !filterMenuRef.current.contains(event.target as Node)) {
+        setFilterMenuOpen(false);
+      }
+    };
+    if (filterMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [filterMenuOpen]);
+
   const roleDisplayMap: Record<string, string> = {
+    student: 'Students',
     supervisor: 'Supervisors',
     co_supervisor: 'Supervisors',
     mentor: 'Mentors',
@@ -560,28 +598,66 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
     );
   };
 
+  // Compute defense counts per participant (all defenses, not just scheduled)
+  const defenseCountByPerson = useMemo(() => {
+    const counts = new Map<string, number>();
+    if (!events || events.length === 0) return counts;
 
-  // Merge and sort participants across all rosters intelligently
+    events.forEach(event => {
+      const participants = [
+        event.student,
+        event.supervisor,
+        event.coSupervisor,
+        ...(event.assessors || []),
+        ...(event.mentors || []),
+      ].filter(Boolean);
+
+      participants.forEach(name => {
+        const key = normalizeName(name);
+        counts.set(key, (counts.get(key) || 0) + 1);
+      });
+    });
+
+    return counts;
+  }, [events]);
+
+  // Merge, filter by role, and sort participants
   const sortedAvailabilities = useMemo(() => {
     const search = normalizedParticipantSearch;
     const isMultiRoster = rosters && rosters.length > 1;
 
+    // Helper sort function for both single and multi-roster cases
+    const sortPeople = (a: PersonAvailability, b: PersonAvailability) => {
+      // Search matches always first
+      const aMatches = search ? normalizeName(a.name).includes(search) : false;
+      const bMatches = search ? normalizeName(b.name).includes(search) : false;
+      if (aMatches && !bMatches) return -1;
+      if (!aMatches && bMatches) return 1;
+
+      // Highlighted persons second
+      const aHighlighted = effectiveHighlightedPersons.includes(a.id);
+      const bHighlighted = effectiveHighlightedPersons.includes(b.id);
+      if (aHighlighted && !bHighlighted) return -1;
+      if (!aHighlighted && bHighlighted) return 1;
+
+      // Then apply sort mode
+      if (sortMode === 'defenses-desc') {
+        const aCount = defenseCountByPerson.get(normalizeName(a.name)) || 0;
+        const bCount = defenseCountByPerson.get(normalizeName(b.name)) || 0;
+        if (aCount !== bCount) return bCount - aCount; // Descending
+      }
+
+      // Finally alphabetical
+      return a.name.localeCompare(b.name);
+    };
+
     if (!isMultiRoster) {
-      // Single roster: simple sort with highlights first
-      return [...availabilities].sort((a, b) => {
-        const aMatches = search ? normalizeName(a.name).includes(search) : false;
-        const bMatches = search ? normalizeName(b.name).includes(search) : false;
-        if (aMatches && !bMatches) return -1;
-        if (!aMatches && bMatches) return 1;
-
-        const aHighlighted = effectiveHighlightedPersons.includes(a.id);
-        const bHighlighted = effectiveHighlightedPersons.includes(b.id);
-
-        if (aHighlighted && !bHighlighted) return -1;
-        if (!aHighlighted && bHighlighted) return 1;
-
-        return a.name.localeCompare(b.name);
-      });
+      // Single roster: filter by role, then sort
+      let filtered = availabilities;
+      if (roleFilter !== 'all') {
+        filtered = availabilities.filter(p => p.role === roleFilter);
+      }
+      return [...filtered].sort(sortPeople);
     }
 
     // Multi-roster: merge participants and sort by overlap count
@@ -590,6 +666,9 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
     // Count how many rosters each person appears in
     rosters.forEach(roster => {
       roster.availabilities.forEach(person => {
+        // Apply role filter
+        if (roleFilter !== 'all' && person.role !== roleFilter) return;
+
         const existing = personMap.get(person.name);
         if (existing) {
           existing.rosterCount += 1;
@@ -602,28 +681,19 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
     // Convert to array and sort
     return Array.from(personMap.values())
       .sort((a, b) => {
-        const aMatches = search ? normalizeName(a.person.name).includes(search) : false;
-        const bMatches = search ? normalizeName(b.person.name).includes(search) : false;
-        if (aMatches && !bMatches) return -1;
-        if (!aMatches && bMatches) return 1;
-
-        // Highlighted persons first
-        const aHighlighted = effectiveHighlightedPersons.includes(a.person.id);
-        const bHighlighted = effectiveHighlightedPersons.includes(b.person.id);
-
-        if (aHighlighted && !bHighlighted) return -1;
-        if (!aHighlighted && bHighlighted) return 1;
+        // First use standard sort
+        const baseSort = sortPeople(a.person, b.person);
+        if (baseSort !== 0) return baseSort;
 
         // Then by roster count (people in more rosters first - they're the constraints)
         if (a.rosterCount !== b.rosterCount) {
           return b.rosterCount - a.rosterCount;
         }
 
-        // Finally alphabetically
-        return a.person.name.localeCompare(b.person.name);
+        return 0;
       })
       .map(item => item.person);
-  }, [availabilities, effectiveHighlightedPersons, normalizedParticipantSearch, rosters]);
+  }, [availabilities, effectiveHighlightedPersons, normalizedParticipantSearch, rosters, sortMode, roleFilter, defenseCountByPerson]);
 
   const columnCount = days.length + 1;
   const shouldVirtualize = sortedAvailabilities.length > 40;
@@ -713,9 +783,10 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
     const personIndex = sortedAvailabilities.findIndex(person => person.id === firstPersonId);
     if (personIndex === -1) return;
 
+    const headerHeight = getHeaderHeight();
     const targetTop = personIndex * rowHeight;
     container.scrollTo({
-      top: Math.max(0, targetTop - rowHeight),
+      top: Math.max(0, targetTop - headerHeight),
       behavior: 'smooth',
     });
   }, [effectiveHighlightedPersons, rowHeight, shouldVirtualize, sortedAvailabilities]);
@@ -780,11 +851,11 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
     <div
       ref={scrollContainerRef}
       className="relative w-full h-full overflow-auto"
-      style={{ contain: 'layout paint' }}
+      style={{ contain: 'layout paint', scrollPaddingTop: `${getHeaderHeight()}px` }}
     >
       <div className="pointer-events-none absolute top-0 left-0 right-0 h-8 bg-gray-50 z-20" />
       <table className="border-collapse" style={{ minWidth: '100%' }}>
-        <thead className="sticky top-0 z-30">
+        <thead ref={theadRef} className="sticky top-0 z-30">
           <tr className="bg-gray-50">
             <th className="border pt-4 pb-2 px-2 sm:pt-5 sm:pb-3 sm:px-3 text-left text-sm sm:text-xl font-semibold text-gray-700 sticky left-0 bg-gray-50 z-40 w-[300px] shadow-sm">
               <div className="flex flex-col gap-1">
@@ -811,6 +882,119 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                       </button>
                     )}
                   </div>
+                  {/* Filter dropdown */}
+                  <div className="relative" ref={filterMenuRef}>
+                    <button
+                      onClick={() => setFilterMenuOpen(v => !v)}
+                      className={clsx(
+                        "h-9 px-2 flex items-center gap-1.5 text-xs border rounded-md transition-colors",
+                        filterMenuOpen || roleFilter !== 'all' || sortMode !== 'alphabetical'
+                          ? "border-blue-400 bg-blue-50 text-blue-700"
+                          : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+                      )}
+                      aria-label="Filter and sort options"
+                    >
+                      <Filter className="h-3.5 w-3.5" />
+                      <span>Filter</span>
+                      {(roleFilter !== 'all' || sortMode !== 'alphabetical') && (
+                        <span className="ml-0.5 px-1.5 py-0.5 text-[10px] font-medium bg-blue-500 text-white rounded-full">
+                          {(roleFilter !== 'all' ? 1 : 0) + (sortMode !== 'alphabetical' ? 1 : 0)}
+                        </span>
+                      )}
+                    </button>
+                    {filterMenuOpen && (
+                      <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                        <div className="p-3 border-b border-gray-100">
+                          <div className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+                            <ArrowUpDown className="h-3 w-3" />
+                            Sort Order
+                          </div>
+                          <div className="space-y-1">
+                            <label className="flex items-center gap-2 cursor-pointer text-xs text-gray-600 hover:text-gray-900">
+                              <input
+                                type="radio"
+                                name="sortMode"
+                                checked={sortMode === 'alphabetical'}
+                                onChange={() => setSortMode('alphabetical')}
+                                className="h-3.5 w-3.5 text-blue-600"
+                              />
+                              Alphabetical (A-Z)
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer text-xs text-gray-600 hover:text-gray-900">
+                              <input
+                                type="radio"
+                                name="sortMode"
+                                checked={sortMode === 'defenses-desc'}
+                                onChange={() => setSortMode('defenses-desc')}
+                                className="h-3.5 w-3.5 text-blue-600"
+                              />
+                              Most Defenses First
+                            </label>
+                          </div>
+                        </div>
+                        <div className="p-3">
+                          <div className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+                            <Filter className="h-3 w-3" />
+                            Show Participants
+                          </div>
+                          <div className="space-y-1">
+                            {([
+                              { value: 'all', label: 'All Participants' },
+                              { value: 'student', label: 'Students' },
+                              { value: 'supervisor', label: 'Supervisors' },
+                              { value: 'assessor', label: 'Assessors' },
+                              { value: 'mentor', label: 'Mentors' },
+                            ] as const).map(({ value, label }) => (
+                              <label key={value} className="flex items-center gap-2 cursor-pointer text-xs text-gray-600 hover:text-gray-900">
+                                <input
+                                  type="radio"
+                                  name="roleFilter"
+                                  checked={roleFilter === value}
+                                  onChange={() => setRoleFilter(value)}
+                                  className="h-3.5 w-3.5 text-blue-600"
+                                />
+                                {label}
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="px-3 pb-3">
+                          <button
+                            onClick={() => {
+                              setSortMode('alphabetical');
+                              setRoleFilter('all');
+                            }}
+                            className="w-full px-3 py-1.5 text-xs text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+                          >
+                            Reset filters
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {bottleneckParticipants.length > 0 && (
+                    <button
+                      onClick={() => {
+                        if (bottleneckHighlightedIds.length > 0) {
+                          // Toggle off
+                          setBottleneckHighlightedIds([]);
+                        } else {
+                          // Toggle on - highlight all bottleneck participants
+                          setBottleneckHighlightedIds(bottleneckParticipants.map(p => p.id));
+                        }
+                      }}
+                      className={clsx(
+                        "flex items-center gap-1.5 ml-2 px-2 py-1 rounded-md transition-colors",
+                        bottleneckHighlightedIds.length > 0
+                          ? "bg-red-100 border border-red-300"
+                          : "hover:bg-red-50"
+                      )}
+                      title="Click to highlight participants with insufficient availability"
+                    >
+                      <span className="text-lg font-bold text-red-500">{bottleneckParticipants.length}</span>
+                      <AlertCircle className="h-5 w-5 text-red-500" />
+                    </button>
+                  )}
                   {availabilityRequests.length > 0 && (
                     <div className="relative ml-auto">
                       <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-md">
@@ -947,6 +1131,35 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                               );
                             })}
                           </div>
+                          {((onClearDeniedRequests && availabilityRequests.some(r => r.status === 'denied')) ||
+                            (onClearFulfilledRequests && availabilityRequests.some(r => r.status === 'fulfilled'))) && (
+                            <div className="sticky bottom-0 bg-gray-50 px-3 py-2 border-t border-gray-100 flex gap-2">
+                              {onClearFulfilledRequests && availabilityRequests.some(r => r.status === 'fulfilled') && (
+                                <button
+                                  onClick={() => {
+                                    onClearFulfilledRequests();
+                                    setRequestHighlightedIds([]);
+                                    setRequestHighlightedSlots(new Set());
+                                  }}
+                                  className="flex-1 px-2 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                                >
+                                  Clear fulfilled
+                                </button>
+                              )}
+                              {onClearDeniedRequests && availabilityRequests.some(r => r.status === 'denied') && (
+                                <button
+                                  onClick={() => {
+                                    onClearDeniedRequests();
+                                    setRequestHighlightedIds([]);
+                                    setRequestHighlightedSlots(new Set());
+                                  }}
+                                  className="flex-1 px-2 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                                >
+                                  Clear denied
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -1015,6 +1228,12 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
             const nameCellPadding = isGapRow ? 'pt-2 pb-7 sm:pt-3 sm:pb-8' : 'py-2 sm:py-3';
             const slotCellPadding = isGapRow ? 'pt-1.5 pb-6 sm:pt-2 sm:pb-7' : 'py-1.5 sm:py-2';
             const showConflictBadge = personHasVisibleConflicts(person) && (requiredCount > 0 || scheduledCount > 0);
+            // Check for bottleneck warning (insufficient available slots)
+            const bottleneckInfo = bottleneckWarnings?.get(person.name) || bottleneckWarnings?.get(normalizedName);
+            const hasBottleneck = bottleneckInfo && bottleneckInfo.deficit > 0;
+            // Check if highlighted due to bottleneck (red) vs other reasons (blue)
+            const isBottleneckHighlighted = bottleneckHighlightedIds.includes(person.id);
+            const highlightColor = isBottleneckHighlighted ? 'bg-red-50' : 'bg-blue-50';
             return (
               <Fragment key={person.id}>
                 <tr
@@ -1027,15 +1246,16 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
               }}
               className={clsx(
                 'transition-colors',
-                (isHighlighted || isSearchMatch) && 'bg-blue-50',
+                (isHighlighted || isSearchMatch) && highlightColor,
                 isGapRow && 'border-b-2 border-b-gray-800'
               )}
             >
               <td
                 className={clsx(
-                  'border px-2 sm:px-3 sticky left-0 z-20 cursor-pointer hover:bg-blue-50 shadow-sm',
+                  'border px-2 sm:px-3 sticky left-0 z-20 cursor-pointer shadow-sm',
+                  isBottleneckHighlighted ? 'hover:bg-red-100' : 'hover:bg-blue-50',
                   nameCellPadding,
-                  (isHighlighted || isSearchMatch) ? 'bg-blue-50' : 'bg-white'
+                  (isHighlighted || isSearchMatch) ? highlightColor : 'bg-white'
                 )}
                 onClick={() => onPersonClick?.(person.id)}
               >
@@ -1048,6 +1268,11 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                   </div>
                   {showConflictBadge && (
                     <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-400 flex-shrink-0 -mt-5" />
+                  )}
+                  {hasBottleneck && !showConflictBadge && (
+                    <span title={`Insufficient availability: needs ${bottleneckInfo!.deficit} more slot(s). ${bottleneckInfo!.suggestion}`}>
+                      <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500 flex-shrink-0 -mt-5" />
+                    </span>
                   )}
                   {showWorkloadBar && (
                     <div className="flex items-center gap-1 -mt-5">

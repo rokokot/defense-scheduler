@@ -27,6 +27,22 @@ class SolveOptions(BaseModel):
     two_phase_adjacency: Optional[bool] = None  # Default True when adjacency enabled
 
 
+class AvailabilityOverride(BaseModel):
+    """Override a person's availability for a specific time slot."""
+    name: str = Field(..., description="Person name")
+    day: str = Field(..., description="Date string (e.g., '2025-01-20')")
+    start_time: str = Field(..., description="Start time (e.g., '09:00')")
+    end_time: str = Field(..., description="End time (e.g., '10:00')")
+    status: str = Field("available", description="'available' to remove unavailability, 'unavailable' to add")
+
+
+class FixedAssignment(BaseModel):
+    """A defense assignment to lock in place during re-solve."""
+    defense_id: int = Field(..., description="Defense index (0-based)")
+    slot_index: int = Field(..., description="Timeslot index")
+    room_name: str = Field(..., description="Room name (resolved to index by solver)")
+
+
 class SolveRequest(BaseModel):
     model_config = ConfigDict(extra="allow")
     data: ScheduleData
@@ -39,6 +55,16 @@ class SolveRequest(BaseModel):
     stream: Optional[bool] = False
     solver_config_yaml: Optional[str] = None
     solver_config: Optional[Dict[str, Any]] = None
+    enabled_room_ids: Optional[List[str]] = None  # Override which rooms are enabled
+    availability_overrides: Optional[List[AvailabilityOverride]] = None  # Override person availability
+    must_fix_defenses: Optional[bool] = Field(
+        default=False,
+        description="Lock previously scheduled defenses in place during re-solve"
+    )
+    fixed_assignments: Optional[List["FixedAssignment"]] = Field(
+        default=None,
+        description="Defenses to lock in place when must_fix_defenses=True"
+    )
 
 
 class SolveResult(BaseModel):

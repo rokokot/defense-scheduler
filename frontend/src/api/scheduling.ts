@@ -15,6 +15,20 @@ import {
 } from '../types/scheduling';
 import { API_BASE_URL } from '../lib/apiConfig';
 
+export interface AvailabilityOverride {
+  name: string;       // Person name
+  day: string;        // Date string (e.g., '2025-01-20')
+  start_time: string; // Start time (e.g., '09:00')
+  end_time: string;   // End time (e.g., '10:00')
+  status: 'available' | 'unavailable';  // 'available' removes unavailability
+}
+
+export interface FixedAssignment {
+  defense_id: number;   // Defense index (0-based)
+  slot_index: number;   // Timeslot index
+  room_name: string;    // Room name (resolved to index by backend)
+}
+
 interface SolveOptions {
   timeout?: number;
   solver?: 'ortools' | 'exact' | 'z3';
@@ -27,6 +41,10 @@ interface SolveOptions {
   streamMinSolutions?: number;
   solverWorkers?: number;
   solverConfigYaml?: string;
+  enabledRoomIds?: string[];
+  availabilityOverrides?: AvailabilityOverride[];
+  mustFixDefenses?: boolean;  // Lock previously scheduled defenses in place
+  fixedAssignments?: FixedAssignment[];  // Assignments to lock when mustFixDefenses=true
 }
 
 interface SolveCallbacks {
@@ -86,6 +104,18 @@ export class SchedulingAPI {
     }
     if (options?.stream !== undefined) {
       payload.stream = options.stream;
+    }
+    if (options?.enabledRoomIds !== undefined) {
+      payload.enabled_room_ids = options.enabledRoomIds;
+    }
+    if (options?.availabilityOverrides !== undefined && options.availabilityOverrides.length > 0) {
+      payload.availability_overrides = options.availabilityOverrides;
+    }
+    if (options?.mustFixDefenses !== undefined) {
+      payload.must_fix_defenses = options.mustFixDefenses;
+    }
+    if (options?.fixedAssignments !== undefined && options.fixedAssignments.length > 0) {
+      payload.fixed_assignments = options.fixedAssignments;
     }
     const solverConfigYaml = buildSolverConfigYaml(options);
     if (solverConfigYaml) {
@@ -445,6 +475,305 @@ export class SchedulingAPI {
     }
 
     return response.json();
+  }
+
+  /**
+   * Get the global room pool (available room names).
+   */
+  async getRoomPool(): Promise<string[]> {
+    const response = await fetch(`${this.baseUrl}/api/room-pool`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch room pool: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.rooms || [];
+  }
+
+  /**
+   * Add a room to a dataset's rooms.json.
+   */
+  async addRoom(datasetId: string, name: string): Promise<{ id: string; name: string; enabled: boolean }> {
+    const response = await fetch(`${this.baseUrl}/api/datasets/${encodeURIComponent(datasetId)}/rooms`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, enabled: true }),
+    });
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Failed to add room: ${response.statusText} - ${detail}`);
+    }
+    return response.json();
+  }
+
+  /**
+   * Toggle a room's enabled status directly in rooms.json.
+   */
+  async toggleRoomInDataset(
+    datasetId: string,
+    roomName: string,
+    enabled: boolean
+  ): Promise<{ name: string; enabled: boolean }> {
+    const response = await fetch(
+      `${this.baseUrl}/api/datasets/${encodeURIComponent(datasetId)}/rooms/${encodeURIComponent(roomName)}/toggle`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled }),
+      }
+    );
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Failed to toggle room: ${response.statusText} - ${detail}`);
+    }
+    return response.json();
+  }
+
+  /**
+   * Remove a room from a dataset's rooms.json (used to unstage pool room repairs).
+   */
+  async removeRoomFromDataset(
+    datasetId: string,
+    roomName: string
+  ): Promise<{ removed: string }> {
+    const response = await fetch(
+      `${this.baseUrl}/api/datasets/${encodeURIComponent(datasetId)}/rooms/${encodeURIComponent(roomName)}`,
+      { method: 'DELETE' }
+    );
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Failed to remove room: ${response.statusText} - ${detail}`);
+    }
+    return response.json();
+  }
+
+  /**
+   * Remove an unavailability entry from the dataset's unavailabilities.csv (staging a person repair).
+   */
+  async removeUnavailability(
+    datasetId: string,
+    name: string,
+    day: string,
+    startTime: string
+  ): Promise<{ removed: boolean }> {
+    const response = await fetch(
+      `${this.baseUrl}/api/datasets/${encodeURIComponent(datasetId)}/unavailability`,
+      {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, day, start_time: startTime }),
+      }
+    );
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Failed to remove unavailability: ${response.statusText} - ${detail}`);
+    }
+    return response.json();
+  }
+
+  /**
+   * Add an unavailability entry back to the dataset's unavailabilities.csv (reverting a staged person repair).
+   */
+  async addUnavailability(
+    datasetId: string,
+    name: string,
+    day: string,
+    startTime: string,
+    endTime: string
+  ): Promise<{ added: boolean }> {
+    const response = await fetch(
+      `${this.baseUrl}/api/datasets/${encodeURIComponent(datasetId)}/unavailability`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, type: 'person', day, start_time: startTime, end_time: endTime, status: 'unavailable' }),
+      }
+    );
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Failed to add unavailability: ${response.statusText} - ${detail}`);
+    }
+    return response.json();
+  }
+
+  /**
+   * Save active repair strings to the dataset's metadata file (active_repairs.json).
+   * Original dataset files remain untouched — solver applies repairs in-memory.
+   * Optionally includes display metadata so the repair card can be restored on refresh.
+   */
+  async saveRepairs(
+    datasetId: string,
+    repairStrings: string[],
+    display?: {
+      availabilityOverrides: Array<{ name: string; day: string; startTime: string; endTime: string }>;
+      enabledRooms: Array<{ id: string; name: string }>;
+    }
+  ): Promise<{ count: number }> {
+    const response = await fetch(
+      `${this.baseUrl}/api/datasets/${encodeURIComponent(datasetId)}/repairs`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repair_strings: repairStrings, display }),
+      }
+    );
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Failed to save repairs: ${response.statusText} - ${detail}`);
+    }
+    return response.json();
+  }
+
+  /**
+   * Get current active repairs for a dataset (including display metadata for the repair card).
+   */
+  async getRepairs(
+    datasetId: string
+  ): Promise<{
+    repairs: string[];
+    applied_at?: string;
+    display?: {
+      availabilityOverrides: Array<{ name: string; day: string; startTime: string; endTime: string }>;
+      enabledRooms: Array<{ id: string; name: string }>;
+    } | null;
+  }> {
+    const response = await fetch(
+      `${this.baseUrl}/api/datasets/${encodeURIComponent(datasetId)}/repairs`
+    );
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Failed to get repairs: ${response.statusText} - ${detail}`);
+    }
+    return response.json();
+  }
+
+  /**
+   * Clear all active repairs for a dataset (deletes active_repairs.json).
+   */
+  async clearRepairs(
+    datasetId: string
+  ): Promise<{ cleared: boolean }> {
+    const response = await fetch(
+      `${this.baseUrl}/api/datasets/${encodeURIComponent(datasetId)}/repairs`,
+      { method: 'DELETE' }
+    );
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Failed to clear repairs: ${response.statusText} - ${detail}`);
+    }
+    return response.json();
+  }
+
+  /**
+   * Apply repairs to dataset files and run a full two-phase solve.
+   *
+   * This mirrors the CLI driver workflow:
+   * 1. Backend copies dataset and applies repair strings to input files
+   * 2. Runs solver with repaired data (two-phase: scheduling → adjacency)
+   * 3. Streams results via SSE
+   *
+   * Returns the final SolveResult (with repairedDatasetId) once the solver completes.
+   */
+  async applyRepairsAndResolve(
+    params: {
+      datasetId: string;
+      repairStrings: string[];
+      plannedDefenseIds: number[];
+      mustFixDefenses?: boolean;
+      solverOutputFolder?: string | null;
+      timeout?: number;
+    },
+    callbacks?: SolveCallbacks
+  ): Promise<SolveResult & { repairedDatasetId?: string }> {
+    // 1. POST to apply-repairs-and-resolve → get run_id
+    const response = await fetch(
+      `${this.baseUrl}/api/explanations/apply-repairs-and-resolve`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dataset_id: params.datasetId,
+          repair_strings: params.repairStrings,
+          planned_defense_ids: params.plannedDefenseIds,
+          must_fix_defenses: params.mustFixDefenses ?? true,
+          solver_output_folder: params.solverOutputFolder ?? null,
+          timeout: params.timeout ?? 180,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(`Apply-repairs-and-resolve failed: ${response.statusText} - ${detail}`);
+    }
+
+    const data = await response.json();
+    const runId: string = data.run_id;
+    const repairedDatasetId: string = data.repaired_dataset_id;
+
+    if (callbacks?.onRunId) {
+      callbacks.onRunId(runId);
+    }
+
+    // 2. Stream results via SSE (reuse existing infrastructure)
+    let finalResult: (SolveResult & { repairedDatasetId?: string }) | null = null;
+    const streamCallbacks: SolveCallbacks = {
+      ...callbacks,
+      onFinal: (result: SolveResult) => {
+        finalResult = Object.assign(result, { repairedDatasetId });
+        callbacks?.onFinal?.(result);
+      },
+      onStreamStatus: (status: 'open' | 'closed' | 'error') => {
+        callbacks?.onStreamStatus?.(status);
+      },
+    };
+
+    const closeStream = this.openSolverStream(runId, streamCallbacks);
+    const timeout = params.timeout ?? 180;
+    const maxWait = timeout * 1000 + 60000;
+    const startTime = Date.now();
+    let delay = 250;
+    let succeededWithoutResult = 0;
+
+    try {
+      while (Date.now() - startTime <= maxWait) {
+        if (finalResult) {
+          return finalResult;
+        }
+
+        let status: SolverRunStatus;
+        try {
+          status = await this.getSolverRun(runId);
+        } catch {
+          await this.sleep(delay);
+          if (finalResult) return finalResult;
+          delay = Math.min(delay * 1.5, 1500);
+          continue;
+        }
+
+        if (status.status === 'succeeded') {
+          if (status.result) return Object.assign(status.result, { repairedDatasetId });
+          succeededWithoutResult++;
+          if (succeededWithoutResult > 5) {
+            throw new Error('Solver succeeded but result not available');
+          }
+          await this.sleep(100);
+          continue;
+        }
+        if (status.status === 'failed') {
+          throw new Error(status.error || 'Solver run failed');
+        }
+        if (status.status === 'cancelled') {
+          throw new Error('Solver run cancelled');
+        }
+
+        await this.sleep(delay);
+        if (finalResult) return finalResult;
+        delay = Math.min(delay * 1.5, 1500);
+      }
+      throw new Error('Solver run timed out');
+    } finally {
+      closeStream?.();
+    }
   }
 }
 

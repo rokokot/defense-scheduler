@@ -23,7 +23,7 @@ import {
 interface UseResolutionStateProps {
   blocking: DefenseBlocking[];
   relaxCandidates: RelaxCandidate[];
-  timeslotInfo: TimeslotInfo;
+  timeslotInfo: TimeslotInfo | undefined;
   initialState?: ResolutionStateSnapshot;
   onStateChange?: (snapshot: ResolutionStateSnapshot) => void;
 }
@@ -71,14 +71,16 @@ export function useResolutionState({
     [stagedChanges]
   );
 
-  const stageRelaxation = useCallback((relaxation: RelaxationAction) => {
+  const stageRelaxation = useCallback((relaxation: RelaxationAction, selectedPoolRoom?: string) => {
     setStagedChanges(prev => {
       if (prev.some(s => s.relaxation.id === relaxation.id)) return prev;
       const newStaged: StagedRelaxation = {
         id: `staged-${Date.now()}-${relaxation.id}`,
         relaxation,
-        status: relaxation.type === 'person_availability' ? 'pending' : 'confirmed',
+        // Auto-confirm all staged relaxations for better UX - users can still unconfirm if needed
+        status: 'confirmed',
         stagedAt: Date.now(),
+        selectedPoolRoom,
       };
       return [...prev, newStaged];
     });

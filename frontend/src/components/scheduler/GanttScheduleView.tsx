@@ -40,7 +40,7 @@ const DEFAULT_ROOMS = ['Room A', 'Room B'];
 export const GanttScheduleView = memo(function GanttScheduleView({
   events,
   days,
-  dayLabels: _dayLabels,
+  dayLabels,
   timeSlots,
   colorScheme,
   selectedEvent,
@@ -57,6 +57,9 @@ export const GanttScheduleView = memo(function GanttScheduleView({
   dragHighlights,
   onSlotClick,
 }: GanttScheduleViewProps) {
+  // Reserved for future day label customization
+  void dayLabels;
+
   const [collapsedDays, setCollapsedDays] = useState<Set<string>>(new Set());
   const [focusedRoom, setFocusedRoom] = useState<string | null>(null);
 

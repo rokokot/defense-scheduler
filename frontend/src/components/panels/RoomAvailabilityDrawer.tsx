@@ -20,6 +20,8 @@ export interface RoomAvailabilityDrawerProps {
   showRoomToggles?: boolean;
   programmeColors?: Record<string, string>;
   highlightedRoomId?: string | null;
+  /** Global pool of available room names for search suggestions */
+  roomPool?: string[];
 }
 
 export interface RoomAvailabilityRoom {
@@ -79,9 +81,13 @@ export const RoomAvailabilityDrawer = memo(function RoomAvailabilityDrawer({
   showRoomToggles = false,
   programmeColors,
   highlightedRoomId,
+  roomPool,
 }: RoomAvailabilityDrawerProps) {
   const [editingSlot, setEditingSlot] = useState<{ roomId: string; day: string; slot: string } | null>(null);
   const [roomSearch, setRoomSearch] = useState('');
+  const [showPoolDropdown, setShowPoolDropdown] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const poolDropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
   useEffect(() => {
@@ -141,13 +147,40 @@ export const RoomAvailabilityDrawer = memo(function RoomAvailabilityDrawer({
   const filteredRooms = normalizedRoomSearch
     ? rooms.filter(room => room.label.toLowerCase().includes(normalizedRoomSearch))
     : rooms;
+  const existingRoomNames = new Set(rooms.map(r => r.label.toLowerCase()));
   const hasExactRoomMatch = normalizedRoomSearch.length > 0
     && rooms.some(room => room.label.toLowerCase() === normalizedRoomSearch);
   const canAddRoom = Boolean(onRoomAdd && normalizedRoomSearch && !hasExactRoomMatch);
+
+  // Pool room suggestions: rooms from the global pool not already in the dataset
+  const poolSuggestions = (roomPool ?? []).filter(name => {
+    const lower = name.toLowerCase();
+    return !existingRoomNames.has(lower) && lower.includes(normalizedRoomSearch);
+  });
+  const showSuggestions = showPoolDropdown && normalizedRoomSearch.length > 0 && poolSuggestions.length > 0;
+
+  // Close pool dropdown on click outside
+  useEffect(() => {
+    if (!showPoolDropdown) return;
+    const handleClick = (e: globalThis.MouseEvent) => {
+      if (poolDropdownRef.current?.contains(e.target as Node)) return;
+      if (searchInputRef.current?.contains(e.target as Node)) return;
+      setShowPoolDropdown(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showPoolDropdown]);
+
   const handleAddRoom = () => {
     if (!canAddRoom) return;
     onRoomAdd?.(roomSearch.trim());
     setRoomSearch('');
+    setShowPoolDropdown(false);
+  };
+  const handleSelectPoolRoom = (name: string) => {
+    onRoomAdd?.(name);
+    setRoomSearch('');
+    setShowPoolDropdown(false);
   };
 
   return (
@@ -171,19 +204,32 @@ export const RoomAvailabilityDrawer = memo(function RoomAvailabilityDrawer({
                   <span className="text-[1.15rem] font-semibold text-gray-700">Rooms</span>
                   <div className="relative w-[70%]">
                     <input
+                      ref={searchInputRef}
                       type="text"
                       value={roomSearch}
-                      onChange={(event) => setRoomSearch(event.target.value)}
+                      onChange={(event) => {
+                        setRoomSearch(event.target.value);
+                        setShowPoolDropdown(true);
+                      }}
+                      onFocus={() => setShowPoolDropdown(true)}
                       onKeyDown={(event) => {
                         if (event.key === 'Enter') {
                           event.preventDefault();
-                          handleAddRoom();
+                          // If there's exactly one pool suggestion, select it
+                          if (showSuggestions && poolSuggestions.length === 1) {
+                            handleSelectPoolRoom(poolSuggestions[0]);
+                          } else {
+                            handleAddRoom();
+                          }
+                        }
+                        if (event.key === 'Escape') {
+                          setShowPoolDropdown(false);
                         }
                       }}
                       placeholder="Search or add..."
                       className="w-full px-2 py-1 pr-14 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-transparent bg-white"
                     />
-                    {canAddRoom && (
+                    {canAddRoom && !showSuggestions && (
                       <button
                         type="button"
                         onClick={handleAddRoom}
@@ -191,6 +237,40 @@ export const RoomAvailabilityDrawer = memo(function RoomAvailabilityDrawer({
                       >
                         Add
                       </button>
+                    )}
+                    {showSuggestions && (
+                      <div
+                        ref={poolDropdownRef}
+                        className="absolute left-0 top-full mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg z-[60] max-h-48 overflow-y-auto"
+                      >
+                        <div className="px-2 py-1 text-[10px] font-medium text-gray-400 uppercase tracking-wide border-b border-gray-100">
+                          Room pool
+                        </div>
+                        {poolSuggestions.map(name => (
+                          <button
+                            key={name}
+                            type="button"
+                            className="w-full text-left px-2 py-1.5 text-xs text-gray-800 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => handleSelectPoolRoom(name)}
+                          >
+                            {name}
+                          </button>
+                        ))}
+                        {canAddRoom && (
+                          <>
+                            <div className="border-t border-gray-100" />
+                            <button
+                              type="button"
+                              className="w-full text-left px-2 py-1.5 text-xs text-blue-600 hover:bg-blue-50 transition-colors font-medium"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={handleAddRoom}
+                            >
+                              + Add "{roomSearch.trim()}"
+                            </button>
+                          </>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

@@ -94,6 +94,7 @@ export interface DetailPanelProps {
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
   onCardClick?: (event: DefenceEvent) => void;
+  onEditClick?: (event: DefenceEvent) => void;
   onAddNew?: () => void;
   colorScheme?: Record<string, string>;
   highlightedEventId?: string;
@@ -118,6 +119,7 @@ export function DetailPanel({
   searchQuery = '',
   onSearchChange,
   onCardClick,
+  onEditClick,
   onAddNew,
   colorScheme = {},
   highlightedEventId,
@@ -175,6 +177,7 @@ export function DetailPanel({
           searchQuery={searchQuery}
           onSearchChange={onSearchChange || (() => {})}
           onCardClick={onCardClick || (() => {})}
+          onEditClick={onEditClick}
           onAddNew={onAddNew || (() => {})}
           onClose={onClose}
           onDelete={onDelete ? (event) => onDelete(event.id) : undefined}

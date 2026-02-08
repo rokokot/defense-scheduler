@@ -1,0 +1,67 @@
+event_id,student,supervisor,co_supervisor,assessors,mentors,programme
+defence-1,Hermons Jules,Katrien Verbert,Gert Vande Broek,Adalberto Simeone|Vincent Vercruyssen,Martijn Millecamp,CW
+defence-2,Stefanidis Vasikis Konstantinos,Frank Piessens,Claudia Diaz Martinez,Gunes Acar|Alexander van den Berghe,Frank Piessens|Gunes Acar|Lennart Oldenburg|Dennis Jackson,CW
+defence-3,Versavel Jef,Tom Schrijvers,,Paolo Morettin|Matthias van der Hallen,Cheng Shao|Georgios Karachalias,CW
+defence-4,Vandenhaute Kasper,Philip Dutré,,Robin De Croon|Jessa Bekker,Roald Frederickx,TI
+defence-5,Aktag Berkan,Katrien Verbert,,Adalberto Simeone|Jessa Bekker,Martijn Millecamp,TI
+defence-6,De Roover Jonas,Frank Piessens,,Jo Van Bulck|Alexander van den Berghe,Jo Van Bulck,CW
+defence-7,Jonckheere Michiel,Marc Denecker,Gerda Janssens,Pierre Carbonnelle|Tom Holvoet,Pierre Carbonnelle|Dorde Markovic,CW
+defence-8,Engels Lucas,Katrien Verbert,,Katrien Laenen|Jessa Bekker,Martijn Millecamp,CW
+defence-9,Meijer Florent Nander,Frank Piessens,,Jo Van Bulck|Alexander van den Berghe,Jo Van Bulck,CW
+defence-10,Peeters Robrecht,Tom Holvoet,,Jan Vermaelen|Dimitri Van Landuyt,Jan Vermaelen,CW
+defence-11,Ekici Kenan,Katrien Verbert,,Martijn Millecamp|Tias Guns,Jeroen Ooge,TI
+defence-12,Nuyts Loren,Jesse Davis,Benedicte Vanwanseele,Arne De Branbandere|Tom Schrijvers,Arne De Branbandere,CW
+defence-13,Verboven Arnout,Hendrik Blockeel,Wannes Meert,Timothy Van Bremen|Nyi Nyi Htun,Timothy Van Bremen,CW
+defence-14,Gantois Stefanie,Katrien Verbert,Peter Van Puyvelde,Thierry Deruyttere|Jan Tobias Mühlberg,Jessica Lizeth Dominguez Alfaro|Robin De Croon,CW
+defence-15,Clijmans Jeroen,Jesse Davis,,Wen-Chi Yang|Matthias van der Hallen,Maaike Van Roy,CW
+defence-16,Martens Tom,Katrien Verbert,,Damien Sileo|Bart De Decker,Oscar Luis Alvarado Rodriguez,TI
+defence-17,Sijmkens Maarten,Jesse Davis,,Maaike Van Roy|Matthias van der Hallen,Maaike Van Roy,CW
+defence-18,Vandersmissen Joachim,Frank Piessens,Bart Preneel,Adrian Ranea Robles|Ansar Rafique,Frank Piessens|Adrian Ranea Robles,CW
+defence-19,Eerlingen Brent,Katrien Verbert,,Damien Sileo|Bart De Decker,Nyi Nyi Htun,TI
+defence-20,Van Hirtum Lennart,Patrick De Causmaecker,,Tias Guns|Samuel Kolb,Jens Goemaere,CW
+defence-21,Standaert Jasper,Katrien Verbert,,Martijn Millecamp|Bart Jacobs,Oscar Luis Alvarado Rodriguez,TI
+defence-22,Plomteux Seppe,Philip Dutré,,Adalberto Simeone|Angelika Kimmig,Pieterjan Bartels|Arno Coomans,CW
+defence-23,De Decker Matthias,Frank Piessens,,Job Noorman|Bart Jacobs,Job Noorman,CW
+defence-24,Maene Jaron,Marie-Francine Moens,,Matthew Blaschko|Marra Guiseppe,Mingxiao Li,TI
+defence-25,De Cremer Thibaut,Luc De Raedt,,Gavin Rens|Tom Holvoet,Gavin Rens,TI
+defence-26,Louage Robbe,Wannes Meert,Robbert Verbeke,Vincent Vercruyssen|Pedro Zuidberg,Sarah Klein|Robbert Verbeke,CW
+defence-27,Mammadzada Ulviyya,Frank Piessens,,Kobe Vrancken|Bart De Decker,Kobe Vrancken|Raoul Strackx,CW
+defence-28,Nuyts Wolf,Marie-Francine Moens,,Francisco Gutiérrez|Philip Dutré,Ruben Cartuyvels,CW
+defence-29,Ravoet Yannou,Luc De Raedt,,Gavin Rens|Thien Duc Nguyen,Gavin Rens,CW
+defence-30,Karakas Enes,Wannes Meert,Jesse Davis,Vincent Vercruyssen|Marc Denecker,Vincent Vercruyssen,TI
+defence-31,Veys Bart,Frank Piessens,Bart Preneel,Jan Tobias Mühlberg|Kim Wuyts,Jan Tobias Mühlberg|Lennert Wouters,CW
+defence-32,Ghekiere Steven,Danny Hughes,Sam Michiels,Ashok Samraj Thangarajan|Alexander van den Berghe,Fan Yang|Ashok Samraj Thangarajan,TI
+defence-33,Vandebeek Sjaan,Hendrik Blockeel,,Sebastijan Dumancic|Robin De Croon,Sebastijan Dumancic|Gust Verbruggen,CW
+defence-34,Van Damme Wout,Katrien Verbert,Vero Vandenabeele,Philip Dutré|Kim Wuyts,Maxwell Szymanski,CW
+defence-35,Bamelis Thomas,Danny Hughes,Sam Michiels,Absar-Ul-Haque Ahmar|Andreas Put,Absar-Ul-Haque Ahmar,CW
+defence-36,Bruynseraede Quinten,Hendrik Blockeel,Sebastijan Dumancic,Gust Verbruggen|Job Noorman,Sebastijan Dumancic|Gust Verbruggen,CW
+defence-37,De Doncker Nathan,Katrien Verbert,,Philip Dutré|Jessa Bekker,Nyi Nyi Htun,TI
+defence-38,Vercammen Thijs,Frank Piessens,Dominique Devriese,Thomas Van Strydonck|Kim Wuyts,Thomas Van Strydonck,CW
+defence-39,Van De Wiel Wout,Danny Hughes,Sam Michiels,Ansar Rafique|Yolande Berbers,Hassaan Janjua,CW
+defence-40,Vandersanden Matthias,Hendrik Blockeel,Sebastijan Dumancic,Gust Verbruggen|Thien Duc Nguyen,Sebastijan Dumancic|Gust Verbruggen,CW
+defence-41,Cammaerts Felix,Katrien Verbert,,Damien Sileo|Ansar Rafique,Francisco Gutiérrez,CW
+defence-42,Masselis Tibo,Luc De Raedt,,Thomas Winters|Katrien Laenen,Thomas Winters,TI
+defence-43,Koops Willem,Patrick De Causmaecker,,Tias Guns|Angelika Kimmig,Patrick De Causmaecker,CW
+defence-44,Provoost Michiel,Philip Dutré,Karel Van Oudheusden,Robin De Croon|Dimitri Van Landuyt,Karel Van Oudheusden,CW
+defence-45,Kato Shotallo,Katrien Verbert,,Francisco Gutiérrez|Gerda Janssens,Jeroen Ooge,CW
+defence-46,Pollet Lara,Luc De Raedt,,Thomas Winters|Katrien Laenen,Thomas Winters|Pieter Delobelle,CW
+defence-47,Mertens Wouter,Adalberto Simeone,Augusto Esteves,Francisco Gutiérrez|Alexander van den Berghe,Xuesong Zhang,TI
+defence-48,Coulier Joren,Luc De Raedt,Gavin Rens,Wen-Chi Yang|Matthias van der Hallen,Wen-Chi Yang,CW
+defence-49,Goovaerts Kenneth,Wannes Meert,,Jessa Bekker|Nick Vannieuwenhoven,Fredrik Vanmaele,CW
+defence-50,Guilliams Niels, Katrien Verbert,,Marie-Francine Moens|Emanuele Sansone,Oscar Luis Alvarado Rodriguez,CW
+defence-51,Joosen Stephanie,Frank Piessens,,Hans Winderix|Koen Yskout,Hans Winderix|Jan Tobias Mühlberg,CW
+defence-52,Verheyden Lotte,Marie-Francine Moens,,Miryam de Lhoneux|Pedro Zuidberg,Liesbeth Allein|Victor Milewski,CW
+defence-53,Valcke Emile,Luc De Raedt,Jesse Davis,Mohit Kumar Kumar|Tom Holvoet,Clément Gautrais|Mohit Kumar Kumar,CW
+defence-54,Jongers Joren,Wannes Meert,Patrick De Causmaecker,Samuel Kolb|Marc Denecker,Chao Li,CW
+defence-55,Stadler Tobias,Jesse Davis,,Kilian Hendrickx|Bert Lagaisse,Kilian Hendrickx,CW
+defence-56,Van der Linden Wout,Danny Hughes,Sam Michiels,Stefanos Peros|Kim Wuyts,Stefanos Peros,TI
+defence-57,Cornille Tobias,Luc De Raedt,Jessa Bekker,Angelika Kimmig|Nyi Nyi Htun,Jessa Bekker|Vincent Pagel|Fengna Wang,TI
+defence-58,Jankeleevitch Nicolas,Hendrik Blockeel,,Jonas Soenen|Matthias van der Hallen,Jonas Soenen,TI
+defence-59,Yang Po-Kai,Katrien Verbert,,Martijn Millecamp|Bart Jacobs,Oscar Luis Alvarado Rodriguez,TI
+defence-60,Krauss Ralph,Jesse Davis,,Emanuele Sansone|Tom Holvoet,Thomas Dierckx,CW
+defence-61,Gilles De Borger,Danny Hughes,Sam Michiels & Bruno Crispo,Sam Michiels|Kim Wuyts,Sam Michiels|Majid Salehi,CW
+defence-62,De Backer Tom,Jesse Davis,Wannes Meert,Vincent Vercruyssen|Koen Yskout,Frederik Mes|Wim Marynissen|Aras Yurtman,TI
+defence-63,Evenepoel Anton,Luc De Raedt,Giuseppe Marra,Robin Manhaeve|Francisco Gutiérrez,Giuseppe Marra|Robin Manhaeve,TI
+defence-64,Schellekens Ellen,Marie-Francine Moens,,Francisco Gutiérrez|Tinne Tuytelaars,Damien Sileo,CS
+defence-65,Merckx Simon,Jesse Davis,,Pieter Robberechts|Pedro Zuidberg,Pieter Robberechts|Matteo Balliu,CS
+defence-66,Bleukx Ignace,Luc De Raedt,,Gust Verbruggen|Koen Yskout,Clément Gautrais|Gust Verbruggen,CS

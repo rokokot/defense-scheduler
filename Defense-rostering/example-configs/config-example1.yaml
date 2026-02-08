@@ -1,0 +1,11 @@
+"input_data": "documented_example1"
+"number_of_defenses_in_problem": "all"
+"number_of_unavailabilities_in_problem": "all"
+
+"solver": "ortools"
+"adjacency_objective": true
+"must_plan_all_defenses" : true
+"allow_online_defenses": false
+"availability_odds": 0.75
+"online_odds": 0
+"max_rooms": 2

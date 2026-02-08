@@ -1,0 +1,16 @@
+person-id,name,role,day,time_slot,status
+student-1,Wout Piessens,student,2025-06-23,09:00,unavailable
+supervisor-1,Tom Schrijvers,supervisor,2025-06-23,10:00,unavailable
+supervisor-2,Joost Vennekens,supervisor,2025-06-23,15:00,unavailable
+supervisor-1,Tom Schrijvers,supervisor,2025-06-23,11:00,unavailable
+supervisor-1,Tom Schrijvers,supervisor,2025-06-23,12:00,unavailable
+supervisor-1,Tom Schrijvers,supervisor,2025-06-23,13:00,unavailable
+supervisor-1,Tom Schrijvers,supervisor,2025-06-23,14:00,unavailable
+supervisor-1,Tom Schrijvers,supervisor,2025-06-23,15:00,unavailable
+supervisor-3,supervisor3,supervisor,2025-06-23,10:00,unavailable
+supervisor-3,supervisor3,supervisor,2025-06-23,11:00,unavailable
+supervisor-3,supervisor3,supervisor,2025-06-23,12:00,unavailable
+supervisor-3,supervisor3,supervisor,2025-06-23,13:00,unavailable
+supervisor-3,supervisor3,supervisor,2025-06-23,14:00,unavailable
+supervisor-3,supervisor3,supervisor,2025-06-23,15:00,unavailable
+supervisor-3,supervisor3,supervisor,2025-06-23,16:00,unavailable

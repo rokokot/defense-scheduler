@@ -1,0 +1,3 @@
+student,title,supervisor,co_supervisor,assessor1,assessor2,mentor1,mentor2,mentor3,mentor4
+Truijen Thomas,Leveraging Chunked Transfer-Encoding to Improve Remote Timing Attacks,Mathy Vanhoef,,,,Tom Van Goethem,Vik Vanderlinden,,
+De Almeida Prata Bernardo,"A model that can say ""I don't know"": Uncertainty quantification in neural networks",Mathias Verbeke,,,,Laurens Devos,,,

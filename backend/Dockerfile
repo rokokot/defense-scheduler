@@ -20,8 +20,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY backend/ .
 
+# Copy Defense-rostering driver pipeline
+COPY Defense-rostering ./Defense-rostering
+
 # Create data directories
-RUN mkdir -p data/input data/output data/snapshots
+RUN mkdir -p data/input data/output data/snapshots Defense-rostering/input_data Defense-rostering/output_data
 
 # Expose port
 EXPOSE 8000

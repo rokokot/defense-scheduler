@@ -1,0 +1,11 @@
+name,day,start_time,end_time,type
+Hendrik Blockeel,2020-01-01,09:00,11:00,person
+Hendrik Blockeel,2020-01-01,13:00,17:00,person
+Stefano Viazzi,2020-01-01,09:00,10:00,person
+Stefano Viazzi,2020-01-01,11:00,14:00,person
+Stefano Viazzi,2020-01-01,16:00,17:00,person
+Wannes Meert,2020-01-01,09:00,12:00,person
+Wannes Meert,2020-01-01,14:00,17:00,person
+200C 00.01,2020-01-01,09:00,12:00,room
+200C 00.01,2020-01-01,14:00,15:00,room
+200C 00.02,2020-01-01,15:00,16:00,room

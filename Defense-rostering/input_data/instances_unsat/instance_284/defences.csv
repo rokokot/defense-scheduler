@@ -1,0 +1,12 @@
+student,title,supervisor,co_supervisor,assessor1,assessor2,mentor1,mentor2,mentor3,mentor4
+Embrechts Jonas,Monitoring of super users in a PON network and guaranteeing fairness versus other users,Bart Jacobs,,,,,,,
+Oosterbosch Arnout,From anomaly map to anomaly detection,Hendrik Blockeel,,,,Marie Schönfeld,,,
+Lampaert Marie,An AI-Driven Clinical Decision Support System for Evidence-Based Personalized Diabetes Management,Katrien Verbert,,,,Reza Samimi,,,
+Vandenbergh Ridan,Extending agda2hs with ornaments,Dominique Devriese,,,,Andreas Nuyts,,,
+Andriessen Simon,General-Relativistic Hydronamics with AMREX,Karl Meerbergen,Tjonnie Guang Feng Li,,,Frederik De Ceuster,Arthur Offermans,,
+Van Damme Arne,Exploring Boundary Encodings for Subword Tokenisation in Language Models,Miryam de Lhoneux,,,,,,,
+Bellefroid Tijs,ARM Your Code: Practical Symbolic Validation of TrustZone Programs on Cortex-M Microcontrollers,Jo Van Bulck,,,,,,,
+Verwimp Sander,From Binary Decisions to Sentences: Extending variable ordering heuristics,Luc De Raedt,,,,Annegret Seibt,Vincent Derkinderen,,
+Olson Nicholas,Behind Enemy LANS: Protecting Local Networks from Malicious Mobile Apps,Mathy Vanhoef,,,,Jeroen Robben,Angelos Beitis,,
+Mertens Yoran,Leveraging Graph Theory for Automated Generation of Missing Test Cases in Software Testing,Tom Holvoet,,,,Vishva Sri Nimantha Kariyakarawana,,,
+De Almeida Prata Bernardo,"A model that can say ""I don't know"": Uncertainty quantification in neural networks",Mathias Verbeke,,,,Laurens Devos,,,

@@ -1,0 +1,4 @@
+event_id,student,supervisor,co_supervisor,assessors,mentors,programme
+defense-1,Wout Piessens,Tom Schrijvers,Joost Vennekens,,,CS
+defense-2,student2,Tom Schrijvers,,,,CS
+defense-3,student3,Tom Schrijvers,"",,,

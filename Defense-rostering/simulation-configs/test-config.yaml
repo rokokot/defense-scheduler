@@ -1,0 +1,19 @@
+name: example
+number_of_evaluators: 30
+number_of_defenses: 20
+number_of_rooms: 5
+number_of_days: 3
+first_day: "2025-02-24"
+start_hour: 9
+end_hour: 17
+
+number_of_clusters: 5
+
+room_available_odds: 0.75
+person_available_odds: 0.75
+
+co_supervisor_odds: 0.5
+mentor1_odds: 0.9
+mentor2_odds: 0.3
+mentor3_odds: 0.1
+mentor4_odds: 0.1

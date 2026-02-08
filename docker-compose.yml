@@ -14,6 +14,7 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - DATA_DIR=/app/data
+      - DEFENSE_ROSTERING_DIR=/app/Defense-rostering
       - FRONTEND_HOSTS=${FRONTEND_HOSTS:-}
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-}
     restart: unless-stopped

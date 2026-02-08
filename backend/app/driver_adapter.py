@@ -10,6 +10,7 @@ from __future__ import annotations
 import csv
 import json
 import logging
+import os
 import queue
 import shutil
 import subprocess
@@ -36,8 +37,8 @@ from .explanation_engine import compute_enhanced_explanations
 
 logger = logging.getLogger("uvicorn.error")
 
-# Path to Defense-rostering folder (relative to project root)
-DRIVER_DIR = Path(__file__).parent.parent.parent / "Defense-rostering"
+# Path to Defense-rostering folder — configurable for Docker, falls back to project root
+DRIVER_DIR = Path(os.getenv("DEFENSE_ROSTERING_DIR", str(Path(__file__).parent.parent.parent / "Defense-rostering")))
 
 
 def _sync_dataset_to_driver(dataset_id: str) -> None:

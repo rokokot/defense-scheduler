@@ -89,8 +89,7 @@ Thumbs.db
 .env.local
 .env.*.local
 
-# Docker
-.dockerignore
+# Docker (keep .dockerignore tracked)
 
 # Jupyter
 .ipynb_checkpoints/
@@ -101,7 +100,12 @@ Thumbs.db
 !**/.gitkeep
 
 
-Defense-rostering/
+# Defense-rostering generated/non-source files
+Defense-rostering/output_data/
+Defense-rostering/__pycache__/
+Defense-rostering/.git/
+Defense-rostering/.idea/
+Defense-rostering/*.pdf
 notes/
 clean_datasets_archive/
 

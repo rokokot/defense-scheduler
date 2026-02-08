@@ -1,0 +1,31 @@
+# Git
+.git/
+.gitignore
+
+# Defense-rostering generated files (not needed in image)
+Defense-rostering/output_data/
+Defense-rostering/__pycache__/
+Defense-rostering/.git/
+Defense-rostering/.idea/
+Defense-rostering/*.pdf
+
+# Data outputs (volume-mounted at runtime)
+data/output/
+data/sessions/
+
+# IDE and OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Node modules (frontend has its own .dockerignore)
+frontend/node_modules/
+
+# Notes and archives
+notes/
+clean_datasets_archive/

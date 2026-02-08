@@ -1,0 +1,16 @@
+# Regarding the input data
+input_data: "june_2021"  # 'june_2021' or 'sept_2025' or 'intermediate_2026' or 'toy_example' or 'documented_example1'
+number_of_defenses_in_problem: 'all'  # if not 'all', select how many defenses you want to consider in this problem
+number_of_unavailabilities_in_problem: "all"  # if not 'all', select how many availabilities you want to consider in this problem
+# (must be at least n with n the amount of timeslots in the problem, otherwise they cannot be inferred)
+
+# Regarding the solving method
+solver: "ortools"  # When adjacency_objectives = False, exact is the best choice, when adjacency_objectives = True, ortools is the best choice
+
+# Regarding the use case
+adjacency_objective: true  # With or without the adjacency objective (not that efficient yet)
+must_plan_all_defenses : true # Whether all defenses must be planned, or whether some unplanned defenses are tolerated (still satisfiable)
+allow_online_defenses: false  # With or without online defenses (still a bug)
+availability_odds: 0.75  # The odds of a room being available at a certain time
+online_odds: 0  # The odds that an available evaluator can only be available online.
+max_rooms: 5  # The maximal amount of rooms that can be used for defenses (must be 2 for documented_example!)

@@ -1,0 +1,7 @@
+event_id,student,title-,supervisor,co_supervisor,assessors,mentors,day,start_time,end_time,programme,room,color
+defence_1,Rochkoulets Maxime,Interactions between Kolmogorov Arnold networks and tensor decompositions,Hendrik Blockeel,Wannes Meert,,"",,,,CW,,
+defence_2,Senica Dailen,Tricking AI: comparison of adversarial examples,Hendrik Blockeel,,,"",,,,CW,,
+defence_3,Sirbu Traian-Florin,Semi-supervised classification of IoT failure Data,Stefano Viazzi,"",,"",,,,CW,,
+defence_4,Demuynck Dieter,Tricking AI: comparison of adversarial examples,Stefano Viazzi,,,"",,,,CW,,
+defence_5,Geybels Maarten,Decomposing KAN networks: A tensor decomposition analysis of Kolmogorov-Arnold neural networks,Mariya Ishteva,"",,"",,,,CW,,
+defence_6,Hamelink Frederic,Time series motif discovery: the faster the better,Mariya Ishteva,Wannes Meert,,"",,,,CW,,

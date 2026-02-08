@@ -1,0 +1,169 @@
+person_id,name,role,day,time_slot,status
+student-1,Hermons Jules,student,2021-06-23,09:00,available
+student-1,Hermons Jules,student,2021-06-23,10:00,available
+student-1,Hermons Jules,student,2021-06-23,11:00,available
+student-1,Hermons Jules,student,2021-06-23,12:00,unavailable
+student-1,Hermons Jules,student,2021-06-23,13:00,unavailable
+student-1,Hermons Jules,student,2021-06-23,14:00,unavailable
+student-1,Hermons Jules,student,2021-06-23,15:00,available
+student-1,Hermons Jules,student,2021-06-23,16:00,available
+student-1,Hermons Jules,student,2021-06-24,09:00,available
+student-1,Hermons Jules,student,2021-06-24,10:00,available
+student-1,Hermons Jules,student,2021-06-24,11:00,unavailable
+student-1,Hermons Jules,student,2021-06-24,12:00,unavailable
+student-1,Hermons Jules,student,2021-06-24,13:00,available
+student-1,Hermons Jules,student,2021-06-24,14:00,available
+student-1,Hermons Jules,student,2021-06-24,15:00,available
+student-1,Hermons Jules,student,2021-06-24,16:00,available
+student-1,Hermons Jules,student,2021-06-25,09:00,unavailable
+student-1,Hermons Jules,student,2021-06-25,10:00,unavailable
+student-1,Hermons Jules,student,2021-06-25,11:00,unavailable
+student-1,Hermons Jules,student,2021-06-25,12:00,unavailable
+student-1,Hermons Jules,student,2021-06-25,13:00,available
+student-1,Hermons Jules,student,2021-06-25,14:00,available
+student-1,Hermons Jules,student,2021-06-25,15:00,available
+student-1,Hermons Jules,student,2021-06-25,16:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-23,09:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-23,10:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-23,11:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-23,12:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-23,13:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-23,14:00,unavailable
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-23,15:00,unavailable
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-23,16:00,unavailable
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-24,09:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-24,10:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-24,11:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-24,12:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-24,13:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-24,14:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-24,15:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-24,16:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-25,09:00,unavailable
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-25,10:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-25,11:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-25,12:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-25,13:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-25,14:00,available
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-25,15:00,unavailable
+student-2,Stefanidis Vasikis Konstantinos,student,2021-06-25,16:00,unavailable
+supervisor-1,Katrien Verbert,supervisor,2021-06-23,09:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-23,10:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-23,11:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-23,12:00,unavailable
+supervisor-1,Katrien Verbert,supervisor,2021-06-23,13:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-23,14:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-23,15:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-23,16:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-24,09:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-24,10:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-24,11:00,unavailable
+supervisor-1,Katrien Verbert,supervisor,2021-06-24,12:00,unavailable
+supervisor-1,Katrien Verbert,supervisor,2021-06-24,13:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-24,14:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-24,15:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-24,16:00,available
+supervisor-1,Katrien Verbert,supervisor,2021-06-25,09:00,unavailable
+supervisor-1,Katrien Verbert,supervisor,2021-06-25,10:00,unavailable
+supervisor-1,Katrien Verbert,supervisor,2021-06-25,11:00,unavailable
+supervisor-1,Katrien Verbert,supervisor,2021-06-25,12:00,unavailable
+supervisor-1,Katrien Verbert,supervisor,2021-06-25,13:00,unavailable
+supervisor-1,Katrien Verbert,supervisor,2021-06-25,14:00,unavailable
+supervisor-1,Katrien Verbert,supervisor,2021-06-25,15:00,unavailable
+supervisor-1,Katrien Verbert,supervisor,2021-06-25,16:00,unavailable
+supervisor-2,Frank Piessens,supervisor,2021-06-23,09:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-23,10:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-23,11:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-23,12:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-23,13:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-23,14:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-23,15:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-23,16:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-24,09:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-24,10:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-24,11:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-24,12:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-24,13:00,unavailable
+supervisor-2,Frank Piessens,supervisor,2021-06-24,14:00,unavailable
+supervisor-2,Frank Piessens,supervisor,2021-06-24,15:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-24,16:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-25,09:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-25,10:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-25,11:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-25,12:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-25,13:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-25,14:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-25,15:00,available
+supervisor-2,Frank Piessens,supervisor,2021-06-25,16:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-23,09:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-23,10:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-23,11:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-23,12:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-23,13:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-23,14:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-23,15:00,unavailable
+assessor-1,Adalberto Simeone,assessor,2021-06-23,16:00,unavailable
+assessor-1,Adalberto Simeone,assessor,2021-06-24,09:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-24,10:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-24,11:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-24,12:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-24,13:00,unavailable
+assessor-1,Adalberto Simeone,assessor,2021-06-24,14:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-24,15:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-24,16:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-25,09:00,unavailable
+assessor-1,Adalberto Simeone,assessor,2021-06-25,10:00,unavailable
+assessor-1,Adalberto Simeone,assessor,2021-06-25,11:00,unavailable
+assessor-1,Adalberto Simeone,assessor,2021-06-25,12:00,unavailable
+assessor-1,Adalberto Simeone,assessor,2021-06-25,13:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-25,14:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-25,15:00,available
+assessor-1,Adalberto Simeone,assessor,2021-06-25,16:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-23,09:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-23,10:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-23,11:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-23,12:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-23,13:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-23,14:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-23,15:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-23,16:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-24,09:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-24,10:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-24,11:00,unavailable
+assessor-2,Jo Van Bulck,assessor,2021-06-24,12:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-24,13:00,unavailable
+assessor-2,Jo Van Bulck,assessor,2021-06-24,14:00,unavailable
+assessor-2,Jo Van Bulck,assessor,2021-06-24,15:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-24,16:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-25,09:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-25,10:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-25,11:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-25,12:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-25,13:00,unavailable
+assessor-2,Jo Van Bulck,assessor,2021-06-25,14:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-25,15:00,available
+assessor-2,Jo Van Bulck,assessor,2021-06-25,16:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-23,09:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-23,10:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-23,11:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-23,12:00,unavailable
+mentor-1,Martijn Millecamp,mentor,2021-06-23,13:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-23,14:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-23,15:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-23,16:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-24,09:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-24,10:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-24,11:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-24,12:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-24,13:00,unavailable
+mentor-1,Martijn Millecamp,mentor,2021-06-24,14:00,unavailable
+mentor-1,Martijn Millecamp,mentor,2021-06-24,15:00,unavailable
+mentor-1,Martijn Millecamp,mentor,2021-06-24,16:00,unavailable
+mentor-1,Martijn Millecamp,mentor,2021-06-25,09:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-25,10:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-25,11:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-25,12:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-25,13:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-25,14:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-25,15:00,available
+mentor-1,Martijn Millecamp,mentor,2021-06-25,16:00,available

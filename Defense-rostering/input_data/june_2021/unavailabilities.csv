@@ -1,0 +1,30 @@
+name,type,day,start_time,end_time
+Adalberto Simeone,person,2021-06-23,15:00,17:00
+Adalberto Simeone,person,2021-06-24,13:00,14:00
+Adalberto Simeone,person,2021-06-25,09:00,13:00
+Frank Piessens,person,2021-06-24,13:00,15:00
+Hermons Jules,person,2021-06-23,12:00,15:00
+Hermons Jules,person,2021-06-24,11:00,13:00
+Hermons Jules,person,2021-06-25,09:00,13:00
+Jo Van Bulck,person,2021-06-24,11:00,12:00
+Jo Van Bulck,person,2021-06-24,13:00,15:00
+Jo Van Bulck,person,2021-06-25,13:00,14:00
+Katrien Verbert,person,2021-06-23,12:00,13:00
+Katrien Verbert,person,2021-06-24,11:00,13:00
+Martijn Millecamp,person,2021-06-23,12:00,13:00
+Martijn Millecamp,person,2021-06-24,13:00,17:00
+Stefanidis Vasikis Konstantinos,person,2021-06-23,14:00,17:00
+Stefanidis Vasikis Konstantinos,person,2021-06-25,09:00,10:00
+Stefanidis Vasikis Konstantinos,person,2021-06-25,15:00,17:00
+200C 00.01,room,2021-06-23,13:00,17:00
+200C 00.01,room,2021-06-25,13:00,14:00
+200C 00.02,room,2021-06-23,15:00,16:00
+200C 00.02,room,2021-06-24,9:00,10:00
+200C 00.02,room,2021-06-24,16:00,17:00
+200C 00.03,room,2021-06-23,15:00,17:00
+200C 00.03,room,2021-06-24,9:00,16:00
+200C 00.03,room,2021-06-25,14:00,16:00
+200C 00.04,room,2021-06-23,13:00,17:00
+200B 01.14,room,2021-06-23,15:00,16:00
+200B 01.14,room,2021-06-25,12:00,13:00
+200B 01.14,room,2021-06-25,15:00,17:00

@@ -1,0 +1,17 @@
+name,day,start_time,end_time,type
+200C 00.01,2020-01-01,09:00,unavailable,room
+200C 00.01,2020-01-01,10:00,unavailable,room
+200C 00.01,2020-01-01,11:00,unavailable,room
+200C 00.01,2020-01-01,12:00,available,room
+200C 00.01,2020-01-01,13:00,available,room
+200C 00.01,2020-01-01,14:00,unavailable,room
+200C 00.01,2020-01-01,15:00,available,room
+200C 00.01,2020-01-01,16:00,available,room
+200C 00.02,2020-01-01,09:00,available,room
+200C 00.02,2020-01-01,10:00,available,room
+200C 00.02,2020-01-01,11:00,available,room
+200C 00.02,2020-01-01,12:00,available,room
+200C 00.02,2020-01-01,13:00,available,room
+200C 00.02,2020-01-01,14:00,available,room
+200C 00.02,2020-01-01,15:00,unavailable,room
+200C 00.02,2020-01-01,16:00,available,room

@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+logs/
+
+# Data (will be volume-mounted)
+data/
+output_data/
+input_data/
+
+# Development
+.git/
+.gitignore
+README.md
+docs/
+tests/
+
+# Temporary files
+tmp_*.json

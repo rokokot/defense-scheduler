@@ -34,6 +34,7 @@ from .models.explanation import (
     BottleneckAnalysis,
     ApplyRepairRequest as ExplanationApplyRepairRequest,
     ApplyRepairResponse,
+    ExplainSingleDefenseRequest,
     ApplyRepairsAndResolveRequest,
     ApplyRepairsAndResolveResponse,
     StageRelaxationRequest,
@@ -1176,6 +1177,158 @@ async def explain_blocked_defenses_stream(req: ExplanationExplainRequest):
             thread.join()
 
         # Send final result or error
+        if result_holder["error"]:
+            yield _sse_event("error", {"message": result_holder["error"]})
+        elif result_holder["result"]:
+            session_mgr = get_session_manager()
+            session_mgr.store_explanation(req.session_id, result_holder["result"])
+            yield _sse_event("result", result_holder["result"].model_dump(by_alias=True))
+        else:
+            yield _sse_event("error", {"message": "No result produced"})
+
+        yield _sse_event("close", {"status": "completed"})
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@app.post("/api/explanations/explain-defense/stream")
+async def explain_single_defense_stream(req: ExplainSingleDefenseRequest):
+    """
+    Stream explanation computation for a SINGLE defense via SSE.
+
+    Mirrors the CLI driver workflow: explain one defense at a time.
+    Returns SSE events with log lines and final result containing
+    MUS (why it can't be scheduled) and MCS repair options.
+    """
+    from .driver_adapter import (
+        run_explanation_streaming,
+        explanation_run_manager,
+        DriverConfig,
+        DRIVER_DIR,
+    )
+
+    run_id = explanation_run_manager.create(req.dataset_id)
+    explanation_run_manager.update_status(run_id, "running")
+
+    must_fix_defenses = req.must_fix_defenses
+    solver_output_folder = req.solver_output_folder
+    use_driver = DRIVER_DIR.exists()
+
+    if use_driver:
+        driver_dataset_path = DRIVER_DIR / "input_data" / req.dataset_id
+        if not driver_dataset_path.exists():
+            logger.info("Driver dataset not found at %s, falling back to native pipeline", driver_dataset_path)
+            use_driver = False
+
+    async def event_generator():
+        yield _sse_event("meta", {"run_id": run_id, "dataset_id": req.dataset_id, "defense_id": req.defense_id})
+
+        planned_ids = req.planned_defense_ids or []
+        result_holder = {"result": None, "error": None}
+
+        if use_driver:
+            yield _sse_event("log", {"line": f"Using Defense-rostering driver pipeline for defense {req.defense_id}"})
+
+            config = DriverConfig(
+                max_resolutions=req.max_mcs,
+                timeout_seconds=req.mcs_timeout_sec,
+                must_fix_defenses=must_fix_defenses,
+                output_folder=solver_output_folder,
+            )
+
+            def run_driver_streaming():
+                try:
+                    gen = run_explanation_streaming(
+                        dataset_id=req.dataset_id,
+                        planned_ids=planned_ids,
+                        unplanned_ids=[req.defense_id],
+                        config=config,
+                    )
+                    try:
+                        while True:
+                            event = next(gen)
+                            explanation_run_manager.add_log(run_id, json.dumps(event))
+                    except StopIteration as e:
+                        result_holder["result"] = e.value
+                except Exception as e:
+                    result_holder["error"] = str(e)
+                    explanation_run_manager.set_error(run_id, str(e))
+
+            thread = threading.Thread(target=run_driver_streaming)
+            thread.start()
+
+            q = explanation_run_manager.subscribe(run_id)
+            while thread.is_alive() or not q.empty():
+                try:
+                    event = q.get(timeout=0.5)
+                    if event["type"] == "log":
+                        try:
+                            log_data = json.loads(event["line"])
+                            yield _sse_event(log_data.get("type", "log"), log_data)
+                        except json.JSONDecodeError:
+                            yield _sse_event("log", {"line": event["line"]})
+                    elif event["type"] == "complete":
+                        break
+                except queue.Empty:
+                    yield _sse_event("heartbeat", {"ts": time.time()})
+
+            thread.join()
+
+        else:
+            yield _sse_event("log", {"line": f"Using native solver pipeline for defense {req.defense_id}"})
+            yield _sse_event("phase", {"phase": "explanation", "message": f"Computing explanation for defense {req.defense_id}..."})
+
+            service = get_explanation_service()
+            config_native = ExplanationConfig(
+                mcs_timeout_sec=req.mcs_timeout_sec,
+                max_mcs_per_defense=req.max_mcs,
+                compute_mcs=True,
+            )
+
+            def progress_callback(defense_id, defense_name, index, total):
+                explanation_run_manager.add_log(
+                    run_id,
+                    json.dumps({"type": "log", "line": f"Analyzing defense: {defense_name}..."})
+                )
+
+            def run_native():
+                try:
+                    result = service.explain_blocked_defenses(
+                        dataset_id=req.dataset_id,
+                        blocked_defense_ids=[req.defense_id],
+                        planned_defense_ids=planned_ids,
+                        config=config_native,
+                        progress_callback=progress_callback,
+                    )
+                    result_holder["result"] = result
+                except Exception as e:
+                    result_holder["error"] = str(e)
+                    explanation_run_manager.set_error(run_id, str(e))
+
+            thread = threading.Thread(target=run_native)
+            thread.start()
+
+            q = explanation_run_manager.subscribe(run_id)
+            while thread.is_alive() or not q.empty():
+                try:
+                    event = q.get(timeout=0.5)
+                    if event["type"] == "log":
+                        try:
+                            log_data = json.loads(event["line"])
+                            yield _sse_event(log_data.get("type", "log"), log_data)
+                        except json.JSONDecodeError:
+                            yield _sse_event("log", {"line": event["line"]})
+                    elif event["type"] == "complete":
+                        break
+                except queue.Empty:
+                    yield _sse_event("heartbeat", {"ts": time.time()})
+
+            thread.join()
+
         if result_holder["error"]:
             yield _sse_event("error", {"message": result_holder["error"]})
         elif result_holder["result"]:

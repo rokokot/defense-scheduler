@@ -8,15 +8,15 @@ import { useState, useCallback, useMemo } from 'react';
 import { User, Building2, Clock, ChevronRight } from 'lucide-react';
 import { MatrixColumn, MatrixColumnType, BlockingMatrixViewProps } from './types';
 
-const LABEL_WIDTH = 215;
-const CELL_WIDTH = 44;
-const ROW_HEIGHT = 44;
-const DOT_RADIUS = 6;
-const EMPTY_RADIUS = 4;
-const BAR_HEIGHT = 95;
-const BAR_WIDTH = 20;
-const HEADER_HEIGHT = 60;
-const CATEGORY_WIDTH = 50;
+const LABEL_WIDTH = 200;
+const CELL_WIDTH = 42;
+const ROW_HEIGHT = 38;
+const DOT_RADIUS = 5;
+const EMPTY_RADIUS = 3;
+const BAR_HEIGHT = 80;
+const BAR_WIDTH = 18;
+const HEADER_HEIGHT = 56;
+const CATEGORY_WIDTH = 44;
 
 function abbreviateResource(resource: string, type: MatrixColumnType): string {
   if (type === 'room') {
@@ -51,26 +51,26 @@ const typeConfig: Record<MatrixColumnType, {
 }> = {
   person: {
     label: 'Persons',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    dotColor: '#3b82f6',
-    barColor: '#3b82f6',
+    color: 'text-slate-600',
+    bgColor: 'bg-slate-50',
+    dotColor: '#334155',
+    barColor: '#475569',
     icon: User,
   },
   room: {
     label: 'Rooms',
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-50',
-    dotColor: '#f59e0b',
-    barColor: '#f59e0b',
+    color: 'text-slate-600',
+    bgColor: 'bg-slate-50',
+    dotColor: '#64748b',
+    barColor: '#64748b',
     icon: Building2,
   },
   time: {
     label: 'Time',
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50',
-    dotColor: '#9333ea',
-    barColor: '#9333ea',
+    color: 'text-slate-600',
+    bgColor: 'bg-slate-50',
+    dotColor: '#94a3b8',
+    barColor: '#94a3b8',
     icon: Clock,
   },
 };
@@ -168,15 +168,15 @@ export function BlockingMatrixView({
   const maxCardinality = Math.max(...columns.map(c => c.cardinality), 1);
 
   return (
-    <div className="flex flex-col h-full border border-slate-400 rounded-lg bg-white">
+    <div className="flex flex-col h-full border border-slate-200 rounded-md bg-white">
       {/* Header area with bars and diagonal labels */}
-      <div className="flex shrink-0 bg-slate-50 border-b border-slate-400 overflow-visible pt-14">
+      <div className="flex shrink-0 bg-slate-50/50 border-b border-slate-200 overflow-visible pt-12">
         {/* Row label header */}
         <div
-          className="shrink-0 flex items-end justify-start px-3 pb-1.5 border-r border-slate-400"
+          className="shrink-0 flex items-end justify-start px-4 pb-2 border-r border-slate-200"
           style={{ width: LABEL_WIDTH, height: BAR_HEIGHT + HEADER_HEIGHT }}
         >
-          <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wide">Defense</span>
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Defense</span>
         </div>
 
         {/* Category headers with bars */}
@@ -189,35 +189,32 @@ export function BlockingMatrixView({
               const isLast = catIdx === categories.length - 1;
 
               if (!isExpanded) {
-                // Collapsed category
                 return (
                   <div
                     key={cat.type}
-                    className={`flex flex-col items-center justify-end cursor-pointer transition-colors hover:bg-opacity-80 ${config.bgColor} ${!isLast ? 'border-r border-slate-400' : ''}`}
+                    className={`flex flex-col items-center justify-end cursor-pointer transition-colors hover:bg-slate-100 bg-slate-50/50 ${!isLast ? 'border-r border-slate-200' : ''}`}
                     style={{ width: CATEGORY_WIDTH, height: BAR_HEIGHT + HEADER_HEIGHT }}
                     onClick={() => toggleCategory(cat.type)}
                   >
-                    <div className="flex flex-col items-center pb-1.5">
-                      <span className="text-[10px] font-bold text-slate-700 mb-0.5">{cat.totalCardinality}</span>
-                      <Icon size={14} className={config.color} />
-                      <ChevronRight size={10} className="text-slate-400 mt-0.5" />
+                    <div className="flex flex-col items-center pb-2">
+                      <span className="text-[10px] font-semibold text-slate-500 mb-0.5">{cat.totalCardinality}</span>
+                      <Icon size={13} className="text-slate-400" />
+                      <ChevronRight size={9} className="text-slate-300 mt-0.5" />
                     </div>
                   </div>
                 );
               }
 
-              // Expanded category
               return (
                 <div key={cat.type} className="flex flex-col">
                   {/* Cardinality bars */}
-                  <div className={`flex items-end ${config.bgColor} bg-opacity-30 ${!isLast ? 'border-r border-slate-400' : ''}`} style={{ height: BAR_HEIGHT, paddingRight: !isLast ? 20 : 0 }}>
-                    {/* Category collapse button */}
+                  <div className={`flex items-end ${!isLast ? 'border-r border-slate-200' : ''}`} style={{ height: BAR_HEIGHT, paddingRight: !isLast ? 16 : 0 }}>
                     <div
-                      className={`flex items-end justify-center cursor-pointer hover:bg-opacity-50 ${config.bgColor}`}
-                      style={{ width: 30, height: BAR_HEIGHT }}
+                      className="flex items-end justify-center cursor-pointer hover:bg-slate-100"
+                      style={{ width: 28, height: BAR_HEIGHT }}
                       onClick={() => toggleCategory(cat.type)}
                     >
-                      <ChevronRight size={10} className="text-slate-400 mb-1.5 rotate-90" />
+                      <ChevronRight size={9} className="text-slate-300 mb-2 rotate-90" />
                     </div>
                     {cat.columns.map(col => {
                       const barHeight = (col.cardinality / maxCardinality) * (BAR_HEIGHT - 20);
@@ -226,19 +223,19 @@ export function BlockingMatrixView({
                         <div
                           key={col.id}
                           className="flex flex-col items-center justify-end cursor-pointer group"
-                          style={{ width: CELL_WIDTH, height: BAR_HEIGHT, paddingLeft: 15 }}
+                          style={{ width: CELL_WIDTH, height: BAR_HEIGHT, paddingLeft: 12 }}
                           onClick={(e) => handleColumnClick(col.id, e)}
                         >
-                          <span className={`text-[9px] font-semibold mb-0.5 ${selected ? 'text-blue-700' : 'text-slate-600'}`}>
+                          <span className={`text-[9px] font-medium mb-1 ${selected ? 'text-slate-800' : 'text-slate-400'}`}>
                             {col.cardinality}
                           </span>
                           <div
-                            className="rounded-t transition-all group-hover:opacity-100"
+                            className="rounded-sm transition-all group-hover:opacity-100"
                             style={{
                               width: BAR_WIDTH,
-                              height: Math.max(barHeight, 3),
-                              backgroundColor: selected ? '#1d4ed8' : config.barColor,
-                              opacity: selected ? 1 : 0.7,
+                              height: Math.max(barHeight, 2),
+                              backgroundColor: selected ? '#1e293b' : config.barColor,
+                              opacity: selected ? 1 : 0.5,
                             }}
                           />
                         </div>
@@ -247,8 +244,8 @@ export function BlockingMatrixView({
                   </div>
 
                   {/* Diagonal column headers */}
-                  <div className={`relative flex ${!isLast ? 'border-r border-slate-400' : ''}`} style={{ height: HEADER_HEIGHT, paddingRight: !isLast ? 20 : 0 }}>
-                    <div style={{ width: 30 }} /> {/* Spacer for collapse button */}
+                  <div className={`relative flex ${!isLast ? 'border-r border-slate-200' : ''}`} style={{ height: HEADER_HEIGHT, paddingRight: !isLast ? 16 : 0 }}>
+                    <div style={{ width: 28 }} />
                     {cat.columns.map(col => {
                       const selected = selection.selectedColumns.has(col.id);
                       return (
@@ -261,16 +258,16 @@ export function BlockingMatrixView({
                             className={`absolute bottom-0 origin-bottom-left cursor-pointer transition-all
                               ${selected ? 'font-semibold' : 'hover:font-medium'}`}
                             style={{
-                              left: 'calc(50% + 15px)',
-                              transform: 'rotate(-60deg) translateX(-50%)',
+                              left: 'calc(50% + 12px)',
+                              transform: 'rotate(-55deg) translateX(-50%)',
                               whiteSpace: 'nowrap',
                             }}
                             onClick={(e) => handleColumnClick(col.id, e)}
                             onDoubleClick={() => onColumnDoubleClick?.(col.id, col.resource, col.type)}
                           >
-                            <span className={`flex items-center gap-1 text-[11px]
-                              ${selected ? 'text-blue-700' : config.color}`}>
-                              <Icon size={10} />
+                            <span className={`flex items-center gap-1 text-[10px]
+                              ${selected ? 'text-slate-800' : 'text-slate-500'}`}>
+                              <Icon size={9} className="opacity-60" />
                               <span>{abbreviateResource(col.resource, col.type)}</span>
                             </span>
                           </div>
@@ -285,24 +282,24 @@ export function BlockingMatrixView({
         </div>
       </div>
 
-      {/* Body area with row labels and dot matrix - single scroll container */}
+      {/* Body area with row labels and dot matrix */}
       <div className="flex-1 min-h-0 overflow-y-auto">
         <div className="flex">
-          {/* Row labels (fixed width, scrolls vertically with dots) */}
-          <div className="shrink-0 sticky left-0 z-10 bg-white border-r border-gray-500" style={{ width: LABEL_WIDTH }}>
+          {/* Row labels */}
+          <div className="shrink-0 sticky left-0 z-10 bg-white border-r border-slate-200" style={{ width: LABEL_WIDTH }}>
             {rows.map((row, idx) => {
               const selected = selection.selectedRows.has(row.defenseId);
               return (
                 <div
                   key={row.defenseId}
-                  className={`flex items-center px-3 cursor-pointer transition-colors hover:bg-blue-50
-                    ${idx !== rows.length - 1 ? 'border-b border-gray-400' : ''}
-                    ${selected ? 'bg-blue-50' : idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
+                  className={`flex items-center px-4 cursor-pointer transition-colors hover:bg-slate-50
+                    ${idx !== rows.length - 1 ? 'border-b border-slate-100' : ''}
+                    ${selected ? 'bg-blue-50' : ''}`}
                   style={{ height: ROW_HEIGHT }}
                   onClick={(e) => handleRowClick(row.defenseId, e)}
                   onDoubleClick={() => onRowDoubleClick?.(row.defenseId, row.student)}
                 >
-                  <span className={`text-sm font-medium truncate ${selected ? 'text-blue-700' : 'text-gray-900'}`}>
+                  <span className={`text-[12px] font-medium truncate ${selected ? 'text-blue-700' : 'text-slate-700'}`}>
                     {row.student}
                   </span>
                 </div>
@@ -310,14 +307,14 @@ export function BlockingMatrixView({
             })}
           </div>
 
-          {/* Dot matrix (scrolls horizontally, shares vertical scroll with labels) */}
+          {/* Dot matrix */}
           <div className="flex-1 overflow-x-auto">
             {rows.map((row, rowIdx) => {
               const rowSelected = selection.selectedRows.has(row.defenseId);
               return (
                 <div
                   key={row.defenseId}
-                  className={`flex ${rowIdx !== rows.length - 1 ? 'border-b border-gray-400' : ''} ${rowSelected ? 'bg-blue-50/50' : rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
+                  className={`flex ${rowIdx !== rows.length - 1 ? 'border-b border-slate-100' : ''} ${rowSelected ? 'bg-slate-50' : ''}`}
                   style={{ height: ROW_HEIGHT }}
                 >
                   {categories.map((cat, catIdx) => {
@@ -326,12 +323,11 @@ export function BlockingMatrixView({
                     const isLast = catIdx === categories.length - 1;
 
                     if (!isExpanded) {
-                      // Collapsed: show single aggregated dot
                       const hasAnyBlocking = cat.columns.some(col => row.blockedBy.has(col.id));
                       return (
                         <div
                           key={cat.type}
-                          className={`flex items-center justify-center ${config.bgColor} bg-opacity-20 ${!isLast ? 'border-r border-gray-400' : ''}`}
+                          className={`flex items-center justify-center ${!isLast ? 'border-r border-slate-200' : ''}`}
                           style={{ width: CATEGORY_WIDTH, height: ROW_HEIGHT }}
                         >
                           {hasAnyBlocking ? (
@@ -341,18 +337,17 @@ export function BlockingMatrixView({
                             />
                           ) : (
                             <div
-                              className="rounded-full border"
-                              style={{ width: EMPTY_RADIUS * 2, height: EMPTY_RADIUS * 2, borderColor: '#6b7280' }}
+                              className="rounded-full"
+                              style={{ width: EMPTY_RADIUS * 2, height: EMPTY_RADIUS * 2, border: '1px solid #cbd5e1' }}
                             />
                           )}
                         </div>
                       );
                     }
 
-                    // Expanded: show individual dots
                     return (
-                      <div key={cat.type} className={`flex ${!isLast ? 'border-r border-gray-400' : ''}`} style={{ paddingRight: !isLast ? 20 : 0 }}>
-                        <div style={{ width: 30 }} /> {/* Spacer */}
+                      <div key={cat.type} className={`flex ${!isLast ? 'border-r border-slate-200' : ''}`} style={{ paddingRight: !isLast ? 16 : 0 }}>
+                        <div style={{ width: 28 }} />
                         {cat.columns.map(col => {
                           const blocked = row.blockedBy.has(col.id);
                           const colSelected = selection.selectedColumns.has(col.id);
@@ -366,11 +361,11 @@ export function BlockingMatrixView({
                             >
                               {blocked ? (
                                 <div
-                                  className="rounded-full cursor-pointer transition-transform hover:scale-110"
+                                  className="rounded-full cursor-pointer transition-transform hover:scale-125"
                                   style={{
                                     width: DOT_RADIUS * 2,
                                     height: DOT_RADIUS * 2,
-                                    backgroundColor: highlighted ? '#1d4ed8' : config.dotColor,
+                                    backgroundColor: highlighted ? '#1e293b' : config.dotColor,
                                   }}
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -383,7 +378,7 @@ export function BlockingMatrixView({
                                   style={{
                                     width: EMPTY_RADIUS * 2,
                                     height: EMPTY_RADIUS * 2,
-                                    border: `1px solid ${highlighted ? '#60a5fa' : '#9ca3af'}`,
+                                    border: `1px solid ${highlighted ? '#94a3b8' : '#e2e8f0'}`,
                                   }}
                                 />
                               )}

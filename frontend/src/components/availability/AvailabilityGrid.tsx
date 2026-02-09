@@ -43,8 +43,7 @@ export interface AvailabilityGridProps {
   slotConflicts?: Map<string, Conflict[]>;
   scheduledBookings?: Map<string, Map<string, string[]>>;
   workloadStats?: Map<string, { required: number; scheduled: number }>;
-  columnHighlights?: Record<string, Record<string, 'primary' | 'match' | 'near-match'>>;
-  nearMatchMissing?: Record<string, Record<string, string[]>>;
+  columnHighlights?: Record<string, Record<string, 'primary' | 'match'>>;
   warningIconScale?: number;
   showLegend?: boolean;
   programmeColors?: Record<string, string>;
@@ -57,11 +56,14 @@ export interface AvailabilityGridProps {
   onClearFulfilledRequests?: () => void;
   // Bottleneck warnings for persons with insufficient availability
   bottleneckWarnings?: Map<string, { deficit: number; suggestion: string }>;
+  /** Preview slots for repair actions: shows amber border + clock icon without creating actual requests */
+  repairPreviewSlots?: Set<string>;
+  /** Person IDs to highlight with yellow accent (repair target row) */
+  accentPersonIds?: string[];
 }
 
 const editableStatuses: AvailabilityStatus[] = ['available', 'unavailable'];
 const MATCH_HIGHLIGHT_CLASS = 'bg-[rgb(145_230_139_/_0.22)]';
-const NEAR_MATCH_MISSING_CLASS = 'bg-[#d5ba9b]';
 
 export const AVAILABILITY_STATUS_CLASSES: Record<AvailabilityStatus, string> = {
   available: `bg-white border border-gray-400`,
@@ -104,7 +106,6 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
   scheduledBookings,
   workloadStats,
   columnHighlights,
-  nearMatchMissing,
   warningIconScale = 1.1,
   columnWidth = 220,
   showLegend = true,
@@ -117,6 +118,8 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
   onClearDeniedRequests,
   onClearFulfilledRequests,
   bottleneckWarnings,
+  repairPreviewSlots,
+  accentPersonIds,
 }: AvailabilityGridProps) {
   const [editingSlot, setEditingSlot] = useState<{ personId: string; day: string; slot: string } | null>(null);
   const [showRequestsPanel, setShowRequestsPanel] = useState(false);
@@ -164,10 +167,11 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
   }, [availabilities, bottleneckWarnings]);
 
   const effectiveHighlightedPersons = useMemo(() => {
-    if (requestHighlightedIds.length === 0 && bottleneckHighlightedIds.length === 0) return highlightedPersons;
-    const merged = new Set([...highlightedPersons, ...requestHighlightedIds, ...bottleneckHighlightedIds]);
+    const extras = [...requestHighlightedIds, ...bottleneckHighlightedIds, ...(accentPersonIds ?? [])];
+    if (extras.length === 0) return highlightedPersons;
+    const merged = new Set([...highlightedPersons, ...extras]);
     return Array.from(merged);
-  }, [highlightedPersons, requestHighlightedIds, bottleneckHighlightedIds]);
+  }, [highlightedPersons, requestHighlightedIds, bottleneckHighlightedIds, accentPersonIds]);
 
   const personHasVisibleConflicts = useCallback(
     (person: PersonAvailability): boolean => {
@@ -1233,7 +1237,8 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
             const hasBottleneck = bottleneckInfo && bottleneckInfo.deficit > 0;
             // Check if highlighted due to bottleneck (red) vs other reasons (blue)
             const isBottleneckHighlighted = bottleneckHighlightedIds.includes(person.id);
-            const highlightColor = isBottleneckHighlighted ? 'bg-red-50' : 'bg-blue-50';
+            const isAccent = (accentPersonIds?.includes(person.id) ?? false) || requestHighlightedIds.includes(person.id);
+            const highlightColor = isAccent ? 'bg-amber-100' : isBottleneckHighlighted ? 'bg-red-50' : 'bg-blue-50';
             return (
               <Fragment key={person.id}>
                 <tr
@@ -1253,7 +1258,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
               <td
                 className={clsx(
                   'border px-2 sm:px-3 sticky left-0 z-20 cursor-pointer shadow-sm',
-                  isBottleneckHighlighted ? 'hover:bg-red-100' : 'hover:bg-blue-50',
+                  isAccent ? 'hover:bg-amber-200' : isBottleneckHighlighted ? 'hover:bg-red-100' : 'hover:bg-blue-50',
                   nameCellPadding,
                   (isHighlighted || isSearchMatch) ? highlightColor : 'bg-white'
                 )}
@@ -1341,19 +1346,11 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                         const isMatchSlot =
                           columnHighlightType === 'match' &&
                           (displayStatus === 'available' || displayStatus === 'empty');
-                        const isNearMatchMissing = Boolean(
-                          nearMatchMissing?.[day]?.[slot]?.includes(person.id)
-                        );
                         const isRequestHighlighted = requestHighlightedSlots.has(`${person.id}:${day}:${slot}`);
-                        const highlightStatus: AvailabilityStatus =
-                          columnHighlightType === 'near-match' && !isNearMatchMissing
-                            ? 'available'
-                            : displayStatus;
+                        const isRepairPreview = repairPreviewSlots?.has(`${person.id}:${day}:${slot}`) ?? false;
                         const slotHighlightClass = isMatchSlot
                           ? MATCH_HIGHLIGHT_CLASS
-                          : isNearMatchMissing
-                            ? NEAR_MATCH_MISSING_CLASS
-                            : AVAILABILITY_STATUS_CLASSES[highlightStatus];
+                          : AVAILABILITY_STATUS_CLASSES[displayStatus];
 
                         const showConflictOverlay = conflict;
                         const warningIconElement = doubleBooked
@@ -1406,34 +1403,33 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                                 const programmeColor = displayStatus === 'booked'
                                   ? getProgrammeColorForSlot(bookingInfo)
                                   : undefined;
-                                const effectiveProgramColor = isNearMatchMissing ? undefined : programmeColor;
 
                                 return (
                                   <div
                                     className={clsx(
                                       'w-6 h-6 sm:w-7 sm:h-7 rounded-lg shadow-sm flex items-center justify-center transition-opacity pointer-events-auto',
                                       isHighlightedSlot ? 'ring-2 ring-blue-400/30' : '',
-                                      isRequestHighlighted && 'ring-2 ring-amber-400 ring-offset-1',
+                                      (isRequestHighlighted || isRepairPreview) && 'ring-2 ring-amber-400 ring-offset-1',
                                       slotHighlightClass,
                                       columnHighlightType === 'primary' && 'outline outline-2 outline-blue-900 outline-offset-[-8px] shadow-lg',
                                       isEditing && '!opacity-100'
                                     )}
                                     style={{
-                                      ...(effectiveProgramColor && { backgroundColor: effectiveProgramColor }),
+                                      ...(programmeColor && { backgroundColor: programmeColor }),
                                       backgroundImage: showConflictOverlay
                                         ? 'repeating-linear-gradient(45deg, rgba(220,38,38,0.35) 0, rgba(220,38,38,0.35) 6px, transparent 6px, transparent 12px)'
-                                        : displayStatus === 'unavailable' && !effectiveProgramColor
+                                        : displayStatus === 'unavailable' && !programmeColor
                                         ? 'repeating-linear-gradient(135deg, transparent 0, transparent 3px, rgba(255,255,255,0.3) 3px, rgba(255,255,255,0.3) 6px)'
                                         : undefined,
                                       outline: showConflictOverlay
                                         ? '2px solid #dc2626'
-                                        : (displayStatus === 'requested' || isBookedPending)
+                                        : (displayStatus === 'requested' || isBookedPending || isRepairPreview)
                                         ? '2px solid #d97706'
                                         : 'none',
                                       outlineOffset: '-2px',
                                     }}
                                   >
-                                    {(displayStatus === 'requested' || isBookedPending) && (
+                                    {(displayStatus === 'requested' || isBookedPending || isRepairPreview) && (
                                       <Clock
                                         className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-600"
                                         strokeWidth={2.5}
@@ -1508,19 +1504,9 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                               const isMatchSlot =
                                 columnHighlightType === 'match' &&
                                 (displayStatus === 'available' || displayStatus === 'empty');
-                              const isNearMatchMissing = Boolean(
-                                nearMatchMissing?.[day]?.[slot]?.includes(person.id)
-                              );
-                              const highlightStatus: AvailabilityStatus =
-                                columnHighlightType === 'near-match' && !isNearMatchMissing
-                                  ? 'available'
-                                  : displayStatus;
                               const slotHighlightClass = isMatchSlot
                                 ? MATCH_HIGHLIGHT_CLASS
-                                : isNearMatchMissing
-                                  ? NEAR_MATCH_MISSING_CLASS
-                                  : AVAILABILITY_STATUS_CLASSES[highlightStatus];
-                              const effectiveProgramColor = isNearMatchMissing ? undefined : programmeColor;
+                                : AVAILABILITY_STATUS_CLASSES[displayStatus];
                               return (
                                 <div
                                   key={slot}
@@ -1551,8 +1537,8 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                                     onSlotClick?.(person.id, day, slot);
                                   }}
                                   style={{
-                                    ...(effectiveProgramColor && { backgroundColor: effectiveProgramColor }),
-                                    backgroundImage: displayStatus === 'unavailable' && !effectiveProgramColor
+                                    ...(programmeColor && { backgroundColor: programmeColor }),
+                                    backgroundImage: displayStatus === 'unavailable' && !programmeColor
                                       ? 'repeating-linear-gradient(135deg, transparent 0, transparent 3px, rgba(255,255,255,0.3) 3px, rgba(255,255,255,0.3) 6px)'
                                       : undefined,
                                     outline: (displayStatus === 'requested' || isBookedPending)
@@ -1598,25 +1584,16 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                         const isMatchSlot =
                           columnHighlightType === 'match' &&
                           (displayStatus === 'available' || displayStatus === 'empty');
-                        const isNearMatchMissing = Boolean(
-                          nearMatchMissing?.[day]?.[slot]?.includes(person.id)
-                        );
                         const isRequestHighlighted = requestHighlightedSlots.has(`${person.id}:${day}:${slot}`);
-                        const highlightStatus: AvailabilityStatus =
-                          columnHighlightType === 'near-match' && !isNearMatchMissing
-                            ? 'available'
-                            : displayStatus;
+                        const isRepairPreview = repairPreviewSlots?.has(`${person.id}:${day}:${slot}`) ?? false;
                         const slotHighlightClass = isMatchSlot
                           ? MATCH_HIGHLIGHT_CLASS
-                          : isNearMatchMissing
-                            ? NEAR_MATCH_MISSING_CLASS
-                            : AVAILABILITY_STATUS_CLASSES[highlightStatus];
+                          : AVAILABILITY_STATUS_CLASSES[displayStatus];
                         const showConflictOverlay = conflict;
                         const showWarnings = doubleBooked || conflict;
                         const programmeColor = displayStatus === 'booked'
                           ? getProgrammeColorForSlot(bookingInfo)
                           : undefined;
-                        const effectiveProgramColor = isNearMatchMissing ? undefined : programmeColor;
                         return (
                           <div
                             key={slot}
@@ -1625,20 +1602,20 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                             className={clsx(
                             'flex-1 min-w-0 cursor-pointer transition-opacity relative overflow-visible rounded-sm border pointer-events-auto',
                             slotHighlightClass,
-                            isRequestHighlighted && 'ring-2 ring-amber-400 ring-offset-1',
+                            (isRequestHighlighted || isRepairPreview) && 'ring-2 ring-amber-400 ring-offset-1',
                             columnHighlightType === 'primary' && 'outline outline-2 outline-blue-900 outline-offset-2 shadow-lg',
                             isEditing && '!opacity-100'
                           )}
                             style={{
-                              ...(effectiveProgramColor && { backgroundColor: effectiveProgramColor }),
+                              ...(programmeColor && { backgroundColor: programmeColor }),
                               backgroundImage: showConflictOverlay
                                 ? 'repeating-linear-gradient(45deg, rgba(220,38,38,0.35) 0, rgba(220,38,38,0.35) 6px, transparent 6px, transparent 12px)'
-                                : displayStatus === 'unavailable' && !effectiveProgramColor
+                                : displayStatus === 'unavailable' && !programmeColor
                                 ? 'repeating-linear-gradient(135deg, transparent 0, transparent 3px, rgba(255,255,255,0.3) 3px, rgba(255,255,255,0.3) 6px)'
                                 : undefined,
                               outline: showConflictOverlay
                                 ? '2px solid #dc2626'
-                                : (displayStatus === 'requested' || isBookedPending)
+                                : (displayStatus === 'requested' || isBookedPending || isRepairPreview)
                                 ? '2px solid #d97706'
                                 : 'none',
                               outlineOffset: '-2px',
@@ -1663,7 +1640,7 @@ export const AvailabilityGrid = memo(function AvailabilityGrid({
                               onSlotClick?.(person.id, day, slot);
                             }}
                           >
-                            {(displayStatus === 'requested' || isBookedPending) && (
+                            {(displayStatus === 'requested' || isBookedPending || isRepairPreview) && (
                               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                 <Clock
                                   className="h-4 w-4 text-amber-600"

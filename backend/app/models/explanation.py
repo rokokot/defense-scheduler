@@ -156,6 +156,29 @@ class ExplainRequest(BaseModel):
     )
 
 
+class ExplainSingleDefenseRequest(BaseModel):
+    """Request to compute MUS/MCS explanations for a single defense."""
+    model_config = ConfigDict(extra="allow")
+
+    session_id: str = Field(..., description="Session identifier")
+    dataset_id: str = Field(..., description="Dataset being scheduled")
+    defense_id: int = Field(..., description="The single defense to explain")
+    planned_defense_ids: List[int] = Field(
+        default_factory=list,
+        description="Already-scheduled defense IDs"
+    )
+    must_fix_defenses: bool = Field(
+        False,
+        description="Whether planned defenses must stay in their assigned slots"
+    )
+    solver_output_folder: Optional[str] = Field(
+        None,
+        description="Path to solver output folder (required when must_fix_defenses=True)"
+    )
+    max_mcs: int = Field(50, description="Maximum MCS per defense")
+    mcs_timeout_sec: float = Field(30.0, description="Timeout for MCS enumeration")
+
+
 class ResourceInfo(BaseModel):
     """Resource impact information from Defense-rostering driver."""
     in_mus_for: List[int] = Field(

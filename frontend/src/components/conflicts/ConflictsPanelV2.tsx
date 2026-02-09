@@ -7,7 +7,13 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { BarChart3, Table2, Search, ChevronDown, GripHorizontal } from 'lucide-react';
 import { AggregateDashboard } from './AggregateDashboard';
 import { DefenseHeatmapTable } from './DefenseHeatmapTable';
-import { generateMockConflictData } from '../../data/mockConflictData';
+import type { DefenceEvent } from '../../types/schedule';
+import type { DefenseBlocking } from '../resolution/types';
+import type {
+  AggregateDashboardData,
+  DefenseHeatmapRow,
+  ConflictConstraintStatus,
+} from '../../data/mockConflictData';
 
 interface ConflictsPanelV2Props {
   isExpanded: boolean;
@@ -16,10 +22,142 @@ interface ConflictsPanelV2Props {
   onHeightChange?: (height: number) => void;
   registerResizeHandle?: (handler: ((event: React.MouseEvent) => void) | null) => void;
   hideInternalHandle?: boolean;
+  /** All defense events from the scheduler */
+  events?: DefenceEvent[];
+  /** Blocking data from solver (unplanned defenses with blocking resources) */
+  blocking?: DefenseBlocking[];
 }
 
 type ViewMode = 'aggregate' | 'defense';
 type SortOption = 'severity' | 'supervisor' | 'day' | 'student';
+
+/**
+ * Build aggregate dashboard data and heatmap rows from real solver data.
+ */
+function buildRealConflictData(
+  events: DefenceEvent[],
+  blocking: DefenseBlocking[],
+): { aggregateData: AggregateDashboardData; heatmapRows: DefenseHeatmapRow[] } {
+  // Build a set of unplanned defense IDs from blocking data
+  const blockingById = new Map(blocking.map(b => [b.defense_id, b]));
+
+  // Identify unplanned events (no day or startTime assigned)
+  const unplannedEvents = events.filter(e => !e.day || !e.startTime);
+  const totalEvents = events.length;
+  const unscheduledCount = unplannedEvents.length;
+
+  // Count blocking resource types across all blocking entries
+  let personBlockingCount = 0;
+  let roomBlockingCount = 0;
+  let otherBlockingCount = 0;
+
+  for (const b of blocking) {
+    for (const br of b.blocking_resources) {
+      if (br.type === 'person') personBlockingCount++;
+      else if (br.type === 'room' || br.type === 'room_pool') roomBlockingCount++;
+      else otherBlockingCount++;
+    }
+  }
+
+  // Build breakdowns from real constraint data
+  const breakdowns = [];
+  if (personBlockingCount > 0) {
+    breakdowns.push({ type: 'evaluator' as const, count: personBlockingCount, color: '#ef4444' });
+  }
+  if (roomBlockingCount > 0) {
+    breakdowns.push({ type: 'room' as const, count: roomBlockingCount, color: '#f59e0b' });
+  }
+  if (otherBlockingCount > 0) {
+    breakdowns.push({ type: 'other' as const, count: otherBlockingCount, color: '#3b82f6' });
+  }
+
+  // Compute evaluator workload from scheduled events
+  const evaluatorCounts = new Map<string, number>();
+  for (const e of events) {
+    if (e.day && e.startTime) {
+      // Count supervisors and assessors participation
+      if (e.supervisor) {
+        evaluatorCounts.set(e.supervisor, (evaluatorCounts.get(e.supervisor) || 0) + 1);
+      }
+      for (const a of e.assessors || []) {
+        evaluatorCounts.set(a, (evaluatorCounts.get(a) || 0) + 1);
+      }
+    }
+  }
+
+  // Top 5 evaluators by workload
+  const evaluators = Array.from(evaluatorCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([name, scheduled]) => ({
+      name,
+      scheduled,
+      capacity: Math.max(scheduled, 8), // Use 8 as default capacity or actual if higher
+      atCapacity: scheduled >= 8,
+    }));
+
+  const aggregateData: AggregateDashboardData = {
+    unscheduled: unscheduledCount,
+    total: totalEvents,
+    breakdowns,
+    evaluators,
+  };
+
+  // Build heatmap rows from unplanned events
+  const heatmapRows: DefenseHeatmapRow[] = unplannedEvents.map(e => {
+    // Extract defense index from event ID (e.g., "def-3" → 2)
+    const defenseId = typeof e.id === 'string' && e.id.startsWith('def-')
+      ? parseInt(e.id.slice(4), 10) - 1
+      : -1;
+    const blockingData = blockingById.get(defenseId);
+
+    // Determine constraint status per category from blocking resources
+    const constraints: ConflictConstraintStatus = {
+      room: 'unconstrained',
+      supervisor: 'unconstrained',
+      coSupervisor: e.coSupervisor ? 'unconstrained' : 'n/a',
+      assessors: 'unconstrained',
+      mentor: e.mentors?.length ? 'unconstrained' : 'n/a',
+      day: 'unconstrained',
+    };
+
+    if (blockingData) {
+      for (const br of blockingData.blocking_resources) {
+        if (br.type === 'room' || br.type === 'room_pool') {
+          constraints.room = 'blocking';
+        } else if (br.type === 'person') {
+          // Match person to their role in this defense
+          const resource = br.resource;
+          if (resource === e.supervisor) {
+            constraints.supervisor = 'blocking';
+          } else if (resource === e.coSupervisor) {
+            constraints.coSupervisor = 'blocking';
+          } else if (e.assessors?.includes(resource)) {
+            constraints.assessors = 'blocking';
+          } else if (e.mentors?.includes(resource)) {
+            constraints.mentor = 'blocking';
+          } else {
+            // Unknown person — mark as evaluator blocking
+            constraints.assessors = constraints.assessors === 'blocking' ? 'blocking' : 'tight';
+          }
+        }
+      }
+    }
+
+    return {
+      defenseId: String(e.id),
+      student: e.student || e.title || String(e.id),
+      supervisor: e.supervisor || 'Unknown',
+      targetDay: e.day || '—',
+      targetTime: e.startTime || '—',
+      programme: e.programme || '',
+      constraints,
+      musComputed: false,
+    };
+  });
+
+  return { aggregateData, heatmapRows };
+}
 
 export function ConflictsPanelV2({
   isExpanded,
@@ -28,6 +166,8 @@ export function ConflictsPanelV2({
   onHeightChange,
   registerResizeHandle,
   hideInternalHandle = false,
+  events = [],
+  blocking = [],
 }: ConflictsPanelV2Props) {
   const [viewMode, setViewMode] = useState<ViewMode>('aggregate');
   const [searchQuery, setSearchQuery] = useState('');
@@ -88,8 +228,11 @@ export function ConflictsPanelV2({
     registerResizeHandle(null);
   }, [registerResizeHandle, handleDragStart, isExpanded]);
 
-  // Load mock data
-  const { aggregateData, heatmapRows } = useMemo(() => generateMockConflictData(), []);
+  // Derive conflict data from real solver results
+  const { aggregateData, heatmapRows } = useMemo(
+    () => buildRealConflictData(events, blocking),
+    [events, blocking]
+  );
 
   // Extract unique supervisors for filter
   const supervisors = useMemo(

@@ -76,6 +76,21 @@ export interface ExplanationRequest {
 }
 
 /**
+ * Request to explain a single defense (defense-by-defense flow).
+ * Mirrors backend ExplainSingleDefenseRequest.
+ */
+export interface ExplainSingleDefenseRequest {
+  session_id: string;
+  dataset_id: string;
+  defense_id: number;
+  planned_defense_ids: number[];
+  must_fix_defenses?: boolean;
+  solver_output_folder?: string | null;
+  max_mcs?: number;
+  mcs_timeout_sec?: number;
+}
+
+/**
  * Resource impact information from Defense-rostering driver.
  * Shows how each person/room contributes to blocking defenses.
  */

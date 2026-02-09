@@ -7,22 +7,13 @@
  * - Right (~280px): Staged changes panel
  */
 
-import { useState, useMemo, useEffect } from 'react';
-import { CheckCircle2, Check, AlertCircle, Users, Building2, ChevronDown, ChevronUp, X } from 'lucide-react';
-import type { DefenseBlocking, StagedRelaxation, RelaxationAction, PersonAvailabilityTarget } from './types';
+import { useState, useMemo } from 'react';
+import { CheckCircle2, AlertCircle, Users } from 'lucide-react';
+import type { DefenseBlocking, StagedRelaxation, RelaxationAction, RepairClickInfo } from './types';
 import type { RankedRepair, DisabledRoom } from '../../types/explanation';
 import { SimpleDefenseCard } from './SimpleDefenseCard';
 import { SelectedDefensePanel } from './SelectedDefensePanel';
 import { StagedChangesPanel } from './StagedChangesPanel';
-
-type MatrixColumnType = 'person' | 'room' | 'time';
-
-function mapBlockingTypeToColumnType(type: string): MatrixColumnType {
-  if (type === 'person') return 'person';
-  if (type === 'room') return 'room';
-  if (type === 'room_pool') return 'time';
-  return 'room';
-}
 
 /**
  * Get display name for a defense - fallback to student field or generate from ID
@@ -80,6 +71,22 @@ interface SimpleConflictViewProps {
   onMustFixDefensesChange?: (value: boolean) => void;
   /** Available rooms from the global room pool (not yet in dataset) */
   availablePoolRooms?: string[];
+  /** Callback to explain a single defense (defense-by-defense flow) */
+  onExplainDefense?: (defenseId: number) => void;
+  /** Per-defense cached explanation results */
+  singleDefenseExplanations?: Map<number, import('../../hooks/useExplanationApi').SingleDefenseExplanationData>;
+  /** Which defense is currently being explained (null if not explaining) */
+  explainingDefenseId?: number | null;
+  /** Streaming logs for the current single-defense explanation */
+  singleDefenseLogs?: import('../../hooks/useExplanationApi').ExplanationLogEvent[];
+  /** Current phase of single-defense explanation streaming */
+  singleDefensePhase?: string | null;
+  /** Error from single-defense explanation */
+  singleDefenseError?: string | null;
+  /** Callback when user clicks a repair card to navigate to availability/rooms panel */
+  onRepairClick?: (info: RepairClickInfo) => void;
+  /** Callback when user selects a defense in the sidebar */
+  onDefenseSelect?: (defenseId: number, blockingPersonNames: string[]) => void;
 }
 
 /**
@@ -240,159 +247,6 @@ function computeInevitabilityScore(
   return { score, reason };
 }
 
-/**
- * ChangesTrackerBar - Compact summary of all staged changes below the 3-column layout.
- * Groups by person/room with clickable names that open availability panels.
- */
-function ChangesTrackerBar({
-  stagedChanges,
-  onRemoveStaged,
-  onPersonClick,
-}: {
-  stagedChanges: StagedRelaxation[];
-  onRemoveStaged?: (id: string) => void;
-  onPersonClick?: (personName: string, staged: StagedRelaxation) => void;
-}) {
-  const [collapsed, setCollapsed] = useState(false);
-
-  // Group changes by type and name
-  const groups = useMemo(() => {
-    const personGroups: Record<string, { name: string; items: StagedRelaxation[]; totalImpact: number }> = {};
-    const roomGroups: Record<string, { name: string; items: StagedRelaxation[]; totalImpact: number }> = {};
-    const otherItems: StagedRelaxation[] = [];
-
-    for (const staged of stagedChanges) {
-      const { type, target } = staged.relaxation;
-      if (type === 'person_availability' && 'personName' in target) {
-        const key = (target as PersonAvailabilityTarget).personName;
-        if (!personGroups[key]) {
-          personGroups[key] = { name: key, items: [], totalImpact: 0 };
-        }
-        personGroups[key].items.push(staged);
-        personGroups[key].totalImpact += staged.relaxation.estimatedImpact;
-      } else if ((type === 'enable_room' || type === 'add_room') && 'roomName' in target) {
-        const key = (target as { roomName?: string }).roomName || 'Room';
-        if (!roomGroups[key]) {
-          roomGroups[key] = { name: key, items: [], totalImpact: 0 };
-        }
-        roomGroups[key].items.push(staged);
-        roomGroups[key].totalImpact += staged.relaxation.estimatedImpact;
-      } else {
-        otherItems.push(staged);
-      }
-    }
-    return { personGroups, roomGroups, otherItems };
-  }, [stagedChanges]);
-
-  if (stagedChanges.length === 0) return null;
-
-  const totalImpact = stagedChanges.reduce((s, c) => s + c.relaxation.estimatedImpact, 0);
-
-  return (
-    <div className="shrink-0 border-t border-slate-200 bg-white">
-      {/* Header */}
-      <button
-        type="button"
-        onClick={() => setCollapsed(!collapsed)}
-        className="w-full flex items-center justify-between px-4 py-2 hover:bg-slate-50 transition-colors"
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-700 uppercase tracking-wide">
-            Pending Changes
-          </span>
-          <span className="inline-flex items-center justify-center h-5 min-w-[20px] px-1.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold">
-            {stagedChanges.length}
-          </span>
-          <span className="text-xs text-green-600 font-medium">
-            Est. +{totalImpact} defenses
-          </span>
-        </div>
-        {collapsed ? <ChevronUp size={14} className="text-slate-400" /> : <ChevronDown size={14} className="text-slate-400" />}
-      </button>
-
-      {/* Content */}
-      {!collapsed && (
-        <div className="px-4 pb-3 flex flex-wrap gap-2">
-          {/* Person chips */}
-          {Object.values(groups.personGroups).map(group => (
-            <div
-              key={`person-${group.name}`}
-              className="inline-flex items-center gap-1.5 pl-2 pr-1 py-1 bg-blue-50 border border-blue-200 rounded-lg group"
-            >
-              <Users size={12} className="text-blue-500 shrink-0" />
-              <button
-                type="button"
-                onClick={() => {
-                  if (group.items[0] && onPersonClick) {
-                    onPersonClick(group.name, group.items[0]);
-                  }
-                }}
-                className="text-xs font-medium text-blue-700 hover:text-blue-900 hover:underline cursor-pointer"
-                title={`Open availability for ${group.name}`}
-              >
-                {group.name}
-              </button>
-              {group.items.length > 1 && (
-                <span className="text-[10px] text-blue-500">
-                  ({group.items.length} slots)
-                </span>
-              )}
-              <span className="text-[10px] text-green-600 font-medium">+{group.totalImpact}</span>
-              <button
-                type="button"
-                onClick={() => group.items.forEach(item => onRemoveStaged?.(item.id))}
-                className="p-0.5 text-blue-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                title="Remove"
-              >
-                <X size={12} />
-              </button>
-            </div>
-          ))}
-
-          {/* Room chips */}
-          {Object.values(groups.roomGroups).map(group => (
-            <div
-              key={`room-${group.name}`}
-              className="inline-flex items-center gap-1.5 pl-2 pr-1 py-1 bg-amber-50 border border-amber-200 rounded-lg group"
-            >
-              <Building2 size={12} className="text-amber-500 shrink-0" />
-              <span className="text-xs font-medium text-amber-700">{group.name}</span>
-              <span className="text-[10px] text-green-600 font-medium">+{group.totalImpact}</span>
-              <button
-                type="button"
-                onClick={() => group.items.forEach(item => onRemoveStaged?.(item.id))}
-                className="p-0.5 text-amber-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                title="Remove"
-              >
-                <X size={12} />
-              </button>
-            </div>
-          ))}
-
-          {/* Other chips */}
-          {groups.otherItems.map(staged => (
-            <div
-              key={staged.id}
-              className="inline-flex items-center gap-1.5 pl-2 pr-1 py-1 bg-slate-50 border border-slate-200 rounded-lg group"
-            >
-              <span className="text-xs text-slate-600">{staged.relaxation.label}</span>
-              <span className="text-[10px] text-green-600 font-medium">+{staged.relaxation.estimatedImpact}</span>
-              <button
-                type="button"
-                onClick={() => onRemoveStaged?.(staged.id)}
-                className="p-0.5 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                title="Remove"
-              >
-                <X size={12} />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export function SimpleConflictView({
   blocking,
   perDefenseRepairs,
@@ -408,6 +262,13 @@ export function SimpleConflictView({
   mustFixDefenses = false,
   onMustFixDefensesChange,
   availablePoolRooms = [],
+  onExplainDefense,
+  singleDefenseExplanations,
+  explainingDefenseId,
+  singleDefensePhase,
+  singleDefenseError,
+  onRepairClick,
+  onDefenseSelect,
 }: SimpleConflictViewProps) {
   // State for selected defense (clicking a defense card selects it)
   const [selectedDefenseId, setSelectedDefenseId] = useState<number | null>(null);
@@ -432,44 +293,6 @@ export function SimpleConflictView({
     return names;
   }, [blocking]);
 
-  // Calculate which defenses would be unblocked by staged changes
-  const potentiallyScheduled = useMemo(() => {
-    if (stagedChanges.length === 0) return [];
-
-    // Collect all resource IDs that would be relaxed
-    const relaxedResourceIds = new Set<string>();
-    for (const staged of stagedChanges) {
-      if (staged.relaxation.sourceSetIds) {
-        for (const sid of staged.relaxation.sourceSetIds) {
-          relaxedResourceIds.add(sid);
-        }
-      }
-    }
-
-    // Find defenses whose blocking would be resolved
-    return blocking.filter(defense => {
-      // Get all blocking resource IDs for this defense
-      const blockingIds = new Set<string>();
-      for (const br of defense.blocking_resources) {
-        if (br.blocked_slots.length > 0) {
-          const colType = mapBlockingTypeToColumnType(br.type);
-          blockingIds.add(`${colType}:${br.resource}`);
-        }
-      }
-
-      // Check if any blocking resource is covered by relaxations
-      for (const bid of blockingIds) {
-        if (relaxedResourceIds.has(bid)) return true;
-        // Also check type-level relaxations
-        const type = bid.split(':')[0];
-        if (relaxedResourceIds.has(`type:${type}`)) return true;
-      }
-      return false;
-    });
-  }, [stagedChanges, blocking]);
-
-  const stagedImpact = potentiallyScheduled.length;
-
   // Sort defenses by inevitability (most inevitable first)
   const sortedBlocking = useMemo(() => {
     const allDefenseIds = blocking.map(d => d.defense_id);
@@ -492,12 +315,6 @@ export function SimpleConflictView({
     return withScores;
   }, [blocking, perDefenseRepairs, disabledRooms]);
 
-  // Auto-select first defense when nothing is selected
-  useEffect(() => {
-    if (selectedDefenseId === null && blocking.length > 0) {
-      setSelectedDefenseId(sortedBlocking[0]?.defense.defense_id ?? blocking[0].defense_id);
-    }
-  }, [selectedDefenseId, blocking, sortedBlocking]);
 
   const blockedCount = blocking.length;
 
@@ -639,24 +456,29 @@ export function SimpleConflictView({
   }, [blocking, selectedDefenseId]);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex-1 flex flex-col min-h-0 min-w-0">
       {/* Three-column layout */}
       <div className="flex flex-1 min-h-0">
         {/* Left column - Defense list */}
-        <div className="flex-1 min-w-[240px] border-r border-slate-200 bg-white flex flex-col min-h-0">
-          <div className="px-3 py-2 border-b border-slate-100 shrink-0">
-            <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-              Defenses ({blockedCount})
-            </div>
+        <div className="w-[408px] min-w-[340px] shrink-0 border-r border-slate-200 bg-white flex flex-col min-h-0">
+          <div className="px-4 py-2.5 border-b border-slate-200 shrink-0">
+            <span className="text-[14px] font-semibold text-slate-500 uppercase tracking-wider">
+              Defenses
+            </span>
+            <span className="text-[14px] text-slate-400 ml-1.5">{blockedCount}</span>
           </div>
           <div className="flex-1 overflow-auto">
             {blockedCount === 0 ? (
-              <div className="text-center py-8 px-3">
-                <CheckCircle2 className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
-                <div className="text-sm font-medium text-slate-700">All scheduled</div>
+              <div className="text-center py-12 px-4">
+                <CheckCircle2 className="h-6 w-6 text-emerald-500 mx-auto mb-2" />
+                <div className="text-[16px] font-medium text-slate-700">All scheduled</div>
               </div>
             ) : (
-              sortedBlocking.map(({ defense }) => (
+              sortedBlocking.map(({ defense }) => {
+                const isExplained = singleDefenseExplanations?.has(defense.defense_id) ||
+                  (perDefenseRepairs[defense.defense_id] && perDefenseRepairs[defense.defense_id].length > 0);
+                const isExplaining = explainingDefenseId === defense.defense_id;
+                return (
                 <SimpleDefenseCard
                   key={defense.defense_id}
                   defense={{
@@ -665,79 +487,154 @@ export function SimpleConflictView({
                   }}
                   isSelected={selectedDefenseId === defense.defense_id}
                   hasRepair={defensesWithStagedRepairs.has(defense.defense_id)}
+                  isExplaining={isExplaining}
+                  isExplained={!!isExplained}
                   onClick={() => {
                     setSelectedDefenseId(defense.defense_id);
+                    if (onExplainDefense && !singleDefenseExplanations?.has(defense.defense_id) && !isExplaining) {
+                      onExplainDefense(defense.defense_id);
+                    }
+                    // Notify parent to highlight participants in availability panel
+                    if (onDefenseSelect) {
+                      const blockingPersonNames = defense.blocking_resources
+                        .filter(br => br.type === 'person' && br.blocked_slots.length > 0)
+                        .map(br => br.resource);
+                      onDefenseSelect(defense.defense_id, blockingPersonNames);
+                    }
                   }}
                 />
-              ))
+                );
+              })
             )}
           </div>
         </div>
 
         {/* Middle column - Selected defense detail + repairs */}
-        <div className="flex-1 min-w-[280px] max-w-[520px] flex flex-col min-h-0 bg-slate-50">
-          {selectedDefense ? (
-            <SelectedDefensePanel
-              defense={{
-                ...selectedDefense,
-                student: defenseNames[selectedDefense.defense_id] || selectedDefense.student,
-              }}
-              repairs={perDefenseRepairs[selectedDefense.defense_id] || []}
-              defenseNames={defenseNames}
-              disabledRooms={disabledRooms}
-              onStageRepair={handleAction}
-              availablePoolRooms={availablePoolRooms}
-            />
-          ) : (
+        <div className="flex-[1.6] min-w-[280px] flex flex-col min-h-0 bg-white">
+          {selectedDefense ? (() => {
+            const isCurrentlyExplaining = explainingDefenseId === selectedDefense.defense_id;
+            const singleExplanation = singleDefenseExplanations?.get(selectedDefense.defense_id);
+            const repairs = singleExplanation
+              ? (() => {
+                  const resp = singleExplanation.response;
+                  const pdr = resp.perDefenseRepairs;
+                  if (pdr) {
+                    const defId = selectedDefense.defense_id;
+                    return (pdr as Record<string | number, RankedRepair[]>)[defId]
+                      || (pdr as Record<string | number, RankedRepair[]>)[String(defId)]
+                      || [];
+                  }
+                  return [];
+                })()
+              : perDefenseRepairs[selectedDefense.defense_id] || [];
+            const hasExplanation = repairs.length > 0 || singleExplanation != null;
+
+            if (isCurrentlyExplaining && !hasExplanation) {
+              return (
+                <div className="flex-1 flex flex-col items-center justify-center p-8">
+                  <div className="animate-spin h-6 w-6 border-[1.5px] border-slate-200 border-t-slate-600 rounded-full mb-4" />
+                  <h3 className="text-[16px] font-medium text-slate-800 mb-1">
+                    Analyzing {defenseNames[selectedDefense.defense_id] || selectedDefense.student}
+                  </h3>
+                  <p className="text-[15px] text-slate-400">
+                    {singleDefensePhase || 'Computing explanation and repairs'}
+                  </p>
+                </div>
+              );
+            }
+
+            if (singleDefenseError && explainingDefenseId === selectedDefense.defense_id) {
+              return (
+                <div className="flex-1 flex flex-col items-center justify-center p-8">
+                  <AlertCircle className="h-6 w-6 text-red-400 mb-3" />
+                  <div className="text-[16px] font-medium text-slate-800 mb-1">Analysis Failed</div>
+                  <div className="text-[15px] text-red-500 mb-4">{singleDefenseError}</div>
+                  {onExplainDefense && (
+                    <button
+                      onClick={() => onExplainDefense(selectedDefense.defense_id)}
+                      className="px-3.5 py-1.5 bg-blue-600 text-white rounded-md text-[15px] hover:bg-blue-700 transition-colors"
+                    >
+                      Retry
+                    </button>
+                  )}
+                </div>
+              );
+            }
+
+            if (hasExplanation) {
+              const enrichedDefense = singleExplanation
+                ? (() => {
+                    const resp = singleExplanation.response;
+                    const explDef = resp.blocked_defenses?.find(
+                      (bd: { defense_id: number }) => bd.defense_id === selectedDefense.defense_id
+                    );
+                    if (explDef && explDef.mus && explDef.mus.constraint_groups) {
+                      const blockingResources = explDef.mus.constraint_groups.map((cg) => ({
+                        resource: cg.entity,
+                        type: (cg.category.includes('person') ? 'person' :
+                              cg.category.includes('room') ? 'room' : 'room_pool') as 'person' | 'room' | 'room_pool',
+                        blocked_slots: cg.slots.map((s) => s.slot_index ?? 0),
+                      }));
+                      return {
+                        ...selectedDefense,
+                        student: defenseNames[selectedDefense.defense_id] || selectedDefense.student,
+                        blocking_resources: blockingResources.length > 0 ? blockingResources : selectedDefense.blocking_resources,
+                      };
+                    }
+                    return {
+                      ...selectedDefense,
+                      student: defenseNames[selectedDefense.defense_id] || selectedDefense.student,
+                    };
+                  })()
+                : {
+                    ...selectedDefense,
+                    student: defenseNames[selectedDefense.defense_id] || selectedDefense.student,
+                  };
+
+              return (
+                <SelectedDefensePanel
+                  defense={enrichedDefense}
+                  repairs={repairs}
+                  defenseNames={defenseNames}
+                  disabledRooms={disabledRooms}
+                  onStageRepair={handleAction}
+                  availablePoolRooms={availablePoolRooms}
+                  onRepairClick={onRepairClick}
+                />
+              );
+            }
+
+            return (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <Users className="h-6 w-6 text-slate-300 mx-auto mb-3" />
+                  <div className="text-[16px] text-slate-400 mb-1">Click to analyze this defense</div>
+                  <div className="text-[15px] text-slate-300">{defenseNames[selectedDefense.defense_id] || selectedDefense.student}</div>
+                  {onExplainDefense && (
+                    <button
+                      onClick={() => onExplainDefense(selectedDefense.defense_id)}
+                      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md text-[15px] hover:bg-blue-700 transition-colors"
+                    >
+                      Analyze
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })() : (
             <div className="flex-1 flex items-center justify-center">
-              <div className="text-center text-slate-400">
-                <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <div className="text-sm">Select a defense to see details</div>
+              <div className="text-center">
+                <AlertCircle className="h-6 w-6 text-slate-300 mx-auto mb-3" />
+                <div className="text-[16px] text-slate-400">Select a defense to see details</div>
               </div>
             </div>
           )}
         </div>
 
         {/* Right column - Staged changes */}
-        <div className="flex-1 min-w-[240px] border-l border-slate-200 bg-white flex flex-col min-h-0">
-          {/* Conflicts Resolved Preview */}
-          <div className="shrink-0 border-b border-slate-100">
-            <div className="px-3 py-2 flex items-center justify-between">
-              <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">
-                Conflicts Resolved
-              </div>
-              {stagedImpact > 0 && (
-                <div className="flex items-center gap-1 text-xs">
-                  <span className="font-semibold text-green-600">{stagedImpact}</span>
-                  <span className="text-slate-400">/ {blockedCount}</span>
-                </div>
-              )}
-            </div>
-            <div className="max-h-28 overflow-auto px-3 pb-3">
-              {potentiallyScheduled.length > 0 ? (
-                <div className="flex flex-wrap gap-1">
-                  {potentiallyScheduled.map(defense => (
-                    <div
-                      key={defense.defense_id}
-                      className="flex items-center gap-1 px-2 py-0.5 bg-green-50 rounded border border-green-200"
-                    >
-                      <Check size={10} className="text-green-500 shrink-0" />
-                      <span className="text-[10px] text-green-700 truncate max-w-[100px]">
-                        {defenseNames[defense.defense_id] || defense.student}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center text-[10px] text-slate-400 py-2">
-                  Stage repairs to see impact
-                </div>
-              )}
-            </div>
-          </div>
-
+        <div className="flex-[1.2] min-w-[240px] border-l border-slate-200 bg-white flex flex-col min-h-0">
           {/* Staged Changes Panel */}
-          <div className="flex-1 overflow-auto p-3">
+          <div className="flex-1 overflow-auto p-4">
             <StagedChangesPanel
               stagedChanges={stagedChanges}
               onConfirm={onConfirmStaged ?? (() => {})}
@@ -752,31 +649,6 @@ export function SimpleConflictView({
         </div>
       </div>
 
-      {/* Changes Tracker Bar - below the 3-column layout */}
-      <ChangesTrackerBar
-        stagedChanges={stagedChanges}
-        onRemoveStaged={onRemoveStaged}
-        onPersonClick={(personName, staged) => {
-          // Open availability panel for this person
-          const target = staged.relaxation.target;
-          if ('personName' in target && 'slots' in target) {
-            const slots = (target as PersonAvailabilityTarget).slots;
-            const firstSlot = slots[0];
-            if (firstSlot) {
-              onRequestPersonAvailability?.(
-                personName,
-                firstSlot.day,
-                firstSlot.time,
-                staged.relaxation.forDefenseId != null ? [staged.relaxation.forDefenseId] : []
-              );
-            }
-          }
-          // Highlight the defense this person is associated with
-          if (staged.relaxation.forDefenseId != null) {
-            setSelectedDefenseId(staged.relaxation.forDefenseId);
-          }
-        }}
-      />
     </div>
   );
 }

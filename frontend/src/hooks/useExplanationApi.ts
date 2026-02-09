@@ -9,6 +9,7 @@ import { API_BASE_URL } from '../lib/apiConfig';
 import type {
   ExplanationResponse,
   ExplanationRequest,
+  ExplainSingleDefenseRequest,
   ApplyRepairRequest,
   ApplyRepairResponse,
   LegalSlotsResponse,
@@ -468,4 +469,221 @@ export function useExplanationStream(
     stopStream,
     clearLogs,
   }), [streaming, logs, currentPhase, result, error, startStream, stopStream, clearLogs]);
+}
+
+
+// =============================================================================
+// Single Defense Explanation Hook (defense-by-defense flow)
+// =============================================================================
+
+export interface SingleDefenseExplanationData {
+  response: ExplanationResponse;
+  defenseId: number;
+}
+
+interface UseSingleDefenseExplanationReturn {
+  /** Whether an explanation is currently streaming */
+  explaining: boolean;
+  /** Which defense is currently being explained */
+  currentDefenseId: number | null;
+  /** Cached explanations by defense ID */
+  explanationsByDefense: Map<number, SingleDefenseExplanationData>;
+  /** Streaming logs for the current explanation */
+  logs: ExplanationLogEvent[];
+  /** Current streaming phase */
+  currentPhase: string | null;
+  /** Error from the current or last explanation */
+  error: string | null;
+  /** Trigger explanation for a single defense */
+  explainDefense: (request: ExplainSingleDefenseRequest) => void;
+  /** Stop the current streaming explanation */
+  stopExplaining: () => void;
+  /** Clear all cached explanations (e.g., after re-solve) */
+  clearExplanations: () => void;
+}
+
+export function useSingleDefenseExplanation(
+  onResult?: (defenseId: number, response: ExplanationResponse) => void
+): UseSingleDefenseExplanationReturn {
+  const [explaining, setExplaining] = useState(false);
+  const [currentDefenseId, setCurrentDefenseId] = useState<number | null>(null);
+  const [explanationsByDefense, setExplanationsByDefense] = useState<Map<number, SingleDefenseExplanationData>>(new Map());
+  const [logs, setLogs] = useState<ExplanationLogEvent[]>([]);
+  const [currentPhase, setCurrentPhase] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const abortControllerRef = React.useRef<AbortController | null>(null);
+
+  const stopExplaining = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setExplaining(false);
+  }, []);
+
+  const clearExplanations = useCallback(() => {
+    stopExplaining();
+    setExplanationsByDefense(new Map());
+    setLogs([]);
+    setCurrentPhase(null);
+    setError(null);
+    setCurrentDefenseId(null);
+  }, [stopExplaining]);
+
+  const explainDefense = useCallback((request: ExplainSingleDefenseRequest) => {
+    // Check cache first
+    const cached = explanationsByDefense.get(request.defense_id);
+    if (cached) {
+      setCurrentDefenseId(request.defense_id);
+      onResult?.(request.defense_id, cached.response);
+      return;
+    }
+
+    // Stop any existing stream
+    stopExplaining();
+    setLogs([]);
+    setCurrentPhase(null);
+    setError(null);
+    setExplaining(true);
+    setCurrentDefenseId(request.defense_id);
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    const url = `${API_BASE_URL}/api/explanations/explain-defense/stream`;
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream',
+      },
+      body: JSON.stringify(request),
+      signal: controller.signal,
+    }).then(response => {
+      if (!response.ok) {
+        setError(`HTTP error: ${response.status}`);
+        setExplaining(false);
+        return;
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        setError('No response body');
+        setExplaining(false);
+        return;
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      const processEvents = (text: string) => {
+        const lines = text.split('\n');
+        let eventType = '';
+        let eventData = '';
+
+        for (const line of lines) {
+          if (line.startsWith('event: ')) {
+            eventType = line.slice(7);
+          } else if (line.startsWith('data: ')) {
+            eventData = line.slice(6);
+          } else if (line === '' && eventType && eventData) {
+            try {
+              const data = JSON.parse(eventData);
+              const logEvent: ExplanationLogEvent = {
+                type: eventType as ExplanationLogEvent['type'],
+                data,
+                timestamp: Date.now(),
+              };
+
+              setLogs(prev => [...prev, logEvent]);
+
+              if (eventType === 'phase') {
+                setCurrentPhase(data.phase || data.message);
+              } else if (eventType === 'result') {
+                const explanationResult = data as ExplanationResponse;
+                // Cache the result
+                setExplanationsByDefense(prev => {
+                  const next = new Map(prev);
+                  next.set(request.defense_id, {
+                    response: explanationResult,
+                    defenseId: request.defense_id,
+                  });
+                  return next;
+                });
+                onResult?.(request.defense_id, explanationResult);
+              } else if (eventType === 'error') {
+                setError(data.message || 'Unknown error');
+              } else if (eventType === 'close') {
+                setExplaining(false);
+              }
+            } catch {
+              console.warn('Failed to parse SSE event:', eventData);
+            }
+            eventType = '';
+            eventData = '';
+          }
+        }
+      };
+
+      const readStream = async () => {
+        try {
+          let streamActive = true;
+          while (streamActive) {
+            const { done, value } = await reader.read();
+            if (done) {
+              setExplaining(false);
+              streamActive = false;
+              continue;
+            }
+
+            buffer += decoder.decode(value, { stream: true });
+
+            const eventEnd = buffer.lastIndexOf('\n\n');
+            if (eventEnd !== -1) {
+              const completeEvents = buffer.slice(0, eventEnd + 2);
+              buffer = buffer.slice(eventEnd + 2);
+              processEvents(completeEvents);
+            }
+          }
+        } catch (err) {
+          if (err instanceof DOMException && err.name === 'AbortError') {
+            // Aborted by user — not an error
+            return;
+          }
+          console.error('Stream reading error:', err);
+          setError(err instanceof Error ? err.message : 'Stream error');
+          setExplaining(false);
+        }
+      };
+
+      readStream();
+    }).catch(err => {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        return;
+      }
+      console.error('Fetch error:', err);
+      setError(err instanceof Error ? err.message : 'Connection error');
+      setExplaining(false);
+    });
+  }, [explanationsByDefense, stopExplaining, onResult]);
+
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      stopExplaining();
+    };
+  }, [stopExplaining]);
+
+  return useMemo(() => ({
+    explaining,
+    currentDefenseId,
+    explanationsByDefense,
+    logs,
+    currentPhase,
+    error,
+    explainDefense,
+    stopExplaining,
+    clearExplanations,
+  }), [explaining, currentDefenseId, explanationsByDefense, logs, currentPhase, error, explainDefense, stopExplaining, clearExplanations]);
 }

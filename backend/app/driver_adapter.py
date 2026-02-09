@@ -447,12 +447,15 @@ def _run_subprocess_streaming(
             if on_log:
                 on_log(line)
 
-    # Read stderr
+    # Read stderr — forward as log events with stream marker
     def read_stderr():
         for line in proc.stderr:
             line = line.rstrip()
             stderr_lines.append(line)
-            # Don't emit stderr as events (often just warnings)
+            event = {"type": "log", "line": line, "stream": "stderr"}
+            events.append(event)
+            if on_log:
+                on_log(line)
 
     stdout_thread = threading.Thread(target=read_stdout)
     stderr_thread = threading.Thread(target=read_stderr)

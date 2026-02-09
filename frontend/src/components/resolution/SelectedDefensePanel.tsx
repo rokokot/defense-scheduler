@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import { AlertCircle, Wrench, Users, Clock, DoorOpen, Plus } from 'lucide-react';
-import type { DefenseBlocking } from './types';
+import type { DefenseBlocking, RepairClickInfo } from './types';
 import type { RankedRepair, DisabledRoom } from '../../types/explanation';
 
 interface SelectedDefensePanelProps {
@@ -25,17 +25,22 @@ interface SelectedDefensePanelProps {
   onStageRepair: (repair: RankedRepair, selectedPoolRoom?: string) => void;
   /** Available rooms from the global room pool (not yet in dataset) */
   availablePoolRooms?: string[];
+  /** Callback when user clicks a repair card to navigate to availability/rooms panel */
+  onRepairClick?: (info: RepairClickInfo) => void;
 }
 
 /**
  * Generate detailed blocking explanation from blocking resources.
  */
-function getBlockingDetails(defense: DefenseBlocking): Array<{
+interface BlockingDetail {
   icon: typeof Users;
   text: string;
   details?: string;
-}> {
-  const result: Array<{ icon: typeof Users; text: string; details?: string }> = [];
+  clickInfo?: RepairClickInfo;
+}
+
+function getBlockingDetails(defense: DefenseBlocking): BlockingDetail[] {
+  const result: BlockingDetail[] = [];
 
   const personBlocking = defense.blocking_resources.filter(
     br => br.type === 'person' && br.blocked_slots.length > 0
@@ -64,6 +69,7 @@ function getBlockingDetails(defense: DefenseBlocking): Array<{
       icon: Users,
       text: `${personName} unavailable`,
       details: slotText,
+      clickInfo: { type: 'person', personNames: [personName] },
     });
   }
 
@@ -79,6 +85,7 @@ function getBlockingDetails(defense: DefenseBlocking): Array<{
       icon: DoorOpen,
       text: `${br.resource} fully booked`,
       details: slotText,
+      clickInfo: { type: 'room', roomName: br.resource },
     });
   }
 
@@ -199,25 +206,76 @@ function hasExtraRoomConstraint(repair: RankedRepair): boolean {
   return (repair.constraintGroups || []).some(cg => cg.includes('extra-room'));
 }
 
+/**
+ * Extract navigation info from a repair's constraint groups.
+ */
+function getRepairClickInfo(
+  repair: RankedRepair,
+  disabledRooms: DisabledRoom[] = []
+): RepairClickInfo | null {
+  const cgs = repair.constraintGroups || [];
+  const personNames: string[] = [];
+  const slots: Array<{ personName: string; day: string; timeSlot: string }> = [];
+  let roomName: string | undefined;
+  let roomId: string | undefined;
+
+  for (const cg of cgs) {
+    // Extract person name AND timestamp from constraint group
+    const personMatch = cg.match(/person-unavailable\s+<([^>]+)>\s+<([^>]+)>/);
+    if (personMatch) {
+      const [, name, timestamp] = personMatch;
+      if (!personNames.includes(name)) personNames.push(name);
+      // Parse timestamp: handles both "2026-01-01 09:00:00" and "2026-01-01T09:00:00"
+      const [day, time] = timestamp.includes('T')
+        ? timestamp.split('T')
+        : timestamp.split(' ');
+      if (day && time) {
+        slots.push({ personName: name, day, timeSlot: time.slice(0, 5) });
+      }
+    }
+
+    const enableRoomMatch = cg.match(/enable-room\s+<([^>]+)>/);
+    if (enableRoomMatch && !roomName) {
+      roomName = enableRoomMatch[1];
+      const matched = disabledRooms.find(r =>
+        r.name.toLowerCase() === roomName!.toLowerCase()
+      );
+      if (matched) roomId = matched.id;
+    }
+
+    if (!roomName) {
+      const roomUnavailMatch = cg.match(/room-unavailable\s+<([^>]+)>/);
+      if (roomUnavailMatch) roomName = roomUnavailMatch[1];
+      const extraRoomMatch = cg.match(/extra-room\s+<([^>]+)>/);
+      if (extraRoomMatch) roomName = extraRoomMatch[1];
+    }
+  }
+
+  if (personNames.length > 0) return { type: 'person', personNames, slots };
+  if (roomName) return { type: 'room', roomName, roomId };
+  return null;
+}
+
 export function SelectedDefensePanel({
   defense,
   repairs,
-  defenseNames,
+  defenseNames: _defenseNames,
   disabledRooms = [],
   onStageRepair,
   availablePoolRooms = [],
+  onRepairClick,
 }: SelectedDefensePanelProps) {
+  void _defenseNames;
   const blockingDetails = getBlockingDetails(defense);
-  // Track selected pool room per repair key
   const [poolRoomSelections, setPoolRoomSelections] = useState<Record<string, string>>({});
 
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-slate-200 bg-slate-50">
-        <div className="flex items-center gap-2">
-          <AlertCircle size={18} className="text-amber-500" />
-          <h2 className="text-base font-semibold text-slate-800">
+      <div className="px-5 py-3.5 border-b border-slate-200 shrink-0">
+        <div className="flex items-center gap-2.5">
+          <AlertCircle size={19} className="text-slate-400" />
+          <h2 className="text-[18px] font-semibold text-slate-800 tracking-tight">
             {defense.student}
           </h2>
         </div>
@@ -225,23 +283,33 @@ export function SelectedDefensePanel({
 
       <div className="flex-1 overflow-auto">
         {/* WHY section */}
-        <div className="p-4 border-b border-slate-100">
-          <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">
-            Why it can't be scheduled
+        <div className="px-5 py-4 border-b border-slate-100">
+          <h3 className="text-[14px] font-semibold text-slate-400 uppercase tracking-wider mb-3">
+            Blocking Constraints
           </h3>
           <div className="space-y-2">
             {blockingDetails.map((detail, idx) => {
               const Icon = detail.icon;
+              const isClickable = detail.clickInfo && onRepairClick;
               return (
                 <div
                   key={idx}
-                  className="flex items-start gap-2 text-sm text-slate-700"
+                  onClick={() => {
+                    if (isClickable) onRepairClick!(detail.clickInfo!);
+                  }}
+                  className={`flex items-start gap-2.5 rounded-md px-2 py-1.5 -mx-2 ${
+                    isClickable
+                      ? 'cursor-pointer hover:bg-slate-50 transition-colors'
+                      : ''
+                  }`}
                 >
-                  <Icon size={14} className="mt-0.5 text-slate-400 shrink-0" />
-                  <div>
-                    <span className="font-medium">{detail.text}</span>
+                  <Icon size={16} className="mt-0.5 text-slate-400 shrink-0" />
+                  <div className="text-[16px] text-slate-700">
+                    <span className={`font-medium ${isClickable ? 'hover:text-blue-600 transition-colors' : ''}`}>
+                      {detail.text}
+                    </span>
                     {detail.details && (
-                      <span className="text-slate-500 ml-1">({detail.details})</span>
+                      <span className="text-slate-400 ml-1.5 text-[15px]">{detail.details}</span>
                     )}
                   </div>
                 </div>
@@ -251,9 +319,9 @@ export function SelectedDefensePanel({
         </div>
 
         {/* REPAIRS section */}
-        <div className="p-4">
-          <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-3">
-            Repair options
+        <div className="px-5 py-4">
+          <h3 className="text-[14px] font-semibold text-slate-400 uppercase tracking-wider mb-3">
+            Repair Options
           </h3>
 
           {repairs.length > 0 ? (
@@ -261,13 +329,6 @@ export function SelectedDefensePanel({
               {repairs.map((repair, idx) => {
                 const { label, type } = getRepairDescription(repair, disabledRooms);
                 const Icon = typeIcons[type];
-                const impactCount = repair.rippleEffect?.directlyUnblocks?.length || 1;
-                const otherDefenses = (repair.rippleEffect?.directlyUnblocks || [])
-                  .filter(id => id !== repair.defenseId)
-                  .map(id => defenseNames[id])
-                  .filter(Boolean)
-                  .slice(0, 2);
-                const rawConstraints = repair.constraintGroups || [];
                 const repairKey = `${repair.defenseId}-${repair.mcsIndex}`;
                 const needsPoolRoom = hasExtraRoomConstraint(repair) && availablePoolRooms.length > 0;
                 const selectedRoom = poolRoomSelections[repairKey] || '';
@@ -275,100 +336,70 @@ export function SelectedDefensePanel({
                 return (
                   <div
                     key={repairKey}
-                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                      idx === 0
-                        ? 'bg-blue-50 border-blue-200'
-                        : 'bg-white border-slate-200'
-                    }`}
+                    onClick={() => {
+                      const info = getRepairClickInfo(repair, disabledRooms);
+                      if (info && onRepairClick) onRepairClick(info);
+                    }}
+                    className="group flex items-center gap-3 px-3.5 py-2.5 rounded-md border border-slate-150 bg-white hover:border-slate-300 hover:bg-slate-50 cursor-pointer transition-colors"
                   >
-                    <div className="flex items-start gap-2">
-                      <Icon
-                        size={14}
-                        className={`mt-0.5 shrink-0 ${
-                          idx === 0 ? 'text-blue-500' : 'text-slate-400'
-                        }`}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono text-slate-400 shrink-0">
-                            #{idx + 1}
-                          </span>
-                          <span
-                            className={`text-sm font-medium ${
-                              idx === 0 ? 'text-blue-900' : 'text-slate-700'
-                            }`}
-                          >
-                            {label}
-                          </span>
-                          {idx === 0 && (
-                            <span className="text-[10px] px-1.5 py-0.5 bg-blue-200 text-blue-800 rounded font-medium">
-                              Best
-                            </span>
-                          )}
-                        </div>
-                        {/* Pool room dropdown for extra-room repairs */}
-                        {needsPoolRoom && (
-                          <div className="mt-1.5">
-                            <select
-                              value={selectedRoom}
-                              onChange={(e) => {
-                                setPoolRoomSelections(prev => ({
-                                  ...prev,
-                                  [repairKey]: e.target.value,
-                                }));
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                              className="w-full text-xs border border-slate-300 rounded px-2 py-1 bg-white text-slate-700 focus:border-blue-400 focus:ring-1 focus:ring-blue-200"
-                            >
-                              <option value="">Select room to add...</option>
-                              {availablePoolRooms.map(room => (
-                                <option key={room} value={room}>{room}</option>
-                              ))}
-                            </select>
-                          </div>
-                        )}
-                        {/* Raw constraint group names */}
-                        {rawConstraints.length > 0 && (
-                          <div className="mt-1 space-y-0.5">
-                            {rawConstraints.map((cg, ci) => (
-                              <div key={ci} className="font-mono text-[10px] text-slate-400 break-all leading-tight">
-                                {cg}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-green-600 font-medium">
-                            +{impactCount} defense{impactCount !== 1 ? 's' : ''}
-                          </span>
-                          {otherDefenses.length > 0 && (
-                            <span className="text-xs text-slate-400">
-                              (also helps {otherDefenses.join(', ')})
-                            </span>
-                          )}
-                        </div>
+                    <Icon
+                      size={18}
+                      className="shrink-0 text-slate-400"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[13px] text-slate-300 font-mono shrink-0">
+                          {idx + 1}
+                        </span>
+                        <span className="text-[16px] font-medium text-slate-700 truncate">
+                          {label}
+                        </span>
                       </div>
-                      <button
-                        onClick={() => onStageRepair(repair, needsPoolRoom ? selectedRoom : undefined)}
-                        disabled={needsPoolRoom && !selectedRoom}
-                        className={`shrink-0 p-1 rounded transition-colors ${
-                          needsPoolRoom && !selectedRoom
-                            ? 'opacity-30 cursor-not-allowed'
-                            : idx === 0
-                              ? 'text-blue-400 hover:text-blue-600 hover:bg-blue-100'
-                              : 'text-slate-300 hover:text-slate-500 hover:bg-slate-100'
-                        }`}
-                        title={needsPoolRoom && !selectedRoom ? 'Select a room first' : 'Stage this repair'}
-                      >
-                        <Plus size={14} />
-                      </button>
+                      {needsPoolRoom && (
+                        <div className="mt-1.5 ml-5">
+                          <select
+                            value={selectedRoom}
+                            onChange={(e) => {
+                              setPoolRoomSelections(prev => ({
+                                ...prev,
+                                [repairKey]: e.target.value,
+                              }));
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="w-full text-[14px] border border-slate-200 rounded-md px-2 py-1.5 bg-white text-slate-600 focus:border-slate-400 focus:ring-1 focus:ring-slate-200 focus:outline-none"
+                          >
+                            <option value="">Select room to add...</option>
+                            {availablePoolRooms.map(room => (
+                              <option key={room} value={room}>{room}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
                     </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Also fire preview when staging
+                        const info = getRepairClickInfo(repair, disabledRooms);
+                        if (info && onRepairClick) onRepairClick(info);
+                        onStageRepair(repair, needsPoolRoom ? selectedRoom : undefined);
+                      }}
+                      disabled={needsPoolRoom && !selectedRoom}
+                      className={`shrink-0 p-1.5 rounded-md transition-all ${
+                        needsPoolRoom && !selectedRoom
+                          ? 'opacity-20 cursor-not-allowed'
+                          : 'text-slate-400 hover:text-blue-600 hover:bg-blue-50'
+                      }`}
+                      title={needsPoolRoom && !selectedRoom ? 'Select a room first' : 'Stage this repair'}
+                    >
+                      <Plus size={16} />
+                    </button>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <div className="text-sm text-slate-500 italic py-2">
+            <div className="text-[16px] text-slate-400 py-4">
               No automatic repairs available. Consider reviewing the schedule manually.
             </div>
           )}

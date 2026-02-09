@@ -8,6 +8,8 @@ export { RelaxationCard } from './RelaxationCard';
 export { StagedChangesPanel } from './StagedChangesPanel';
 export { UpSetVisualization } from './UpSetPlot';
 export { RepairDependencyGraph } from './RepairDependencyGraph';
+export { TabbedLogPanel, ExplanationLogPanel } from './ExplanationLogPanel';
+export type { TabbedLogPanelProps, LogTab } from './ExplanationLogPanel';
 export { useResolutionState } from './useResolutionState';
 export * from './types';
 export * from './transformers';

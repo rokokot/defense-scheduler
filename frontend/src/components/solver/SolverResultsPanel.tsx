@@ -1,5 +1,6 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
-import { Pin, Loader2, FileSearch, User, Building2, FileCheck2 } from 'lucide-react';
+import { Pin, Loader2, User, Building2, FileCheck2 } from 'lucide-react';
+import { CalendarWarning } from '../icons/CalendarWarning';
 import { SolveResult } from '../../types/scheduling';
 import { DefenseBlocking } from '../resolution';
 import type { AppliedResolutionChanges } from './AppliedChangesPanel';
@@ -61,7 +62,6 @@ interface SolverResultsPanelProps {
   hasRichExplanations?: boolean;
   /** Whether a schedule has been loaded (not just available to load) */
   scheduleLoaded?: boolean;
-  onAnalyzeClick?: () => void;
   // Applied changes card props
   appliedChanges?: AppliedResolutionChanges | null;
   appliedChangesOpen?: boolean;
@@ -102,13 +102,18 @@ function CircularProgress({ scheduled, total, status }: CircularProgressProps) {
   const textColor = textColorClasses[status];
   const hasUnscheduled = total > scheduled;
 
+  // Adaptive font size based on digit count
+  const displayLen = String(scheduled).length + String(total).length;
+  const fontSize = displayLen <= 2 ? 16 : displayLen <= 3 ? 14 : displayLen <= 4 ? 12 : displayLen <= 5 ? 11 : 9;
+  const slashSize = Math.round(fontSize * 0.75);
+
   return (
-    <div className="relative h-15 w-15 flex-shrink-0">
-      <svg className="h-16 w-16 -rotate-90" viewBox="0 0 80 80">
+    <div className="relative flex-shrink-0" style={{ height: 50, width: 50 }}>
+      <svg className="-rotate-90" style={{ height: 50, width: 50 }} viewBox="0 0 80 80">
         {/* Background circle */}
         <circle
           className="text-slate-200"
-          strokeWidth="6"
+          strokeWidth="7"
           stroke="currentColor"
           fill="transparent"
           r="36"
@@ -119,7 +124,7 @@ function CircularProgress({ scheduled, total, status }: CircularProgressProps) {
         {hasUnscheduled && (
           <circle
             className="text-orange-400 transition-all duration-500 ease-out"
-            strokeWidth="6"
+            strokeWidth="7"
             stroke="currentColor"
             fill="transparent"
             r="36"
@@ -137,7 +142,7 @@ function CircularProgress({ scheduled, total, status }: CircularProgressProps) {
         {/* Scheduled portion (blue/green based on status) */}
         <circle
           className={`${scheduledColor} transition-all duration-500 ease-out`}
-          strokeWidth="6"
+          strokeWidth="7"
           strokeLinecap="round"
           stroke="currentColor"
           fill="transparent"
@@ -151,13 +156,12 @@ function CircularProgress({ scheduled, total, status }: CircularProgressProps) {
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className={`flex flex-col leading-none ${textColor}`}>
-          <span className="text-sm font-bold">{scheduled}</span>
-          <div className="flex items-center gap-0.5 -mt-0.5 ml-2">
-            <span className="text-[8px]">/</span>
-            <span className="text-sm font-bold">{total}</span>
-          </div>
-        </div>
+        <span
+          className={`font-bold leading-none tabular-nums ${textColor}`}
+          style={{ fontSize }}
+        >
+          {scheduled}<span className="font-medium" style={{ fontSize: slashSize }}>/{total}</span>
+        </span>
       </div>
     </div>
   );
@@ -231,7 +235,8 @@ function AdjacencyCard({
   return (
     <div className="relative">
       <div
-        className={`w-72 rounded-xl border bg-white px-4 py-3 shadow-sm text-left transition-all hover:border-indigo-300 hover:shadow-md ${
+        style={{ width: 218 }}
+        className={`rounded-xl border bg-white px-3 py-2.5 shadow-sm text-left transition-all hover:border-indigo-300 hover:shadow-md ${
           isShowingOptimizedSolution ? 'border-blue-500 border-2' : 'border-slate-200'
         }`}
       >
@@ -387,7 +392,7 @@ interface ExplanationCardProps {
   phase: string | null;
   error: string | null;
   elapsedTime?: number;
-  onAnalyzeClick?: () => void;
+  onOpenResolutionView?: () => void;
 }
 
 function ExplanationCard({
@@ -398,78 +403,51 @@ function ExplanationCard({
   phase,
   error,
   elapsedTime = 0,
-  onAnalyzeClick,
+  onOpenResolutionView,
 }: ExplanationCardProps) {
   // Only show 'complete' if we have rich explanations AND a schedule is actually loaded
   const status = error ? 'error' : isLoading ? 'running' : (hasRichExplanations && scheduleLoaded) ? 'complete' : 'idle';
 
   const statusColors = {
-    idle: { label: 'Conflicts', ring: 'text-amber-500', text: 'text-amber-600', description: 'click to analyze' },
+    idle: { label: `${blockedCount} Conflicts`, ring: 'text-amber-500', text: 'text-amber-600', description: 'click to resolve' },
     running: { label: phase || 'Analyzing', ring: 'text-blue-500', text: 'text-blue-600', description: 'computing explanations...' },
     complete: { label: 'Analyzed', ring: 'text-emerald-500', text: 'text-emerald-600', description: 'MCS repairs available' },
     error: { label: 'Failed', ring: 'text-red-500', text: 'text-red-600', description: error?.slice(0, 25) || 'check logs' },
   };
 
   const config = statusColors[status];
-  const circumference = 2 * Math.PI * 36;
-  const percentage = status === 'complete' ? 100 : status === 'running' ? 50 : (blockedCount > 0 ? 0 : 100);
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   const handleClick = () => {
-    if (onAnalyzeClick && !isLoading) {
-      onAnalyzeClick();
+    if (!isLoading && onOpenResolutionView) {
+      onOpenResolutionView();
     }
   };
+
+  const isClickable = !isLoading && !!onOpenResolutionView;
 
   return (
     <div
       role="button"
-      tabIndex={onAnalyzeClick && !isLoading ? 0 : -1}
+      tabIndex={isClickable ? 0 : -1}
       onClick={handleClick}
       onKeyDown={(e) => {
-        if (onAnalyzeClick && !isLoading && (e.key === 'Enter' || e.key === ' ')) {
+        if (isClickable && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
           handleClick();
         }
       }}
-      className={`flex w-64 items-center gap-3 rounded-xl bg-white px-4 py-2.5 shadow-sm text-left transition-colors border border-slate-200 ${
-        onAnalyzeClick && !isLoading ? 'hover:border-blue-300 hover:shadow-md cursor-pointer' : ''
+      style={{ width: 218 }}
+      className={`flex items-center gap-3 rounded-xl bg-white px-3 py-2 shadow-sm text-left transition-colors border border-slate-200 ${
+        isClickable ? 'hover:border-blue-300 hover:shadow-md cursor-pointer' : ''
       } ${isLoading ? 'opacity-80' : ''}`}
     >
-      {/* Circular indicator - same size as status card */}
-      <div className="relative h-15 w-15 flex-shrink-0">
-        <svg className="h-16 w-16 -rotate-90" viewBox="0 0 80 80">
-          <circle
-            className="text-slate-200"
-            strokeWidth="6"
-            stroke="currentColor"
-            fill="transparent"
-            r="36"
-            cx="40"
-            cy="40"
-          />
-          <circle
-            className={`${config.ring} transition-all duration-500 ease-out ${isLoading ? 'animate-pulse' : ''}`}
-            strokeWidth="6"
-            strokeLinecap="round"
-            stroke="currentColor"
-            fill="transparent"
-            r="36"
-            cx="40"
-            cy="40"
-            style={{
-              strokeDasharray: circumference,
-              strokeDashoffset: isLoading ? circumference * 0.6 : strokeDashoffset,
-            }}
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          {isLoading ? (
-            <Loader2 size={20} className={`animate-spin ${config.text}`} />
-          ) : (
-            <FileSearch size={20} className={config.text} />
-          )}
-        </div>
+      {/* Icon — sized to match ring icons */}
+      <div className="flex-shrink-0 flex items-center justify-center" style={{ height: 50, width: 50 }}>
+        {isLoading ? (
+          <Loader2 size={22} className={`animate-spin ${config.text}`} />
+        ) : (
+          <CalendarWarning size={34} className={config.text} style={{ width: 43, height: 34 }} />
+        )}
       </div>
 
       {/* Status info */}
@@ -529,7 +507,6 @@ export function SolverResultsPanel({
   explanationElapsedTime = 0,
   hasRichExplanations = false,
   scheduleLoaded = false,
-  onAnalyzeClick,
   appliedChanges,
   appliedChangesOpen = false,
   onShowAppliedChanges,
@@ -689,7 +666,6 @@ export function SolverResultsPanel({
 
   const config = statusConfig[status];
   const hasConflicts = currentBlocking.length > 0;
-  const showSeeConflicts = !solverRunning && (status === 'partial' || status === 'failed');
 
   const handleStatusCardClick = () => {
     // Load the first full schedule (original, before optimization)
@@ -788,7 +764,8 @@ export function SolverResultsPanel({
                     handleStatusCardClick();
                   }
                 }}
-                className={`flex w-64 items-center gap-3 rounded-xl bg-white px-4 py-2.5 shadow-sm text-left transition-colors ${
+                style={{ width: 218 }}
+                className={`flex items-center gap-3 rounded-xl bg-white px-3 py-2 shadow-sm text-left transition-colors ${
                   isStatusCardSelected ? 'border-2 border-blue-500' : 'border border-slate-200'
                 } ${
                   isCardClickable ? 'hover:border-blue-300 hover:shadow-md cursor-pointer' : 'opacity-60'
@@ -838,15 +815,16 @@ export function SolverResultsPanel({
                 tabIndex={0}
                 onClick={onShowAppliedChanges}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onShowAppliedChanges?.(); }}
-                className={`flex w-64 items-center gap-3 rounded-xl bg-white px-4 py-2.5 shadow-sm text-left cursor-pointer hover:border-blue-300 hover:shadow-md transition-colors ${
+                style={{ width: 218 }}
+                className={`flex items-center gap-3 rounded-xl bg-white px-3 py-2 shadow-sm text-left cursor-pointer hover:border-blue-300 hover:shadow-md transition-colors ${
                   appliedChangesOpen ? 'border-2 border-blue-500' : 'border border-slate-200'
                 }`}
               >
-                <div className={`relative h-15 w-15 flex-shrink-0`}>
-                  <svg className="h-16 w-16 -rotate-90" viewBox="0 0 80 80">
+                <div className="relative flex-shrink-0" style={{ height: 50, width: 50 }}>
+                  <svg className="-rotate-90" style={{ height: 50, width: 50 }} viewBox="0 0 80 80">
                     <circle
                       className="text-slate-200"
-                      strokeWidth="6"
+                      strokeWidth="7"
                       stroke="currentColor"
                       fill="transparent"
                       r="36"
@@ -855,7 +833,7 @@ export function SolverResultsPanel({
                     />
                     <circle
                       className={`${fullyRepaired ? 'text-emerald-500' : 'text-amber-500'} transition-all duration-500 ease-out`}
-                      strokeWidth="6"
+                      strokeWidth="7"
                       strokeLinecap="round"
                       stroke="currentColor"
                       fill="transparent"
@@ -931,7 +909,7 @@ export function SolverResultsPanel({
               phase={explanationPhase}
               error={explanationError}
               elapsedTime={explanationElapsedTime}
-              onAnalyzeClick={onAnalyzeClick}
+              onOpenResolutionView={onOpenResolutionView}
             />
           )}
         </div>
@@ -966,19 +944,6 @@ export function SolverResultsPanel({
           >
             Logs
           </button>
-          {showSeeConflicts && (
-            <button
-              type="button"
-              onClick={onOpenResolutionView}
-              className={`rounded-full px-5 py-2 text-sm font-semibold shadow-sm transition-colors ${
-                hasConflicts
-                  ? 'bg-amber-500 text-white hover:bg-amber-600'
-                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              See conflicts{hasConflicts ? ` (${currentBlocking.length})` : ''}
-            </button>
-          )}
         </div>
       </div>
 

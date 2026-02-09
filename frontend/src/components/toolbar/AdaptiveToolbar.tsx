@@ -268,7 +268,7 @@ export function AdaptiveToolbar({
           }}
           disabled={isSolving}
           className={`p-2 text-white rounded transition-colors ${
-            isSolving ? 'bg-blue-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700'
+            isSolving ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
           }`}
           title="Solve"
         >
@@ -528,7 +528,7 @@ export function AdaptiveToolbar({
               }}
               disabled={isSolving}
               className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-white rounded transition-colors ${
-                isSolving ? 'bg-blue-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700'
+                isSolving ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
               }`}
               title="Solve schedule"
             >

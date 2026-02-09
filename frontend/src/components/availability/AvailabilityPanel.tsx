@@ -27,6 +27,7 @@ export interface AvailabilityPanelProps {
   isExpanded?: boolean;
   onToggleExpanded?: () => void;
   highlightedPersons?: string[]; // Person IDs to scroll to and highlight
+  accentPersonIds?: string[]; // Person IDs to highlight with yellow accent (repair target)
   highlightedSlot?: { day: string; timeSlot: string }; // Time slot to highlight
   // Multi-roster support
   rosters?: RosterInfo[];
@@ -34,8 +35,7 @@ export interface AvailabilityPanelProps {
   slotConflicts?: Map<string, Conflict[]>;
   scheduledBookings?: Map<string, Map<string, string[]>>;
   workloadStats?: Map<string, { required: number; scheduled: number }>;
-  columnHighlights?: Record<string, Record<string, 'primary' | 'match' | 'near-match'>>;
-  nearMatchMissing?: Record<string, Record<string, string[]>>;
+  columnHighlights?: Record<string, Record<string, 'primary' | 'match'>>;
   programmeColors?: Record<string, string>;
   events?: DefenceEvent[];
   sharedHeight?: number;
@@ -50,6 +50,8 @@ export interface AvailabilityPanelProps {
   onClearFulfilledRequests?: () => void;
   // Bottleneck warnings for persons with insufficient availability
   bottleneckWarnings?: Map<string, { deficit: number; suggestion: string }>;
+  /** Preview slots for repair actions (amber border + clock icon) */
+  repairPreviewSlots?: Set<string>;
 }
 
 export function AvailabilityPanel({
@@ -66,6 +68,7 @@ export function AvailabilityPanel({
   positioning = 'fixed',
   isExpanded: controlledIsExpanded,
   highlightedPersons = [],
+  accentPersonIds,
   highlightedSlot,
   rosters,
   activeRosterId,
@@ -73,7 +76,6 @@ export function AvailabilityPanel({
   scheduledBookings,
   workloadStats,
   columnHighlights,
-  nearMatchMissing,
   programmeColors,
   events,
   sharedHeight,
@@ -87,6 +89,7 @@ export function AvailabilityPanel({
   onClearDeniedRequests,
   onClearFulfilledRequests,
   bottleneckWarnings,
+  repairPreviewSlots,
 }: AvailabilityPanelProps) {
   const [granularity, setGranularity] = useState<ViewGranularity>('day');
   const [roleFilter, setRoleFilter] = useState<PersonRole | 'all'>('all');
@@ -115,22 +118,28 @@ export function AvailabilityPanel({
   }, [sharedHeight, panelHeight]);
 
   // Memoize filtered and sorted availabilities
-  // Highlighted persons appear first, then sorted alphabetically
+  // Accent persons first, then highlighted, then alphabetical
   const filteredAvailabilities = useMemo(() => {
     const filtered = availabilities.filter((person) => roleFilter === 'all' || person.role === roleFilter);
+    const accentSet = new Set(accentPersonIds ?? []);
 
     return filtered.sort((a, b) => {
-      const aHighlighted = highlightedPersons.includes(a.name);
-      const bHighlighted = highlightedPersons.includes(b.name);
+      // Accent persons (repair target) at very top
+      const aAccent = accentSet.has(a.id);
+      const bAccent = accentSet.has(b.id);
+      if (aAccent && !bAccent) return -1;
+      if (!aAccent && bAccent) return 1;
 
-      // Highlighted persons first
+      // Then highlighted persons
+      const aHighlighted = highlightedPersons.includes(a.id);
+      const bHighlighted = highlightedPersons.includes(b.id);
       if (aHighlighted && !bHighlighted) return -1;
       if (!aHighlighted && bHighlighted) return 1;
 
-      // Within same highlight status, sort alphabetically
+      // Within same status, sort alphabetically
       return a.name.localeCompare(b.name);
     });
-  }, [availabilities, roleFilter, highlightedPersons]);
+  }, [availabilities, roleFilter, highlightedPersons, accentPersonIds]);
 
   const positionClasses = positioning === 'fixed'
     ? 'fixed bottom-0 left-0 right-0 z-50'
@@ -241,6 +250,7 @@ export function AvailabilityPanel({
               onSlotEdit={onSlotEdit}
               onDayLockToggle={onDayLockToggle}
               highlightedPersons={highlightedPersons}
+              accentPersonIds={accentPersonIds}
               highlightedSlot={highlightedSlot}
               onGranularityChange={handleGranularityChange}
               roleFilter={roleFilter}
@@ -251,7 +261,6 @@ export function AvailabilityPanel({
               scheduledBookings={scheduledBookings}
               workloadStats={workloadStats}
               columnHighlights={columnHighlights}
-              nearMatchMissing={nearMatchMissing}
               programmeColors={programmeColors}
               events={events}
               showLegend={false}
@@ -262,6 +271,7 @@ export function AvailabilityPanel({
               onClearDeniedRequests={onClearDeniedRequests}
               onClearFulfilledRequests={onClearFulfilledRequests}
               bottleneckWarnings={bottleneckWarnings}
+              repairPreviewSlots={repairPreviewSlots}
             />
           </div>
           <div className="shrink-0 sticky bottom-0 left-0 right-0 px-4 py-3 bg-gray-50 border-t border-gray-100 z-10">

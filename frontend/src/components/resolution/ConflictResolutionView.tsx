@@ -216,6 +216,14 @@ export function ConflictResolutionView({
   onRefetchExplanations,
   explanationLoading,
   mustFixDefenses: mustFixDefensesProp = true,
+  onExplainDefense,
+  singleDefenseExplanations,
+  explainingDefenseId,
+  singleDefenseLogs,
+  singleDefensePhase,
+  singleDefenseError,
+  onRepairClick,
+  onDefenseSelect,
 }: ConflictResolutionViewProps) {
   // Reserved for future use
   void unscheduledDefenseIds;
@@ -318,44 +326,6 @@ export function ConflictResolutionView({
     return filteredBlocking.filter(d => matrixSelection.selectedRows.has(d.defense_id));
   }, [filteredBlocking, matrixSelection.selectedRows]);
 
-  // Calculate which defenses would be unblocked by staged changes
-  const potentiallyScheduled = useMemo(() => {
-    if (state.stagedChanges.length === 0) return [];
-
-    // Collect all resource IDs that would be relaxed
-    const relaxedResourceIds = new Set<string>();
-    for (const staged of state.stagedChanges) {
-      if (staged.relaxation.sourceSetIds) {
-        for (const sid of staged.relaxation.sourceSetIds) {
-          relaxedResourceIds.add(sid);
-        }
-      }
-    }
-
-    // Find defenses whose blocking would be resolved
-    return filteredBlocking.filter(defense => {
-      // Get all blocking resource IDs for this defense
-      const blockingIds = new Set<string>();
-      for (const br of defense.blocking_resources) {
-        if (br.blocked_slots.length > 0) {
-          const colType = mapBlockingTypeToColumnType(br.type);
-          blockingIds.add(`${colType}:${br.resource}`);
-        }
-      }
-
-      // Check if any blocking resource is covered by relaxations
-      for (const bid of blockingIds) {
-        if (relaxedResourceIds.has(bid)) return true;
-        // Also check type-level relaxations
-        const type = bid.split(':')[0];
-        if (relaxedResourceIds.has(`type:${type}`)) return true;
-      }
-      return false;
-    });
-  }, [state.stagedChanges, filteredBlocking]);
-
-  const stagedImpact = potentiallyScheduled.length;
-
   const handleResolve = useCallback(async () => {
     if (state.stagedChanges.length === 0) return;
 
@@ -423,87 +393,85 @@ export function ConflictResolutionView({
   if (!open) return null;
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-white rounded-lg border border-slate-200 m-1 overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0 bg-white m-1 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200 shrink-0">
+      <div className="flex items-center justify-between px-5 py-2.5 border-b border-slate-200 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-amber-600">
-            <AlertTriangle size={16} />
-            <span className="font-semibold text-sm text-slate-900">
-              {summary.totalBlocked} Unscheduled Defense{summary.totalBlocked !== 1 ? 's' : ''}
-            </span>
-          </div>
+          <AlertTriangle size={19} className="text-slate-400" />
+          <h1 className="text-[16px] font-semibold text-slate-800 tracking-tight">
+            {summary.totalBlocked} Unscheduled Defense{summary.totalBlocked !== 1 ? 's' : ''}
+          </h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {/* Simple/Detailed toggle */}
-          <div className="flex items-center bg-slate-200 rounded-lg p-0.5">
+          <div className="flex items-center border border-slate-200 rounded-md overflow-hidden">
             <button
               onClick={() => setDetailLevel('simple')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-[14px] font-medium transition-colors ${
                 detailLevel === 'simple'
-                  ? 'bg-white text-slate-800 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'bg-white text-slate-500 hover:text-slate-700 hover:bg-slate-50'
               }`}
             >
-              <LayoutList size={14} />
+              <LayoutList size={16} />
               Simple
             </button>
             <button
               onClick={() => setDetailLevel('detailed')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-[14px] font-medium transition-colors border-l border-slate-200 ${
                 detailLevel === 'detailed'
-                  ? 'bg-white text-slate-800 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-blue-50 text-blue-700'
+                  : 'bg-white text-slate-500 hover:text-slate-700 hover:bg-slate-50'
               }`}
             >
-              <LayoutGrid size={14} />
+              <LayoutGrid size={16} />
               Detailed
             </button>
           </div>
           <button
             onClick={handleClose}
-            className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-600 rounded-md hover:bg-slate-100 transition-colors"
           >
-            <X size={16} />
+            <X size={19} />
           </button>
         </div>
       </div>
 
       {/* Re-solving banner */}
       {(resolving || externalResolving) && (
-        <div className="px-4 py-2 bg-blue-50 border-b border-blue-200 flex items-center gap-2 shrink-0">
-          <div className="animate-spin h-4 w-4 border-2 border-blue-300 border-t-blue-600 rounded-full" />
-          <span className="text-sm text-blue-700">Re-solving with your changes...</span>
+        <div className="px-5 py-2 bg-slate-50 border-b border-slate-200 flex items-center gap-2.5 shrink-0">
+          <div className="animate-spin h-3.5 w-3.5 border-[1.5px] border-slate-300 border-t-slate-700 rounded-full" />
+          <span className="text-[15px] text-slate-600">Re-solving with your changes...</span>
         </div>
       )}
 
-      {/* Re-analyzing banner (after re-solve, fetching new explanations) */}
+      {/* Re-analyzing banner */}
       {explanationLoading && !resolving && !externalResolving && (
-        <div className="px-4 py-2 bg-amber-50 border-b border-amber-200 flex items-center gap-2 shrink-0">
-          <div className="animate-spin h-4 w-4 border-2 border-amber-300 border-t-amber-600 rounded-full" />
-          <span className="text-sm text-amber-700">Re-analyzing remaining conflicts...</span>
+        <div className="px-5 py-2 bg-slate-50 border-b border-slate-200 flex items-center gap-2.5 shrink-0">
+          <div className="animate-spin h-3.5 w-3.5 border-[1.5px] border-slate-300 border-t-slate-700 rounded-full" />
+          <span className="text-[12px] text-slate-600">Re-analyzing remaining conflicts...</span>
         </div>
       )}
 
-      {/* Success card — replaces content when all conflicts resolved */}
+      {/* Success state */}
       {resolveSuccess ? (
-        <div className="flex-1 flex items-center justify-center bg-gradient-to-b from-green-50 to-white p-8">
-          <div className="text-center max-w-md">
-            <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
-              <CheckCircle2 className="h-9 w-9 text-green-600" />
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="text-center max-w-sm">
+            <div className="mx-auto mb-5 h-14 w-14 rounded-full bg-emerald-50 flex items-center justify-center border border-emerald-200">
+              <CheckCircle2 className="h-7 w-7 text-emerald-600" />
             </div>
-            <h2 className="text-xl font-bold text-slate-900 mb-2">
+            <h2 className="text-lg font-semibold text-slate-900 mb-1.5">
               All Defenses Scheduled
             </h2>
-            <p className="text-sm text-slate-500 mb-6">
-              Your changes resolved all scheduling conflicts. The full schedule is ready to view.
+            <p className="text-[16px] text-slate-500 mb-6 leading-relaxed">
+              Your changes resolved all scheduling conflicts.
             </p>
             <button
               onClick={onReturnToSchedule ?? onClose}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors shadow-sm"
+              className="inline-flex items-center gap-2 px-5 py-2 bg-blue-500 text-white text-[16px] font-medium rounded-md hover:bg-blue-600 transition-colors"
             >
               Return to Schedule
-              <ArrowRight size={16} />
+              <ArrowRight size={18} />
             </button>
           </div>
         </div>
@@ -511,7 +479,6 @@ export function ConflictResolutionView({
 
       /* Content */
       <div className="flex-1 flex min-h-0 overflow-hidden">
-        {/* Simple View - user-friendly problem cards with staging panel */}
         {detailLevel === 'simple' ? (
           <SimpleConflictView
             blocking={filteredBlocking}
@@ -529,11 +496,19 @@ export function ConflictResolutionView({
             mustFixDefenses={mustFixDefenses}
             onMustFixDefensesChange={undefined}
             availablePoolRooms={availablePoolRooms}
+            onExplainDefense={onExplainDefense}
+            singleDefenseExplanations={singleDefenseExplanations}
+            explainingDefenseId={explainingDefenseId}
+            singleDefenseLogs={singleDefenseLogs}
+            singleDefensePhase={singleDefensePhase}
+            singleDefenseError={singleDefenseError}
+            onRepairClick={onRepairClick}
+            onDefenseSelect={onDefenseSelect}
           />
         ) : (
           <>
             {/* Detailed View - Matrix visualization */}
-            <div className="flex-1 flex flex-col min-h-0 p-2">
+            <div className="flex-1 flex flex-col min-h-0 p-3">
               <BlockingMatrixView
                 data={matrixData}
                 selection={matrixSelection}
@@ -543,11 +518,11 @@ export function ConflictResolutionView({
               />
             </div>
 
-            {/* Right: Relaxations and Staged Changes - fixed width */}
-            <div className="w-[450px] shrink-0 flex flex-col bg-slate-50/50 min-h-0 border border-slate-400 rounded-lg m-2">
-              {/* Dependency Graph - shows repair relationships */}
+            {/* Right sidebar */}
+            <div className="w-[380px] shrink-0 flex flex-col min-h-0 border-l border-slate-200 bg-white">
+              {/* Dependency Graph */}
               {hasEnhancedData && perDefenseRepairs && Object.keys(perDefenseRepairs).length > 0 && (
-                <div className="shrink-0 p-3 border-b border-slate-200 max-h-64 overflow-auto">
+                <div className="shrink-0 p-4 border-b border-slate-200 max-h-56 overflow-auto">
                   <RepairDependencyGraph
                     blocking={blocking}
                     perDefenseRepairs={perDefenseRepairs}
@@ -562,21 +537,22 @@ export function ConflictResolutionView({
                 </div>
               )}
 
-              {/* Relaxations */}
+              {/* Repair Options */}
               <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-                <div className="px-3 py-2 border-b border-slate-200 shrink-0">
-                  <div className="text-[10px] font-medium text-slate-500 uppercase tracking-wide">
+                <div className="px-4 py-2.5 border-b border-slate-200 shrink-0">
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
                     Repair Options
-                    {selectedDefenses.length > 0 && (
-                      <span className="ml-1.5 text-blue-600">({selectedDefenses.length} selected)</span>
-                    )}
-                  </div>
+                  </span>
+                  {selectedDefenses.length > 0 && (
+                    <span className="ml-2 text-[11px] text-slate-400">
+                      {selectedDefenses.length} selected
+                    </span>
+                  )}
                 </div>
-                <div className="flex-1 overflow-auto p-3">
+                <div className="flex-1 overflow-auto p-4">
                   {selectedDefenses.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {selectedDefenses.map(defense => {
-                        // Use enhanced repair cards if enhanced data is available
                         const enhancedRepairs = hasEnhancedData && enhancedExplanation?.perDefenseRepairs
                           ? getTransformedRankedRepairs(enhancedExplanation as EnhancedExplanationResponse, defense.defense_id)
                           : [];
@@ -584,7 +560,7 @@ export function ConflictResolutionView({
                         if (enhancedRepairs.length > 0) {
                           return (
                             <div key={defense.defense_id} className="space-y-2">
-                              <div className="text-xs font-medium text-slate-700 truncate">
+                              <div className="text-[12px] font-medium text-slate-700 truncate">
                                 {defense.student}
                               </div>
                               {enhancedRepairs.slice(0, 3).map((repair, idx) => (
@@ -617,15 +593,14 @@ export function ConflictResolutionView({
                                 />
                               ))}
                               {enhancedRepairs.length > 3 && (
-                                <div className="text-[9px] text-slate-400 text-center">
-                                  +{enhancedRepairs.length - 3} more options
+                                <div className="text-[10px] text-slate-400 text-center pt-1">
+                                  +{enhancedRepairs.length - 3} more
                                 </div>
                               )}
                             </div>
                           );
                         }
 
-                        // Fallback to original card when no enhanced data
                         return (
                           <DefenseRelaxationCard
                             key={defense.defense_id}
@@ -639,63 +614,27 @@ export function ConflictResolutionView({
                       })}
                     </div>
                   ) : (
-                    <div className="text-center text-xs text-slate-400 py-6">
-                      <div className="mb-1">Select a defense row to see repair options</div>
-                      <div className="text-[10px]">Shift+click for multiple selection</div>
+                    <div className="text-center py-8">
+                      <div className="text-[12px] text-slate-400 mb-1">Select a defense row</div>
+                      <div className="text-[11px] text-slate-300">Shift+click for multiple</div>
                     </div>
                   )}
                 </div>
               </div>
 
-          {/* Potentially Scheduled */}
-          <div className="border-t border-slate-200 shrink-0">
-            <div className="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
-              <div className="text-[10px] font-medium text-slate-500 uppercase tracking-wide">
-                Conflicts resolved
+              {/* Staged Changes */}
+              <div className="border-t border-slate-200 shrink-0 p-4">
+                <StagedChangesPanel
+                  stagedChanges={state.stagedChanges}
+                  onConfirm={confirmStaged}
+                  onRemove={removeStaged}
+                  onResolve={handleResolve}
+                  resolving={resolving}
+                  mustFixDefenses={mustFixDefenses}
+                  onMustFixDefensesChange={undefined}
+                />
               </div>
-              {stagedImpact > 0 && (
-                <div className="flex items-center gap-1 text-[10px]">
-                  <span className="font-semibold text-green-600">{stagedImpact}</span>
-                  <span className="text-slate-400">/ {summary.totalBlocked} defenses</span>
-                </div>
-              )}
             </div>
-            <div className="max-h-36 overflow-auto p-3">
-              {potentiallyScheduled.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {potentiallyScheduled.map(defense => (
-                    <div
-                      key={defense.defense_id}
-                      className="flex items-center gap-1 px-2 py-1 bg-green-50 rounded border border-green-200"
-                    >
-                      <Check size={10} className="text-green-500 shrink-0" />
-                      <span className="text-[10px] text-green-700 truncate max-w-[120px]">
-                        {defense.student}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center text-[10px] text-slate-400 py-2">
-                  Select relaxations to see which defenses can be scheduled
-                </div>
-              )}
-            </div>
-
-            {/* Staged Changes Panel */}
-            <div className="p-3 bg-white border-t border-slate-100">
-              <StagedChangesPanel
-                stagedChanges={state.stagedChanges}
-                onConfirm={confirmStaged}
-                onRemove={removeStaged}
-                onResolve={handleResolve}
-                resolving={resolving}
-                mustFixDefenses={mustFixDefenses}
-                onMustFixDefensesChange={undefined}
-              />
-            </div>
-          </div>
-        </div>
           </>
         )}
       </div>

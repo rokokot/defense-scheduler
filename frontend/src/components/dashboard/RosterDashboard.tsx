@@ -6,7 +6,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef, useMemo, useCallback, startTransition } from 'react';
 import type { ReactNode } from 'react';
-import { GripHorizontal, X, AlertCircle } from 'lucide-react';
+import { GripHorizontal, AlertCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { monitorForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { extractClosestEdge } from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
@@ -61,10 +61,11 @@ import { API_BASE_URL } from '../../lib/apiConfig';
 import { exportRosterSnapshot } from '../../services/snapshotService';
 import { SolverResultsPanel } from '../solver/SolverResultsPanel';
 import { AppliedChangesPanel } from '../solver/AppliedChangesPanel';
-import { ConflictResolutionView } from '../resolution';
-import type { DefenseBlocking, RelaxCandidate, StagedRelaxation, ResolutionStateSnapshot, ResolveResult, ResolveOptions } from '../resolution/types';
-import { useExplanationApi, useExplanationStream } from '../../hooks/useExplanationApi';
-import type { ExplanationRequest, ExplanationResponse } from '../../types/explanation';
+import { ConflictResolutionView, TabbedLogPanel } from '../resolution';
+import type { LogTab } from '../resolution';
+import type { DefenseBlocking, RelaxCandidate, StagedRelaxation, ResolutionStateSnapshot, ResolveResult, ResolveOptions, RepairClickInfo } from '../resolution/types';
+import { useExplanationApi, useExplanationStream, useSingleDefenseExplanation } from '../../hooks/useExplanationApi';
+import type { ExplanationRequest, ExplanationResponse, ExplainSingleDefenseRequest } from '../../types/explanation';
 
 
 const normalizeName = (name?: string | null) => (name || '').trim().toLowerCase();
@@ -478,7 +479,10 @@ export function RosterDashboard({
   const [dragHighlights, setDragHighlights] = useState<Record<string, Record<string, Record<string, 'match'>>> | null>(null);
   const [roomsExpanded, setRoomsExpanded] = useState(false);
   const [highlightedPersons, setHighlightedPersons] = useState<string[]>([]);
+  const [accentPersonIds, setAccentPersonIds] = useState<string[]>([]);
+  const defenseParticipantIdsRef = useRef<string[]>([]);
   const [highlightedRoomId, setHighlightedRoomId] = useState<string | null>(null);
+  const [repairPreviewSlots, setRepairPreviewSlots] = useState<Set<string>>(new Set());
   const [toolbarPosition, setToolbarPosition] = useState<'top' | 'right'>(
     persistedSnapshot?.uiPreferences?.toolbarPosition ?? 'top'
   );
@@ -517,6 +521,7 @@ export function RosterDashboard({
   const [solverLogStatus, setSolverLogStatus] = useState<'open' | 'error' | 'closed' | null>(null);
   const [solverLogRunId, setSolverLogRunId] = useState<string | null>(null);
   const solverLogSourceRef = useRef<EventSource | null>(null);
+  const [logPanelTab, setLogPanelTab] = useState<LogTab>('solver');
 
   const mapAssignmentsToEvents = useCallback(
     (sourceEvents: DefenceEvent[], assignments: SolveResult['assignments'] = []) => {
@@ -757,8 +762,19 @@ export function RosterDashboard({
 
   const explanationStream = useExplanationStream(undefined, handleExplanationResult);
 
-  // Explanation log panel state (reuses left panel UI)
-  const [explanationLogOpen, setExplanationLogOpen] = useState(false);
+  // Single-defense explanation hook (defense-by-defense flow)
+  const singleDefenseExplanation = useSingleDefenseExplanation();
+
+  // Track whether we're in the iterative resolution cycle (auto re-open after re-solve)
+  const [iterativeResolutionActive, setIterativeResolutionActive] = useState(false);
+
+  // Auto-open log panel on explanation tab when explanation starts streaming
+  useEffect(() => {
+    if (singleDefenseExplanation.explaining) {
+      setSolverLogOpen(true);
+      setLogPanelTab('explanation');
+    }
+  }, [singleDefenseExplanation.explaining]);
   const [explanationStartedAt, setExplanationStartedAt] = useState<number | null>(null);
   const [explanationElapsedSeconds, setExplanationElapsedSeconds] = useState(0);
   const explanationProgressInterval = useRef<NodeJS.Timeout | null>(null);
@@ -1224,7 +1240,7 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   type ScheduleColumnHighlight = 'primary' | 'match';
-  type AvailabilityColumnHighlight = ScheduleColumnHighlight | 'near-match';
+  type AvailabilityColumnHighlight = ScheduleColumnHighlight;
 
   const resolveHighlightedRoomId = useCallback((room: unknown) => {
     const label = resolveRoomName(room).trim();
@@ -1247,10 +1263,9 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
   const highlightInfo = useMemo(() => {
     const scheduleHighlights: Record<string, Record<string, ScheduleColumnHighlight>> = {};
     const availabilityHighlights: Record<string, Record<string, AvailabilityColumnHighlight>> = {};
-    const nearMatchMissing: Record<string, Record<string, string[]>> = {};
 
     if (highlightedPersons.length === 0) {
-      return { scheduleHighlights, availabilityHighlights, nearMatchMissing };
+      return { scheduleHighlights, availabilityHighlights };
     }
 
     const targetEvent = selectedEvent ? events.find(e => e.id === selectedEvent) : undefined;
@@ -1265,7 +1280,7 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     }
 
     if (persons.length === 0) {
-      return { scheduleHighlights, availabilityHighlights, nearMatchMissing };
+      return { scheduleHighlights, availabilityHighlights };
     }
 
     const highlightedNameSet = new Set(
@@ -1330,52 +1345,14 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
           availabilityHighlights[day][slot] = 'match';
         }
       });
-      return { scheduleHighlights, availabilityHighlights, nearMatchMissing };
+      return { scheduleHighlights, availabilityHighlights };
     }
 
-    const candidates: Array<{
-      day: string;
-      slot: string;
-      missingIds: string[];
-      missingCount: number;
-      dayIndex: number;
-      slotIndex: number;
-    }> = [];
-
-    days.forEach((day, dayIndex) => {
-      timeSlots.forEach((slot, slotIndex) => {
-        const missingIds = persons
-          .filter(person => getStatus(person, day, slot) !== 'available')
-          .map(person => person.id);
-        const missingCount = missingIds.length;
-        if (missingCount >= 1 && missingCount <= 2) {
-          candidates.push({ day, slot, missingIds, missingCount, dayIndex, slotIndex });
-        }
-      });
-    });
-
-    candidates
-      .sort((a, b) => a.missingCount - b.missingCount || a.dayIndex - b.dayIndex || a.slotIndex - b.slotIndex)
-      .slice(0, 3)
-      .forEach(({ day, slot, missingIds }) => {
-        if (!availabilityHighlights[day]) {
-          availabilityHighlights[day] = {};
-        }
-        if (!availabilityHighlights[day][slot]) {
-          availabilityHighlights[day][slot] = 'near-match';
-        }
-        if (!nearMatchMissing[day]) {
-          nearMatchMissing[day] = {};
-        }
-        nearMatchMissing[day][slot] = missingIds;
-      });
-
-    return { scheduleHighlights, availabilityHighlights, nearMatchMissing };
+    return { scheduleHighlights, availabilityHighlights };
   }, [selectedEvent, highlightedPersons, events, availabilities, days, timeSlots]);
 
   const scheduleColumnHighlights = highlightInfo.scheduleHighlights;
   const availabilityColumnHighlights = highlightInfo.availabilityHighlights;
-  const availabilityNearMatchMissing = highlightInfo.nearMatchMissing;
   const hasColumnHighlighting = useMemo(
     () =>
       Object.values(scheduleColumnHighlights).some(dayMap => dayMap && Object.keys(dayMap).length > 0),
@@ -1400,18 +1377,28 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     }
   }, [events, partialScheduleNotice]);
 
-  // Auto-open conflict resolution view when a partial solve is detected
+  // Reset auto-open flag when all defenses are scheduled
   useEffect(() => {
-    if (partialScheduleNotice && partialScheduleNotice.unscheduled > 0) {
-      if (!autoOpenedForSolveRef.current) {
-        autoOpenedForSolveRef.current = true;
-        setShowResolutionView(true);
-      }
-    } else {
-      // Reset when all defenses are scheduled (or no partial notice)
+    if (!partialScheduleNotice || partialScheduleNotice.unscheduled === 0) {
       autoOpenedForSolveRef.current = false;
     }
   }, [partialScheduleNotice]);
+
+  // Iterative resolution: auto re-open resolution view after re-solve if still unplanned
+  useEffect(() => {
+    if (!iterativeResolutionActive || solverRunning) return;
+
+    const unplannedCount = events.filter(e => !e.day || !e.startTime).length;
+    if (unplannedCount > 0 && !showResolutionView) {
+      // Re-open the resolution view for the next iteration
+      setShowResolutionView(true);
+      // Clear stale per-defense explanations from previous cycle
+      singleDefenseExplanation.clearExplanations();
+    } else if (unplannedCount === 0 && iterativeResolutionActive) {
+      // All defenses scheduled — exit iterative mode
+      setIterativeResolutionActive(false);
+    }
+  }, [iterativeResolutionActive, solverRunning, events, showResolutionView, singleDefenseExplanation]);
 
   // Patch active roster with latest availabilities/state before persisting.
   // The roster sync effect is debounced (100ms), so rosters may be stale when
@@ -2158,25 +2145,47 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     // Track start time for elapsed display
     setExplanationStartedAt(Date.now());
     setExplanationElapsedSeconds(0);
-    // Open the log panel to show progress
-    setExplanationLogOpen(true);
     // Use streaming hook for real-time progress feedback
     explanationStream.startStream(request);
   }, [currentDatasetId, events, explanationSessionId, explanationStream, logger, solverOutputFolder]);
 
-  // Combined handler: open resolution view AND auto-trigger analysis if no data yet
+  // Open resolution view — shows unplanned defense list immediately (no auto-trigger of batch explanations)
   const handleOpenResolutionView = useCallback(() => {
     if (showResolutionView) {
       // Toggle off if already open
       setShowResolutionView(false);
+      setIterativeResolutionActive(false);
       return;
     }
     setShowResolutionView(true);
-    // Auto-trigger explanation fetch if no enhanced data yet
-    if (!enhancedExplanation && !explanationStream.streaming) {
-      handleFetchExplanations();
-    }
-  }, [showResolutionView, enhancedExplanation, explanationStream.streaming, handleFetchExplanations]);
+    setIterativeResolutionActive(true);
+    // Clear stale per-defense explanations from previous cycle
+    singleDefenseExplanation.clearExplanations();
+  }, [showResolutionView, singleDefenseExplanation]);
+
+  // Handler: explain a single defense (called when user clicks a defense in the resolution view)
+  const handleExplainSingleDefense = useCallback((defenseId: number) => {
+    if (!currentDatasetId) return;
+
+    const plannedDefenseIds = events
+      .filter(e => e.day && e.startTime)
+      .map(e => extractDefenseIndex(String(e.id)))
+      .filter(id => !isNaN(id));
+
+    const request: ExplainSingleDefenseRequest = {
+      session_id: explanationSessionId,
+      dataset_id: currentDatasetId,
+      defense_id: defenseId,
+      planned_defense_ids: plannedDefenseIds,
+      must_fix_defenses: mustFixDefenses && plannedDefenseIds.length > 0,
+      solver_output_folder: solverOutputFolder,
+      max_mcs: 50,
+      mcs_timeout_sec: 30.0,
+    };
+
+    logger.info('Explaining single defense', { defenseId, datasetId: currentDatasetId });
+    singleDefenseExplanation.explainDefense(request);
+  }, [currentDatasetId, events, explanationSessionId, mustFixDefenses, solverOutputFolder, singleDefenseExplanation, logger]);
 
   // Use ref to store the fetchBottlenecks function to avoid dependency cycles
   const fetchBottlenecksRef = useRef(explanationApi.fetchBottlenecks);
@@ -2581,8 +2590,11 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
     // 4. Clear stale explanation data
     setEnhancedExplanation(undefined);
     setHasRichExplanations(false);
+    // Clear per-defense explanation cache (solver state changed, all explanations are stale)
+    singleDefenseExplanation.clearExplanations();
 
     // 5. Close conflict resolution view — solver panel will take over
+    //    (iterativeResolutionActive will re-open it after re-solve if still unplanned)
     setShowResolutionView(false);
     setResolutionResolving(false);
     // Clear persisted staged changes since they've been applied
@@ -2754,6 +2766,8 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
 
   const handleClearDeniedRequests = useCallback(() => {
     setAvailabilityRequests(prev => prev.filter(req => req.status !== 'denied'));
+    setHighlightedPersons([]);
+    setAccentPersonIds([]);
     showToast.success('Cleared denied availability requests');
     setTimeout(() => {
       const result = persistNowRef.current();
@@ -2763,6 +2777,8 @@ const [roomAvailabilityState, setRoomAvailabilityState] = useState<RoomAvailabil
 
   const handleClearFulfilledRequests = useCallback(() => {
     setAvailabilityRequests(prev => prev.filter(req => req.status !== 'fulfilled'));
+    setHighlightedPersons([]);
+    setAccentPersonIds([]);
     showToast.success('Cleared fulfilled availability requests');
     setTimeout(() => {
       const result = persistNowRef.current();
@@ -4562,7 +4578,6 @@ const prevRosterSyncRef = useRef<{
   const handleShowAppliedChanges = useCallback(() => {
     setAppliedChangesOpen(true);
     setSolverLogOpen(false);
-    setExplanationLogOpen(false);
   }, []);
 
   const handleCopyAppliedChanges = useCallback(() => {
@@ -4673,6 +4688,99 @@ const prevRosterSyncRef = useRef<{
       }
     },
     [resolvedRoomOptions, handleRoomToggle, logger]
+  );
+
+  // Navigate to availability/rooms panel when clicking a repair card or blocking constraint
+  const handleRepairCardClick = useCallback(
+    (info: RepairClickInfo) => {
+      if (info.type === 'person' && info.personNames && info.personNames.length > 0) {
+        // Switch to availability tab and highlight matching persons
+        setBottomPanelTab('availability');
+        setAvailabilityExpanded(true);
+        setRoomsExpanded(false);
+        const nameSet = new Set(info.personNames.map(n => normalizeName(n)));
+        const personIds = availabilities
+          .filter(p => nameSet.has(normalizeName(p.name)))
+          .map(p => p.id);
+        setAccentPersonIds(personIds);
+
+        // Re-assert defense participants as highlighted (ensures they stay visible)
+        if (defenseParticipantIdsRef.current.length > 0) {
+          setHighlightedPersons(defenseParticipantIdsRef.current);
+        }
+
+        // Set repair preview slots (amber border + clock icon on specific time slots)
+        if (info.slots && info.slots.length > 0) {
+          const previewSet = new Set<string>();
+          for (const slot of info.slots) {
+            const person = availabilities.find(p => normalizeName(p.name) === normalizeName(slot.personName));
+            if (person) {
+              previewSet.add(`${person.id}:${slot.day}:${slot.timeSlot}`);
+            }
+          }
+          setRepairPreviewSlots(previewSet);
+        } else {
+          setRepairPreviewSlots(new Set());
+        }
+      } else if (info.type === 'room') {
+        // Switch to rooms tab and highlight matching room
+        setBottomPanelTab('rooms');
+        setRoomsExpanded(true);
+        setAvailabilityExpanded(false);
+        const roomId = info.roomId
+          ? info.roomId
+          : resolveHighlightedRoomId(info.roomName);
+        setHighlightedRoomId(roomId);
+        setRepairPreviewSlots(new Set());
+      }
+    },
+    [availabilities, resolveHighlightedRoomId]
+  );
+
+  // Highlight all participants when a defense is selected in resolution view
+  const handleDefenseSelectInResolution = useCallback(
+    (defenseId: number, blockingPersonNames: string[]) => {
+      // Find the event matching this defense_id (0-based solver index → 1-based event ID)
+      const event = events.find(e => e.id === `def-${defenseId + 1}`);
+      if (!event) return;
+
+      // Get all participant names for this defense
+      const allParticipants = getEventParticipants(event);
+
+      // Build ordered list: warnings first, then blocking, then remaining
+      const blockingSet = new Set(blockingPersonNames.map(n => normalizeName(n)));
+      const warningNames: string[] = [];
+      const blockingNames: string[] = [];
+      const otherNames: string[] = [];
+      for (const name of allParticipants) {
+        const hasWarning = bottleneckWarnings.has(normalizeName(name));
+        const isBlocking = blockingSet.has(normalizeName(name));
+        if (hasWarning) {
+          warningNames.push(name);
+        } else if (isBlocking) {
+          blockingNames.push(name);
+        } else {
+          otherNames.push(name);
+        }
+      }
+      const orderedNames = [...warningNames, ...blockingNames, ...otherNames];
+
+      // Resolve to person IDs, preserving order
+      const orderedIds: string[] = [];
+      for (const name of orderedNames) {
+        const person = availabilities.find(p => normalizeName(p.name) === normalizeName(name));
+        if (person) orderedIds.push(person.id);
+      }
+
+      defenseParticipantIdsRef.current = orderedIds;
+      setHighlightedPersons(orderedIds);
+      setAccentPersonIds([]); // Clear repair accent
+      setRepairPreviewSlots(new Set()); // Clear any repair preview
+      setBottomPanelTab('availability');
+      setAvailabilityExpanded(true);
+      setRoomsExpanded(false);
+    },
+    [events, availabilities, getEventParticipants, bottleneckWarnings]
   );
 
   const handleRoomAdd = useCallback(
@@ -4839,6 +4947,10 @@ const prevRosterSyncRef = useRef<{
     });
 
     setSelectedEvents(new Set());
+    setHighlightedPersons([]);
+    setAccentPersonIds([]);
+    setHighlightedSlot(null);
+    setHighlightedEventId(undefined);
     showToast.success(`Unscheduled ${selectedEvents.size} defense(s)`);
   };
 
@@ -4872,6 +4984,16 @@ const prevRosterSyncRef = useRef<{
     setCancellingSolverRun(false);
     setCancelledPhase(null);
 
+    // 2b. Clear conflict resolution view and all repair/request state
+    setShowResolutionView(false);
+    setCurrentBlocking([]);
+    setRelaxCandidates([]);
+    setPersistedStagedChanges([]);
+    setRepairPreviewSlots(new Set());
+    setAvailabilityRequests([]);
+    setEnhancedExplanation(undefined);
+    setHasRichExplanations(false);
+
     // 3. Unassign all defenses
     const unscheduledEvents = currentState.events.map(clearSchedulingFields);
     const action: ScheduleAction = {
@@ -4885,6 +5007,10 @@ const prevRosterSyncRef = useRef<{
       events: unscheduledEvents,
     });
     setSelectedEvents(new Set());
+    setHighlightedPersons([]);
+    setAccentPersonIds([]);
+    setHighlightedSlot(null);
+    setHighlightedEventId(undefined);
     showToast.success('All defenses were unscheduled');
   };
 
@@ -5651,96 +5777,25 @@ const prevRosterSyncRef = useRef<{
           .filter(id => !isNaN(id))
       );
 
-      // Show streaming progress when no blocking data yet
-      if (currentBlocking.length === 0) {
-        const scheduledCount = events.filter(e => e.day && e.startTime).length;
-        return (
-          <div className="flex-1 overflow-auto bg-slate-50 p-4">
-            <div className="bg-white rounded-lg border border-slate-200 p-8 text-center max-w-lg mx-auto">
-              {explanationStream.streaming ? (
-                // Streaming in progress — show real-time progress
-                <>
-                  <div className="animate-spin h-10 w-10 border-3 border-blue-200 border-t-blue-600 rounded-full mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                    Analyzing Conflicts...
-                  </h3>
-                  <p className="text-sm text-slate-500 mb-4">
-                    {explanationStream.currentPhase || 'Initializing analysis'}
-                    {explanationElapsedSeconds > 0 && ` (${explanationElapsedSeconds}s)`}
-                  </p>
-                  {/* Show recent log lines */}
-                  <div className="text-left bg-slate-50 rounded-lg p-3 max-h-48 overflow-auto text-xs font-mono text-slate-600 space-y-0.5">
-                    {explanationStream.logs.slice(-10).map((log, i) => (
-                      <div key={i} className="truncate">
-                        {typeof log.data === 'object' && 'line' in log.data
-                          ? String(log.data.line)
-                          : typeof log.data === 'object' && 'message' in log.data
-                          ? String(log.data.message)
-                          : JSON.stringify(log.data)}
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => setShowResolutionView(false)}
-                    className="mt-4 px-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
-                  >
-                    Return to Schedule
-                  </button>
-                </>
-              ) : explanationStream.error ? (
-                // Error state — show error with retry
-                <>
-                  <AlertCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                    Analysis Failed
-                  </h3>
-                  <p className="text-sm text-red-600 mb-4">{explanationStream.error}</p>
-                  <div className="flex gap-3 justify-center">
-                    <button
-                      onClick={handleFetchExplanations}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Retry Analysis
-                    </button>
-                    <button
-                      onClick={() => setShowResolutionView(false)}
-                      className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
-                    >
-                      Return to Schedule
-                    </button>
-                  </div>
-                </>
-              ) : (
-                // Initial state — analysis should auto-start (handleOpenResolutionView triggers it)
-                <>
-                  <div className="animate-spin h-10 w-10 border-3 border-slate-200 border-t-slate-600 rounded-full mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                    Starting Analysis...
-                  </h3>
-                  <p className="text-sm text-slate-500 mb-2">
-                    {unscheduledIds.size} defense{unscheduledIds.size !== 1 ? 's' : ''} could not be scheduled
-                    {scheduledCount > 0 ? ` (${scheduledCount} scheduled successfully)` : ''}
-                  </p>
-                  <p className="text-xs text-slate-400">Computing explanations and repair options</p>
-                  <button
-                    onClick={() => setShowResolutionView(false)}
-                    className="mt-4 px-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
-                  >
-                    Return to Schedule
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        );
-      }
+      // Build minimal blocking list from unplanned events (no explanation data needed)
+      // Use currentBlocking if available (from batch explanation), otherwise build from events
+      const blockingForView: DefenseBlocking[] = currentBlocking.length > 0
+        ? currentBlocking
+        : events
+            .filter(e => !e.day || !e.startTime)
+            .map(e => ({
+              defense_id: extractDefenseIndex(String(e.id)),
+              student: (e as DefenceEvent & { title?: string }).title || String(e.id),
+              blocking_resources: [],
+            }))
+            .filter(d => !isNaN(d.defense_id));
 
       return (
         <div className="flex-1 flex flex-col overflow-auto bg-slate-50 p-2">
           <ConflictResolutionView
             open={true}
-            onClose={() => setShowResolutionView(false)}
-            blocking={currentBlocking}
+            onClose={() => { setShowResolutionView(false); setIterativeResolutionActive(false); }}
+            blocking={blockingForView}
             relaxCandidates={relaxCandidates}
             timeslotInfo={timeslotInfo}
             unscheduledDefenseIds={unscheduledIds}
@@ -5760,6 +5815,14 @@ const prevRosterSyncRef = useRef<{
             onRefetchExplanations={handleFetchExplanations}
             explanationLoading={explanationStream.streaming}
             mustFixDefenses={mustFixDefenses}
+            onExplainDefense={handleExplainSingleDefense}
+            singleDefenseExplanations={singleDefenseExplanation.explanationsByDefense}
+            explainingDefenseId={singleDefenseExplanation.explaining ? singleDefenseExplanation.currentDefenseId : null}
+            singleDefenseLogs={singleDefenseExplanation.logs}
+            singleDefensePhase={singleDefenseExplanation.currentPhase}
+            singleDefenseError={singleDefenseExplanation.error}
+            onRepairClick={handleRepairCardClick}
+            onDefenseSelect={handleDefenseSelectInResolution}
           />
         </div>
       );
@@ -6227,139 +6290,37 @@ const prevRosterSyncRef = useRef<{
       case 'schedule':
         return (
           <div className="flex-1 flex overflow-hidden">
-              {/* Solver Log Panel */}
+              {/* Tabbed Log Panel (Solver / Explanation) */}
               {solverLogOpen && (
-                <div className="w-[360px] flex-shrink-0 border-r border-slate-200 bg-white">
-                  <div className="flex h-full flex-col">
-                  <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-                    <div>
-                      <div className="text-sm font-semibold text-slate-900">Solver log</div>
-                      <div className="text-xs text-slate-500">
-                        {solverLogRunId ? `Run ${solverLogRunId.slice(0, 8)}` : 'No run selected'}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {solverLogStatus === 'error' && (
-                        <button
-                          type="button"
-                          onClick={() => openSolverLogStreamFor(solverLogRunId)}
-                          className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 transition hover:bg-slate-200"
-                        >
-                          Reconnect
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSolverLogOpen(false);
-                          setSolverLogLines([]);
-                          setSolverLogStatus(null);
-                        }}
-                        className="rounded-full p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
-                        aria-label="Close solver log"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                    <div className="flex items-center justify-between border-b border-slate-200 px-4 py-2 text-xs text-slate-500">
-                      <span>
-                        {solverLogStatus === 'open'
-                          ? 'Live'
-                          : solverLogStatus === 'error'
-                            ? 'Disconnected'
-                            : solverLogStatus === 'closed'
-                              ? 'Closed'
-                              : 'Idle'}
-                      </span>
-                      <span>{solverLogLines.length} lines</span>
-                    </div>
-                    <div className="flex-1 overflow-auto bg-slate-950">
-                      <pre className="whitespace-pre-wrap break-words px-4 py-3 text-[11px] leading-relaxed text-slate-100">
-                        {solverLogLines.length > 0 ? solverLogLines.join('\n') : 'Waiting for solver logs...'}
-                      </pre>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Explanation Log Panel */}
-              {explanationLogOpen && !solverLogOpen && (
-                <div className="w-[360px] flex-shrink-0 border-r border-slate-200 bg-white">
-                  <div className="flex h-full flex-col">
-                    <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-                      <div>
-                        <div className="text-sm font-semibold text-slate-900">Explanation log</div>
-                        <div className="text-xs text-slate-500">
-                          {explanationStream.currentPhase || 'Conflict analysis'}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setExplanationLogOpen(false);
-                            explanationStream.clearLogs();
-                          }}
-                          className="rounded-full p-1 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
-                          aria-label="Close explanation log"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between border-b border-slate-200 px-4 py-2 text-xs text-slate-500">
-                      <span>
-                        {explanationStream.streaming
-                          ? 'Live'
-                          : explanationStream.error
-                            ? 'Error'
-                            : explanationStream.result
-                              ? 'Complete'
-                              : 'Idle'}
-                      </span>
-                      <span>{explanationStream.logs.length} events</span>
-                    </div>
-                    <div className="flex-1 overflow-auto bg-slate-950">
-                      <pre className="whitespace-pre-wrap break-words px-4 py-3 text-[11px] leading-relaxed text-slate-100">
-                        {explanationStream.logs.length > 0
-                          ? explanationStream.logs.map((event, idx) => {
-                              const line = event.type === 'phase'
-                                ? `▶ ${event.data.phase}: ${event.data.message}`
-                                : event.type === 'log'
-                                ? `  ${event.data.line || JSON.stringify(event.data)}`
-                                : event.type === 'error'
-                                ? `✗ ERROR: ${event.data.message}`
-                                : event.type === 'result'
-                                ? `✓ Analysis complete`
-                                : JSON.stringify(event.data);
-                              return (
-                                <span
-                                  key={idx}
-                                  className={
-                                    event.type === 'phase' ? 'text-blue-400 font-semibold' :
-                                    event.type === 'error' ? 'text-red-400' :
-                                    event.type === 'result' ? 'text-green-400' :
-                                    'text-slate-400'
-                                  }
-                                >
-                                  {line}
-                                  {'\n'}
-                                </span>
-                              );
-                            })
-                          : 'Waiting for explanation logs...'}
-                        {explanationStream.error && (
-                          <span className="text-red-400">{'\n'}Error: {explanationStream.error}</span>
-                        )}
-                      </pre>
-                    </div>
-                  </div>
+                <div className="w-[360px] flex-shrink-0 border-r border-slate-200">
+                  <TabbedLogPanel
+                    activeTab={logPanelTab}
+                    onTabChange={setLogPanelTab}
+                    solverLogLines={solverLogLines}
+                    solverLogStatus={solverLogStatus}
+                    solverRunning={solverRunning}
+                    solverLogRunId={solverLogRunId}
+                    onReconnectSolver={() => openSolverLogStreamFor(solverLogRunId)}
+                    explanationStreaming={singleDefenseExplanation.explaining}
+                    explanationLogs={singleDefenseExplanation.logs}
+                    explanationPhase={singleDefenseExplanation.currentPhase}
+                    explanationError={singleDefenseExplanation.error}
+                    onRetryExplanation={
+                      singleDefenseExplanation.error && singleDefenseExplanation.currentDefenseId != null
+                        ? () => handleExplainSingleDefense(singleDefenseExplanation.currentDefenseId!)
+                        : undefined
+                    }
+                    onClose={() => {
+                      setSolverLogOpen(false);
+                      setSolverLogLines([]);
+                      setSolverLogStatus(null);
+                    }}
+                  />
                 </div>
               )}
 
               {/* Applied Changes Panel */}
-              {appliedChangesOpen && appliedChanges && !solverLogOpen && !explanationLogOpen && (
+              {appliedChangesOpen && appliedChanges && !solverLogOpen && (
                 <div className="w-[360px] flex-shrink-0 border-r border-slate-200">
                   <AppliedChangesPanel
                     changes={appliedChanges}
@@ -6523,12 +6484,13 @@ const prevRosterSyncRef = useRef<{
                       bestLiveAdjacency={bestLiveAdjacency}
                       onDismiss={handleDismissSolverPanel}
                       onOpenLogs={() => {
-                        if (solverLogOpen) {
+                        if (solverLogOpen && logPanelTab === 'solver') {
                           setSolverLogOpen(false);
                           setSolverLogLines([]);
                           setSolverLogStatus(null);
                         } else {
                           setSolverLogOpen(true);
+                          setLogPanelTab('solver');
                           openSolverLogStreamFor(solverLogRunId);
                         }
                       }}
@@ -6546,7 +6508,6 @@ const prevRosterSyncRef = useRef<{
                       explanationElapsedTime={explanationElapsedSeconds}
                       hasRichExplanations={hasRichExplanations}
                       scheduleLoaded={selectedStreamSolutionId !== null}
-                      onAnalyzeClick={handleFetchExplanations}
                       appliedChanges={appliedChanges}
                       appliedChangesOpen={appliedChangesOpen}
                       onShowAppliedChanges={handleShowAppliedChanges}
@@ -6749,7 +6710,7 @@ const prevRosterSyncRef = useRef<{
 
       {/* Bottom panel with tabs */}
       <div
-        className="relative border-t border-gray-200 bg-white flex flex-col"
+        className="relative border-t-2 border-slate-300 bg-white flex flex-col shadow-[0_-2px_6px_rgba(0,0,0,0.06)]"
         style={{
           pointerEvents: overlayActive ? 'none' : 'auto',
           maxHeight: '60vh'
@@ -6846,6 +6807,7 @@ const prevRosterSyncRef = useRef<{
             isExpanded={availabilityExpanded}
             onToggleExpanded={() => setAvailabilityExpanded(!availabilityExpanded)}
             highlightedPersons={availabilityPanelHighlights}
+            accentPersonIds={accentPersonIds}
             highlightedSlot={highlightedSlot || undefined}
             rosters={availabilityRosters}
             activeRosterId={activeRosterId}
@@ -6853,7 +6815,6 @@ const prevRosterSyncRef = useRef<{
             scheduledBookings={scheduledBookings}
             workloadStats={participantWorkload}
             columnHighlights={availabilityColumnHighlights}
-            nearMatchMissing={availabilityNearMatchMissing}
             programmeColors={colorScheme}
             events={events}
             sharedHeight={sharedPanelHeight}
@@ -6871,6 +6832,7 @@ const prevRosterSyncRef = useRef<{
             onClearDeniedRequests={handleClearDeniedRequests}
             onClearFulfilledRequests={handleClearFulfilledRequests}
             bottleneckWarnings={bottleneckWarnings}
+            repairPreviewSlots={repairPreviewSlots}
           />
         </div>
 
@@ -6974,6 +6936,8 @@ const prevRosterSyncRef = useRef<{
                 : undefined
             }
             hideInternalHandle={bottomPanelTab === 'conflicts' && conflictsExpanded}
+            events={events}
+            blocking={currentBlocking}
           />
           )}
         </div>

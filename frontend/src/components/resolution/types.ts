@@ -95,6 +95,22 @@ export interface UpSetData {
 export type AggregationLevel = 'type' | 'resource';
 
 // ============================================================================
+// Repair Card Navigation
+// ============================================================================
+
+export interface RepairClickInfo {
+  type: 'person' | 'room';
+  /** Person names extracted from person-unavailable constraint groups */
+  personNames?: string[];
+  /** Room name extracted from enable-room / room-unavailable constraint groups */
+  roomName?: string;
+  /** Room ID if available (from DisabledRoom match) */
+  roomId?: string;
+  /** Specific time slots from the constraint groups (for availability preview) */
+  slots?: Array<{ personName: string; day: string; timeSlot: string }>;
+}
+
+// ============================================================================
 // Relaxation Actions
 // ============================================================================
 
@@ -247,6 +263,22 @@ export interface ConflictResolutionViewProps {
   explanationLoading?: boolean;
   /** Global toggle: keep planned defenses in their assigned slots during re-solve */
   mustFixDefenses?: boolean;
+  /** Callback to explain a single defense (defense-by-defense flow) */
+  onExplainDefense?: (defenseId: number) => void;
+  /** Per-defense cached explanation results */
+  singleDefenseExplanations?: Map<number, import('../../hooks/useExplanationApi').SingleDefenseExplanationData>;
+  /** Which defense is currently being explained (null if not explaining) */
+  explainingDefenseId?: number | null;
+  /** Streaming logs for the current single-defense explanation */
+  singleDefenseLogs?: import('../../hooks/useExplanationApi').ExplanationLogEvent[];
+  /** Current phase of single-defense explanation streaming */
+  singleDefensePhase?: string | null;
+  /** Error from single-defense explanation */
+  singleDefenseError?: string | null;
+  /** Callback when user clicks a repair card to navigate to availability/rooms panel */
+  onRepairClick?: (info: RepairClickInfo) => void;
+  /** Callback when user selects a defense in the sidebar */
+  onDefenseSelect?: (defenseId: number, blockingPersonNames: string[]) => void;
 }
 
 export interface TimeslotInfo {

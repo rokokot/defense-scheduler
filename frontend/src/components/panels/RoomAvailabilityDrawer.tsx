@@ -334,13 +334,13 @@ export const RoomAvailabilityDrawer = memo(function RoomAvailabilityDrawer({
                   className={clsx(
                     'text-base',
                     room.enabled === false && 'opacity-60',
-                    isHighlightedRoom ? 'bg-blue-50/60' : 'odd:bg-white even:bg-gray-50/60'
+                    isHighlightedRoom ? 'bg-amber-100' : 'odd:bg-white even:bg-gray-50/60'
                   )}
                 >
                   <td
                     className={clsx(
                       'sticky left-0 z-30 border-r-2 border-gray-300 px-4 py-3 w-[440px]',
-                      isHighlightedRoom ? 'bg-blue-50/60' : 'bg-white'
+                      isHighlightedRoom ? 'bg-amber-100' : 'bg-white'
                     )}
                     style={{
                       minWidth: '160px',
